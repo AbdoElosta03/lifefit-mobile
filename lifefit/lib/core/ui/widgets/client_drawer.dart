@@ -3,7 +3,7 @@ import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
 import '../../../features/client/experts/experts_screen.dart';
 import '../../../features/client/chats/chats_screen.dart';
-import '../../../features/client/health_profile/health_profile_screen.dart';
+import '../../../features/client/profile/profile_screen.dart';
 import '../../../features/client/Subscriptions/subscriptions_screen.dart';
 class ClientDrawer extends StatelessWidget {
   const ClientDrawer({super.key});
@@ -58,11 +58,11 @@ class ClientDrawer extends StatelessWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 8),
               children: [
-                _buildDrawerItem(context, Icons.add_moderator_rounded, 'الملف الصحي', () {
+                _buildDrawerItem(context, Icons.add_moderator_rounded, 'الملف الشخصي', () {
                   Navigator.pop(context); // إغلاق الدرواير
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const HealthProfileScreen()),
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
                   );
                 }),
                 _buildDrawerItem(context, Icons.group_rounded, 'الخبراء', () {
@@ -97,7 +97,7 @@ class ClientDrawer extends StatelessWidget {
                   );
                   // أضف وجهة الاشتراكات هنا
                 }),
-                _buildDrawerItem(context, Icons.settings_outlined, 'الإعدادات', () {
+                _buildDrawerItem(context, Icons.settings_outlined, 'اعدادات الحساب', () {
                   // أضف وجهة الإعدادات هنا
                   Navigator.pop(context); // إغلاق الدرواير
                   Navigator.push(

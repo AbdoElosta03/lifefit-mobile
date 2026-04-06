@@ -12,7 +12,6 @@ class ApiService {
       options: Options(headers: {"Accept": "application/json"}),
     );
 
-    // يعتمد على هيكلة الـ API: نحاول أولاً access_token ثم token لو كان الاسم مختلفاً
     final token = response.data['access_token'] ?? response.data['token'];
     if (token != null) {
       await TokenStorage.saveToken(token);
@@ -88,13 +87,13 @@ class ApiService {
     }
   }
 
-  Future<Response?> getHealthProfile() async {
+  Future<Response?> getProfile() async {
     try {
       final token = await TokenStorage.getToken();
       if (token == null) return null;
 
       return await _dio.get(
-        "${_baseUrl}client/health-profile",
+        "${_baseUrl}client/profile",
         options: Options(
           headers: {
             "Authorization": "Bearer $token",
@@ -103,18 +102,18 @@ class ApiService {
         ),
       );
     } catch (e) {
-      print("Error fetching health profile: $e");
+      print("Error fetching profile: $e");
       return null;
     }
   }
 
-  Future<Response?> saveHealthProfile(Map<String, dynamic> body) async {
+  Future<Response?> saveProfile(Map<String, dynamic> body) async {
     try {
       final token = await TokenStorage.getToken();
       if (token == null) return null;
 
       return await _dio.post(
-        "${_baseUrl}client/health-profile",
+        "${_baseUrl}client/profile",
         data: body,
         options: Options(
           headers: {
@@ -124,7 +123,10 @@ class ApiService {
         ),
       );
     } catch (e) {
-      print("Error saving health profile: $e");
+      if (e is DioException) {
+        return e.response;
+      }
+      print("Error saving profile: $e");
       return null;
     }
   }
@@ -231,6 +233,7 @@ class ApiService {
       return null;
     }
   }
+
   //method to get subscriptions
   Future<Response?> getSubscriptions() async {
     try {
@@ -255,6 +258,7 @@ class ApiService {
       return null;
     }
   }
+
   //method to cancel subscription
   Future<Response?> cancelSubscription(String id) async {
     try {
@@ -279,4 +283,114 @@ class ApiService {
       return null;
     }
   }
+
+  //method to get experts
+  Future<Response?> getExperts() async {
+    try {
+      final token = await TokenStorage.getToken();
+      if (token == null) return null;
+
+      return await _dio.get(
+        "${_baseUrl}client/experts",
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $token",
+            "Accept": "application/json",
+          },
+        ),
+      );
+    } on DioException catch (e) {
+      if (e.response != null) return e.response;
+      print("Error fetching experts: ${e.message}");
+      return null;
+    } catch (e) {
+      print("Error fetching experts: $e");
+      return null;
+    }
+  }
+  //method to get msg
+  Future<Response?> getMessages(int conversationId) async {
+  try {
+    final token = await TokenStorage.getToken();
+    if (token == null) return null;
+
+    return await _dio.get(
+      "${_baseUrl}conversations/$conversationId/messages",
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      ),
+    );
+  } catch (e) {
+    print("Error fetching messages: $e");
+    return null;
+  }
+  //method to send msg
+}
+Future<Response?> sendMessage(int conversationId, String body) async {
+  try {
+    final token = await TokenStorage.getToken();
+    if (token == null) return null;
+
+    return await _dio.post(
+      "${_baseUrl}messages",
+      data: {
+        "conversation_id": conversationId,
+        "body": body,
+      },
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      ),
+    );
+  } catch (e) {
+    print("Error sending message: $e");
+    return null;
+  }
+}
+//method to mark conversation as read
+Future<Response?> markConversationRead(int conversationId) async {
+  try {
+    final token = await TokenStorage.getToken();
+    if (token == null) return null;
+
+    return await _dio.post(
+      "${_baseUrl}conversations/$conversationId/read",
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      ),
+    );
+  } catch (e) {
+    print("Error marking read: $e");
+    return null;
+  }
+}
+Future<Response?> getConversations() async {
+  try {
+    final token = await TokenStorage.getToken();
+    if (token == null) return null;
+
+    return await _dio.get(
+      "${_baseUrl}conversations",
+      options: Options(
+        headers: {
+          "Authorization": "Bearer $token",
+          "Accept": "application/json",
+        },
+      ),
+    );
+  } catch (e) {
+    print("Error fetching conversations: $e");
+    return null;
+  }
+}
+
+
 }

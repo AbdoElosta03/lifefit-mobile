@@ -9,17 +9,30 @@ class TokenStorage {
 
   // 1. دالة حفظ التوكن
   static Future<void> saveToken(String token) async {
-    await _storage.write(key: _keyToken, value: token);
+    try {
+      await _storage.write(key: _keyToken, value: token);
+    } catch (e) {
+      print('TokenStorage.saveToken error: $e');
+    }
   }
 
   // 2. دالة جلب التوكن
   static Future<String?> getToken() async {
-    return await _storage.read(key: _keyToken);
+    try {
+      return await _storage.read(key: _keyToken);
+    } catch (e) {
+      print('TokenStorage.getToken error: $e');
+      return null;
+    }
   }
 
   // 3. دالة مسح التوكن (عند تسجيل الخروج)
   static Future<void> deleteToken() async {
-    await _storage.delete(key: _keyToken);
+    try {
+      await _storage.delete(key: _keyToken);
+    } catch (e) {
+      print('TokenStorage.deleteToken error: $e');
+    }
   }
 
   // 4. دالة للتأكد هل المستخدم مسجل دخول أم لا (وجود توكن)

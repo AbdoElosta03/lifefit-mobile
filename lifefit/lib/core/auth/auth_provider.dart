@@ -21,6 +21,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = User.fromJson(response.data['user']);
 
       state = state.copyWith(user: user, isLoading: false);
+      
+
     } on DioException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: _toUserMessage(e));
     }

@@ -9,6 +9,7 @@ import '../nutrition/nutrition_screen.dart';
 import '../workouts/workouts_screen.dart';
 import '../progrees/progress_screen.dart';
 
+
 // 3. تغيير StatefulWidget إلى ConsumerStatefulWidget
 class ClientHomeScreen extends ConsumerStatefulWidget {
   const ClientHomeScreen({super.key});
@@ -26,6 +27,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
     WorkoutsScreen(),        
     NutritionScreen(),
     ProgressScreen(),
+    
   ];
 
   @override

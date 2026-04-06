@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 // تأكد من استيراد الملفات الخاصة بالصفحات هنا
-import '../../../features/client/health_profile/health_profile_screen.dart';
+import '../../../features/client/profile/profile_screen.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 
 
@@ -36,7 +36,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const HealthProfileScreen()),
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
               );
             },
             child: Container(

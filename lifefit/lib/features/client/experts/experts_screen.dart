@@ -1,67 +1,78 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/models/experts.dart';
 import 'expert_detail_screen.dart';
-class ExpertsScreen extends StatefulWidget {
+import 'experts_provider.dart';
+
+final selectedCategoryProvider = StateProvider<String>((ref) => 'الكل');
+
+class ExpertsScreen extends ConsumerWidget {
   const ExpertsScreen({super.key});
 
-  @override
-  State<ExpertsScreen> createState() => _ExpertsScreenState();
-}
-
-class _ExpertsScreenState extends State<ExpertsScreen> {
-  // القائمة المتاحة عندك حالياً (بدون يوغا)
-  final List<String> categories = ['الكل', 'مدربين', 'أخصائيي تغذية'];
-  String selectedCategory = 'الكل';
+  static const List<String> categories = ['الكل', 'مدربين', 'أخصائيي تغذية'];
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final selectedCategory = ref.watch(selectedCategoryProvider);
+    final expertsAsync = ref.watch(ExpertsProvider.provider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
       appBar: AppBar(
-        title: const Text('الخبراء', 
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+        title: const Text(
+          'الخبراء',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black),
+          icon: const Icon(
+            Icons.arrow_back_ios_new_rounded,
+            color: Colors.black,
+          ),
           onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Column(
         children: [
           // 1. نظام التصفية العلوي
-          _buildFilterBar(),
+          _buildFilterBar(ref, selectedCategory),
 
           // 2. قائمة الخبراء
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildExpertCard(
-                  context: context,
-                  name: 'أحمد علي',
-                  specialty: 'مدرب شخصي',
-                  bio: 'متخصص في التدريب عالي الكثافة (HIIT) وتمارين القوة وبناء العضلات.',
-                  rating: 4.8,
-                  isVerified: true,
+            child: expertsAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (error, stackTrace) => Center(
+                child: Text(
+                  'حدث خطأ أثناء جلب الخبراء',
+                  style: TextStyle(color: Colors.grey[600]),
                 ),
-                _buildExpertCard(
-                  context: context,
-                  name: 'سارة محمود',
-                  specialty: 'أخصائية تغذية',
-                  bio: 'تخطيط وجبات الكيتو والنظام النباتي. مساعدة في خسارة الوزن بطريقة صحية.',
-                  rating: 4.9,
-                  isVerified: false,
-                ),
-                _buildExpertCard(
-                  context: context,
-                  name: 'عمر خالد',
-                  specialty: 'مدرب كمال أجسام',
-                  bio: 'مدرب محترف للتحضير للمسابقات وبناء الأجسام واللياقة البدنية.',
-                  rating: 4.5,
-                  isVerified: true,
-                ),
-              ],
+              ),
+              data: (experts) {
+                final filteredExperts = _filterExperts(
+                  experts,
+                  selectedCategory,
+                );
+
+                if (filteredExperts.isEmpty) {
+                  return Center(
+                    child: Text(
+                      'لا يوجد خبراء مطابقون',
+                      style: TextStyle(color: Colors.grey[600]),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(16),
+                  itemCount: filteredExperts.length,
+                  itemBuilder: (context, index) {
+                    final expert = filteredExperts[index];
+                    return _buildExpertCard(context: context, expert: expert);
+                  },
+                );
+              },
             ),
           ),
         ],
@@ -70,7 +81,7 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
   }
 
   // ويدجت شريط التصفية الديناميكي
-  Widget _buildFilterBar() {
+  Widget _buildFilterBar(WidgetRef ref, String selectedCategory) {
     return Container(
       height: 65,
       width: double.infinity,
@@ -83,12 +94,10 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
         itemBuilder: (context, index) {
           final category = categories[index];
           final bool isActive = selectedCategory == category;
-          
+
           return GestureDetector(
             onTap: () {
-              setState(() {
-                selectedCategory = category;
-              });
+              ref.read(selectedCategoryProvider.notifier).state = category;
             },
             child: Container(
               margin: const EdgeInsets.only(left: 8),
@@ -99,13 +108,15 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
                 border: Border.all(
                   color: isActive ? Colors.transparent : Colors.grey[200]!,
                 ),
-                boxShadow: isActive ? [
-                  BoxShadow(
-                    color: const Color(0xFF00D9D9).withOpacity(0.3),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  )
-                ] : null,
+                boxShadow: isActive
+                    ? [
+                        BoxShadow(
+                          color: const Color(0xFF00D9D9).withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 3),
+                        ),
+                      ]
+                    : null,
               ),
               alignment: Alignment.center,
               child: Text(
@@ -122,14 +133,40 @@ class _ExpertsScreenState extends State<ExpertsScreen> {
       ),
     );
   }
-Widget _buildExpertCard({
+
+  List<Experts> _filterExperts(List<Experts> experts, String category) {
+    if (category == 'الكل') {
+      return experts;
+    }
+
+    if (category == 'مدربين') {
+      return experts
+          .where((expert) => (expert.type ?? '').contains('trainer'))
+          .toList();
+    }
+
+    if (category == 'أخصائيي تغذية') {
+      return experts
+          .where((expert) => (expert.type ?? '').contains('nutritionist'))
+          .toList();
+    }
+
+    return experts;
+  }
+
+  Widget _buildExpertCard({
     required BuildContext context, // إضافة الـ context هنا
-    required String name,
-    required String specialty,
-    required String bio,
-    required double rating,
-    required bool isVerified,
+    required Experts expert,
   }) {
+    final name = expert.name ?? 'خبير بدون اسم';
+    final specialty = expert.type ?? 'تخصص غير محدد';
+    final bio = expert.bio ?? 'لا توجد نبذة حالياً.';
+    final avatarUrl = expert.avatarUrl ?? 'https://i.pravatar.cc/150?img=3';
+    final yearsExperience = expert.yearsExperience ?? 0;
+    final certifications = expert.certifications ?? '';
+    final rating = (expert.yearsExperience ?? 4).toDouble();
+    final isVerified = (expert.certifications ?? '').isNotEmpty;
+
     return InkWell(
       onTap: () {
         // الانتقال لصفحة التفاصيل وتمرير البيانات
@@ -141,11 +178,16 @@ Widget _buildExpertCard({
               specialty: specialty,
               bio: bio,
               rating: rating,
+              avatarUrl: avatarUrl,
+              certifications: certifications,
+              yearsExperience: yearsExperience,
             ),
           ),
         );
       },
-      borderRadius: BorderRadius.circular(20), // لضمان بقاء تأثير الضغط داخل حدود الكارد
+      borderRadius: BorderRadius.circular(
+        20,
+      ), // لضمان بقاء تأثير الضغط داخل حدود الكارد
       child: Container(
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(15),
@@ -167,20 +209,29 @@ Widget _buildExpertCard({
             Column(
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: Colors.amber[50],
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Row(
                     children: [
-                      Text('$rating',
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 12,
-                              color: Colors.amber)),
-                      const Icon(Icons.star_rounded,
-                          color: Colors.amber, size: 16),
+                      Text(
+                        '$rating',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                          color: Colors.amber,
+                        ),
+                      ),
+                      const Icon(
+                        Icons.star_rounded,
+                        color: Colors.amber,
+                        size: 16,
+                      ),
                     ],
                   ),
                 ),
@@ -194,34 +245,52 @@ Widget _buildExpertCard({
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(name,
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                          color: Color(0xFF2D3142))),
+                  Text(
+                    name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 17,
+                      color: Color(0xFF2D3142),
+                    ),
+                  ),
                   const SizedBox(height: 4),
-                  Text(specialty,
-                      style: const TextStyle(
-                          color: Color(0xFF00D9D9),
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600)),
+                  Text(
+                    specialty,
+                    style: const TextStyle(
+                      color: Color(0xFF00D9D9),
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   Text(
                     bio,
                     textAlign: TextAlign.right,
                     style: TextStyle(
-                        color: Colors.grey[500], fontSize: 13, height: 1.5),
+                      color: Colors.grey[500],
+                      fontSize: 13,
+                      height: 1.5,
+                    ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
                   const SizedBox(height: 12),
+                  Text(
+                    'خبرة: $yearsExperience سنوات',
+                    style: TextStyle(color: Colors.grey[600], fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
                   // أيقونات النجوم الزرقاء
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: List.generate(
-                        5,
-                        (index) => const Icon(Icons.star_rounded,
-                            color: Color(0xFF00D9D9), size: 20)),
+                      5,
+                      (index) => const Icon(
+                        Icons.star_rounded,
+                        color: Color(0xFF00D9D9),
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -237,13 +306,28 @@ Widget _buildExpertCard({
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                        color: const Color(0xFF00D9D9).withOpacity(0.2),
-                        width: 2),
+                      color: const Color(0xFF00D9D9).withOpacity(0.2),
+                      width: 2,
+                    ),
                   ),
-                  child: const CircleAvatar(
+                  child: CircleAvatar(
                     radius: 38,
-                    backgroundColor: Color(0xFFF0F0F0),
-                    child: Icon(Icons.person, size: 45, color: Colors.grey),
+                    backgroundColor: const Color(0xFFF0F0F0),
+                    child: ClipOval(
+                      child: Image.network(
+                        avatarUrl,
+                        width: 76,
+                        height: 76,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(
+                            Icons.person,
+                            size: 45,
+                            color: Colors.grey,
+                          );
+                        },
+                      ),
+                    ),
                   ),
                 ),
                 if (isVerified)
@@ -259,5 +343,4 @@ Widget _buildExpertCard({
       ),
     );
   }
-
 }

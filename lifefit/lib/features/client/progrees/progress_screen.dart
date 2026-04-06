@@ -23,33 +23,9 @@ class ProgressScreen extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // 2. كارد الأرقام القياسية (أبيض)
-            _buildWhiteProgressCard(
-              title: 'الأرقام القياسية',
-              icon: Icons.fitness_center,
-              child: Column(
-                children: const [
-                  _RecordRow(label: 'Bench Press', value: '80 كغ', sub: 'كان 75 كغ'),
-                  Divider(height: 20),
-                  _RecordRow(label: 'Squat', value: '100 كغ', sub: 'كان 95 كغ'),
-                ],
-              ),
-            ),
-
+            
             const SizedBox(height: 20),
 
-            // 3. كارد التمارين والسعرات (بشكل مبسط)
-            _buildWhiteProgressCard(
-              title: 'النشاط الشهري',
-              icon: Icons.bar_chart,
-              child: Column(
-                children: [
-                  _buildStatRow('التمارين المكتملة', '12 / 16', 0.75, const Color(0xFF00D9D9)),
-                  const SizedBox(height: 20),
-                  _buildStatRow('السعرات المحروقة', '1850 / 2500', 0.60, Colors.orange),
-                ],
-              ),
-            ),
           ],
         ),
       ),
@@ -82,53 +58,7 @@ class ProgressScreen extends StatelessWidget {
     );
   }
 
-  // ويدجت الكارد الأبيض الموحد (المعايير التي حددناها)
-  Widget _buildWhiteProgressCard({required String title, required IconData icon, required Widget child}) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 4))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-              const SizedBox(width: 10),
-              Icon(icon, color: const Color(0xFF00D9D9), size: 20),
-            ],
-          ),
-          const SizedBox(height: 20),
-          child,
-        ],
-      ),
-    );
-  }
-
-  // ويدجت صف الإحصائيات (تمارين، سعرات)
-  Widget _buildStatRow(String label, String value, double progress, Color color) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-            Text(label, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-          ],
-        ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(5),
-          child: LinearProgressIndicator(value: progress, minHeight: 6, backgroundColor: Colors.grey[100], valueColor: AlwaysStoppedAnimation(color)),
-        ),
-      ],
-    );
-  }
+  
 }
 
 // ويدجت صف الأرقام القياسية المختصرة
@@ -150,3 +80,4 @@ class _RecordRow extends StatelessWidget {
     );
   }
 }
+\\\\\\\

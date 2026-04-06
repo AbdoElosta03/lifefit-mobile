@@ -38,8 +38,8 @@ class BottomNavigationWidget extends StatelessWidget {
           _buildItem(Icons.home_rounded, Icons.home_outlined, 'الرئيسية', 0),
           _buildItem(Icons.fitness_center_rounded, Icons.fitness_center_outlined, 'التمارين', 1),
           _buildItem(Icons.restaurant_rounded, Icons.restaurant_outlined, 'التغذية', 2),
-          // تم تغيير هذه الأيقونة فقط لتكون أكثر تعبيراً عن "التقدم"
-          _buildItem(Icons.analytics_rounded, Icons.analytics_outlined, 'التقدم', 3),
+          // تم تغيير هذه الأيقونة فقط لتكون أكثر تعبيراً عن "التقارير"
+          _buildItem(Icons.analytics_rounded, Icons.analytics_outlined, 'التقارير', 3),
         ],
       ),
     );
