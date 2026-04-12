@@ -3,7 +3,7 @@ import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
 import '../../../features/client/experts/experts_screen.dart';
 import '../../../features/client/chats/chats_screen.dart';
-import '../../../features/client/profile/profile_screen.dart';
+import '../../../features/client/profile_web/profile_screen_web.dart';
 import '../../../features/client/Subscriptions/subscriptions_screen.dart';
 class ClientDrawer extends StatelessWidget {
   const ClientDrawer({super.key});
@@ -62,7 +62,7 @@ class ClientDrawer extends StatelessWidget {
                   Navigator.pop(context); // إغلاق الدرواير
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                    MaterialPageRoute(builder: (context) => const ProfileScreenWeb()),
                   );
                 }),
                 _buildDrawerItem(context, Icons.group_rounded, 'الخبراء', () {

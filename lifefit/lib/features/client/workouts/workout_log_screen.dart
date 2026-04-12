@@ -1,73 +1,75 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:lifefit/core/models/exercise.dart';
-import 'package:lifefit/core/models/workout.dart';
-import 'package:lifefit/core/services/api_service.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // مكتبة الريفربود
-import 'workout_provider.dart'; // ملف البروفايدر الخاص بك
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/models/workout/today_schedule.dart';
+import '../../../core/models/workout/exercise.dart';
+import '../../../core/models/workout/exercise_log.dart';
+import 'workout_provider.dart';
 
-// 1. تغيير الكلاس إلى ConsumerStatefulWidget ليعمل الـ ref
 class WorkoutLogScreen extends ConsumerStatefulWidget {
+  final TodaySchedule schedule;
   final Exercise exercise;
-  final Workout workout;
 
   const WorkoutLogScreen({
     super.key,
+    required this.schedule,
     required this.exercise,
-    required this.workout,
   });
 
   @override
-  ConsumerState<WorkoutLogScreen> createState() => _WorkoutLogScreenState();
+  ConsumerState<WorkoutLogScreen> createState() =>
+      _WorkoutLogScreenState();
 }
 
-// 2. تغيير الحالة إلى ConsumerState
 class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
-  late List<_SetLogFields> _sets;
+  late List<_SetFields> _sets;
   bool _isSubmitting = false;
   Timer? _restTimer;
   int _restRemaining = 60;
   bool _restRunning = false;
 
+  static const _primary = Color(0xFF00D9D9);
+
+  Exercise get _exercise => widget.exercise;
+  TodaySchedule get _schedule => widget.schedule;
+
   @override
   void initState() {
     super.initState();
-    final setsCount = widget.exercise.sets > 0 ? widget.exercise.sets : 1;
+    final pivot = _exercise.pivot;
+    final count = (pivot?.sets ?? 1).clamp(1, 20);
+    final targetReps = _parseFirstInt(pivot?.reps);
+    final targetWeight = pivot?.targetWeight;
+
     _sets = List.generate(
-      setsCount,
-      (index) => _SetLogFields(
-        targetReps: _parseTargetReps(widget.exercise.reps),
-        targetWeight: widget.exercise.targetWeight,
+      count,
+      (_) => _SetFields(
+        targetReps: targetReps,
+        targetWeight: targetWeight,
       ),
     );
   }
 
   @override
   void dispose() {
-    for (final set in _sets) {
-      set.dispose();
+    for (final s in _sets) {
+      s.dispose();
     }
     _restTimer?.cancel();
     super.dispose();
   }
 
-  int _parseTargetReps(String repsText) {
-    final match = RegExp(r'(\d+)').firstMatch(repsText);
-    return match != null ? int.tryParse(match.group(1)!) ?? 0 : 0;
-  }
-
-  double _parseDouble(String value, double fallback) {
-    return double.tryParse(value.trim()) ?? fallback;
-  }
-
-  int _parseInt(String value, int fallback) {
-    return int.tryParse(value.trim()) ?? fallback;
+  int? _parseFirstInt(String? text) {
+    if (text == null) return null;
+    final match = RegExp(r'(\d+)').firstMatch(text);
+    return match != null ? int.tryParse(match.group(1)!) : null;
   }
 
   void _startRestTimer() {
     _restTimer?.cancel();
+    final restSec = _exercise.pivot?.restSeconds ?? 60;
     setState(() {
-      _restRemaining = 60;
+      _restRemaining = restSec;
       _restRunning = true;
     });
     _restTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -82,107 +84,79 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   Future<void> _submitLog() async {
     if (_isSubmitting) return;
-
     FocusScope.of(context).unfocus();
-    final scheduleId = widget.workout.scheduleId ?? widget.workout.id;
-
     setState(() => _isSubmitting = true);
 
     try {
-      final entries = <Map<String, dynamic>>[];
+      final exerciseLogs = <ExerciseLog>[];
       for (var i = 0; i < _sets.length; i++) {
-        final set = _sets[i];
-        final actualReps = _parseInt(
-          set.actualRepsController.text.isEmpty
-              ? (set.targetReps?.toString() ?? '0')
-              : set.actualRepsController.text,
-          set.targetReps ?? 0,
-        );
-        final actualWeight = _parseDouble(
-          set.actualWeightController.text.isEmpty
-              ? (set.targetWeight?.toString() ?? '0.0')
-              : set.actualWeightController.text,
-          set.targetWeight ?? 0,
-        );
+        final s = _sets[i];
+        final actualReps = _intFrom(s.repsCtrl.text, s.targetReps);
+        final actualWeight = _doubleFrom(s.weightCtrl.text, s.targetWeight);
 
-        entries.add({
-          'exercise_id': widget.exercise.id,
-          'set_number': i + 1,
-          'target_reps': set.targetReps ?? actualReps,
-          'actual_reps': actualReps,
-          'target_weight': set.targetWeight ?? actualWeight,
-          'actual_weight': actualWeight,
-          'rpe': 7,
-          'notes': set.notesController.text.trim().isEmpty
-              ? null
-              : set.notesController.text.trim(),
-        });
+        exerciseLogs.add(ExerciseLog(
+          exerciseId: _exercise.id,
+          setNumber: i + 1,
+          targetReps: s.targetReps,
+          actualReps: actualReps,
+          targetWeight: s.targetWeight,
+          actualWeight: actualWeight,
+          intensityType: _exercise.pivot?.intensityType ?? 'weight',
+          rpeTarget: _exercise.pivot?.rpeTarget,
+          notes: s.notesCtrl.text.trim().isEmpty ? null : s.notesCtrl.text.trim(),
+        ));
       }
 
-      final requestBody = {
-        'schedule_id': scheduleId,
-        'total_duration_seconds': 0,
-        'notes': null,
-        'status': 'completed',
-        'exercises': entries,
-      };
+      final success = await ref.read(todaySchedulesProvider.notifier).saveWorkoutLog(
+            scheduleId: _schedule.scheduleId,
+            exerciseLogs: exerciseLogs,
+          );
 
-      final api = ApiService();
-      final response = await api.saveWorkoutLog(requestBody);
-
-      final success =
-          response != null &&
-          (response.statusCode == 200 || response.statusCode == 201);
+      if (!mounted) return;
 
       if (success) {
-        // 3. تحديث البيانات في البروفايدر فور النجاح وقبل الخروج
-        await ref.read(workoutProvider.notifier).fetchTodayWorkout();
-
-        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم حفظ سجل التمرين بنجاح')),
         );
-
-        // 4. الرجوع لشاشة التمارين الرئيسية (إغلاق شاشتين)
         int count = 0;
         Navigator.of(context).popUntil((_) => count++ >= 2);
       } else {
-        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تعذر حفظ السجل، حاول مجدداً')),
         );
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('حدث خطأ: $e')));
     } finally {
-      if (mounted) {
-        setState(() => _isSubmitting = false);
-      }
+      if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  int? _intFrom(String text, int? fallback) {
+    if (text.trim().isEmpty) return fallback;
+    return int.tryParse(text.trim()) ?? fallback;
+  }
+
+  double? _doubleFrom(String text, double? fallback) {
+    if (text.trim().isEmpty) return fallback;
+    return double.tryParse(text.trim()) ?? fallback;
   }
 
   @override
   Widget build(BuildContext context) {
-    final primary = const Color(0xFF00D9D9);
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7F9),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
-          'تسجيل التمرين',
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600),
-        ),
+        title: const Text('تسجيل التمرين',
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.w600)),
         leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios_new,
-            color: Colors.black,
-            size: 18,
-          ),
+          icon: const Icon(Icons.arrow_back_ios_new,
+              color: Colors.black, size: 18),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -191,30 +165,24 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            _buildHeaderCard(primary),
+            _buildHeader(),
             const SizedBox(height: 12),
-            _buildRestTimerCard(primary),
+            _buildRestTimer(),
             const SizedBox(height: 16),
-            const Text(
-              'المجموعات',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
+            const Text('المجموعات',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
             const SizedBox(height: 10),
-            ...List.generate(
-              _sets.length,
-              (index) => _buildSetCard(index, primary),
-            ),
+            ...List.generate(_sets.length, (i) => _buildSetCard(i)),
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
               height: 52,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: primary,
+                  backgroundColor: _primary,
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                      borderRadius: BorderRadius.circular(12)),
                 ),
                 onPressed: _isSubmitting ? null : _submitLog,
                 child: _isSubmitting
@@ -223,19 +191,15 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
                         height: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2.2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
-                          ),
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text(
-                        'إنهاء التمرين',
+                    : const Text('إنهاء التمرين',
                         style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w700,
-                          color: Colors.white,
-                        ),
-                      ),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
               ),
             ),
           ],
@@ -244,7 +208,8 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     );
   }
 
-  Widget _buildHeaderCard(Color primary) {
+  Widget _buildHeader() {
+    final pivot = _exercise.pivot;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -256,48 +221,36 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(
-            widget.workout.title,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            textAlign: TextAlign.right,
-          ),
+          Text(_schedule.workout.name,
+              style:
+                  const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+              textAlign: TextAlign.right),
           const SizedBox(height: 4),
-          Text(
-            widget.exercise.name,
-            style: const TextStyle(fontSize: 15, color: Colors.grey),
-            textAlign: TextAlign.right,
-          ),
-          const SizedBox(height: 10),
-          Wrap(
-            spacing: 8,
-            runSpacing: 6,
-            alignment: WrapAlignment.end,
-            children: [
-              _smallTag(
-                '${widget.exercise.sets} مجموعات',
-                Colors.blue[50]!,
-                Colors.blue,
-              ),
-              _smallTag(
-                '${widget.exercise.reps} عدات',
-                Colors.orange[50]!,
-                Colors.orange,
-              ),
-              _smallTag(
-                _weightText(widget.exercise.targetWeight),
-                Colors.green[50]!,
-                Colors.green,
-              ),
-            ],
-          ),
+          Text(_exercise.name,
+              style: const TextStyle(fontSize: 15, color: Colors.grey),
+              textAlign: TextAlign.right),
+          if (pivot != null) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              alignment: WrapAlignment.end,
+              children: [
+                _tag('${pivot.sets} مجموعات', Colors.blue[50]!, Colors.blue),
+                _tag('${pivot.reps} عدات', Colors.orange[50]!, Colors.orange),
+                _tag(_weightLabel(pivot.targetWeight), Colors.green[50]!,
+                    Colors.green),
+              ],
+            ),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildRestTimerCard(Color primary) {
-    final minutes = (_restRemaining ~/ 60).toString().padLeft(2, '0');
-    final seconds = (_restRemaining % 60).toString().padLeft(2, '0');
+  Widget _buildRestTimer() {
+    final mm = (_restRemaining ~/ 60).toString().padLeft(2, '0');
+    final ss = (_restRemaining % 60).toString().padLeft(2, '0');
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
@@ -311,56 +264,45 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
         children: [
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Text(
-                'مؤقت الراحة',
-                style: TextStyle(fontWeight: FontWeight.w700),
-              ),
-              SizedBox(height: 2),
-              Text(
-                '60 ثانية للراحة',
-                style: TextStyle(color: Colors.grey, fontSize: 12),
-              ),
-            ],
-          ),
-          Row(
             children: [
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: primary.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  '$minutes:$seconds',
-                  style: TextStyle(color: primary, fontWeight: FontWeight.bold),
-                ),
-              ),
-              const SizedBox(width: 10),
-              TextButton(
-                onPressed: _restRunning ? null : _startRestTimer,
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: primary,
-                  padding: const EdgeInsets.symmetric(horizontal: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: Text(_restRunning ? 'يعمل' : 'ابدأ'),
-              ),
+              const Text('مؤقت الراحة',
+                  style: TextStyle(fontWeight: FontWeight.w700)),
+              const SizedBox(height: 2),
+              Text('${_exercise.pivot?.restSeconds ?? 60} ثانية للراحة',
+                  style: const TextStyle(color: Colors.grey, fontSize: 12)),
             ],
           ),
+          Row(children: [
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              decoration: BoxDecoration(
+                color: _primary.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Text('$mm:$ss',
+                  style: TextStyle(
+                      color: _primary, fontWeight: FontWeight.bold)),
+            ),
+            const SizedBox(width: 10),
+            TextButton(
+              onPressed: _restRunning ? null : _startRestTimer,
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.white,
+                backgroundColor: _primary,
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+              ),
+              child: Text(_restRunning ? 'يعمل' : 'ابدأ'),
+            ),
+          ]),
         ],
       ),
     );
   }
 
-  Widget _buildSetCard(int index, Color primary) {
-    final set = _sets[index];
+  Widget _buildSetCard(int index) {
+    final s = _sets[index];
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -375,111 +317,90 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text('المجموعة ${index + 1}',
+                  style: const TextStyle(fontWeight: FontWeight.w700)),
               Text(
-                'المجموعة ${index + 1}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
-              ),
-              Text(
-                'الهدف: ${set.targetReps ?? '--'} | ${_weightText(set.targetWeight)}',
+                'الهدف: ${s.targetReps ?? "--"} | ${_weightLabel(s.targetWeight)}',
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: TextFormField(
-                  controller: set.actualRepsController,
-                  textAlign: TextAlign.center,
-                  keyboardType: TextInputType.number,
-                  decoration: _inputDecoration('العدات'),
-                ),
+          Row(children: [
+            Expanded(
+              child: TextFormField(
+                controller: s.repsCtrl,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: _inputDeco('العدات'),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: TextFormField(
-                  controller: set.actualWeightController,
-                  textAlign: TextAlign.center,
-                  keyboardType: const TextInputType.numberWithOptions(
-                    decimal: true,
-                  ),
-                  decoration: _inputDecoration('الوزن كجم'),
-                ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: s.weightCtrl,
+                textAlign: TextAlign.center,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                decoration: _inputDeco('الوزن كجم'),
               ),
-            ],
-          ),
+            ),
+          ]),
           const SizedBox(height: 10),
           TextFormField(
-            controller: set.notesController,
+            controller: s.notesCtrl,
             textAlign: TextAlign.right,
             maxLines: 1,
-            decoration: _inputDecoration('ملاحظات المجمـوعة'),
+            decoration: _inputDeco('ملاحظات المجموعة'),
           ),
         ],
       ),
     );
   }
 
-  InputDecoration _inputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: const TextStyle(fontSize: 12, color: Colors.grey),
-      filled: true,
-      fillColor: const Color(0xFFF7F9FC),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-      border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
-        borderSide: BorderSide.none,
-      ),
-    );
-  }
+  InputDecoration _inputDeco(String label) => InputDecoration(
+        labelText: label,
+        labelStyle: const TextStyle(fontSize: 12, color: Colors.grey),
+        filled: true,
+        fillColor: const Color(0xFFF7F9FC),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none),
+      );
 
-  Widget _smallTag(String text, Color bgColor, Color textColor) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Text(
-        text,
-        style: TextStyle(
-          color: textColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 11,
-        ),
-      ),
-    );
-  }
+  Widget _tag(String text, Color bg, Color fg) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration:
+            BoxDecoration(color: bg, borderRadius: BorderRadius.circular(8)),
+        child: Text(text,
+            style:
+                TextStyle(color: fg, fontWeight: FontWeight.bold, fontSize: 11)),
+      );
 
-  String _weightText(double? w) {
+  String _weightLabel(double? w) {
     if (w == null || w == 0) return 'بوزن الجسم';
     return '${w.toStringAsFixed(w % 1 == 0 ? 0 : 1)} كجم';
   }
 }
 
-// 5. كلاس تنظيم الحقول لكل مجموعة
-class _SetLogFields {
-  final TextEditingController actualRepsController;
-  final TextEditingController actualWeightController;
-  final TextEditingController notesController;
+class _SetFields {
+  final TextEditingController repsCtrl;
+  final TextEditingController weightCtrl;
+  final TextEditingController notesCtrl;
   final int? targetReps;
   final double? targetWeight;
 
-  _SetLogFields({required this.targetReps, required this.targetWeight})
-    // هنا نقوم بوضع القيم المستهدفة كقيم أولية للنصوص
-    : actualRepsController = TextEditingController(
-        text: targetReps?.toString() ?? '',
-      ),
-      actualWeightController = TextEditingController(
-        text: targetWeight?.toString() ?? '',
-      ),
-      notesController = TextEditingController();
+  _SetFields({this.targetReps, this.targetWeight})
+      : repsCtrl = TextEditingController(text: targetReps?.toString() ?? ''),
+        weightCtrl =
+            TextEditingController(text: targetWeight?.toString() ?? ''),
+        notesCtrl = TextEditingController();
 
   void dispose() {
-    actualRepsController.dispose();
-    actualWeightController.dispose();
-    notesController.dispose();
+    repsCtrl.dispose();
+    weightCtrl.dispose();
+    notesCtrl.dispose();
   }
 }

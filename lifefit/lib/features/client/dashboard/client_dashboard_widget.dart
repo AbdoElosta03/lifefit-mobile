@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:lifefit/features/client/nutrition/meal_details_screen.dart';
-import '../workouts/workout_provider.dart';
+import '../../../core/models/workout/exercise.dart' as workout_v2;
+import '../../../core/models/workout/today_schedule.dart';
 import '../nutrition/nutrition_provider.dart';
-import '../workouts/workout_details_screen.dart';
+import '../workouts/workout_detail_screen.dart';
+import '../workouts/workout_provider.dart';
 
 class ClientDashboardWidget extends ConsumerWidget {
   const ClientDashboardWidget({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final workoutAsync = ref.watch(workoutProvider);
+    final schedulesAsync = ref.watch(todaySchedulesProvider);
     final nutritionAsync = ref.watch(nutritionProvider);
 
     // الألوان المحدثة (حيوية أكثر ومتناسقة)
@@ -24,7 +26,7 @@ class ClientDashboardWidget extends ConsumerWidget {
       backgroundColor: const Color(0xFFF8FAFC),
       body: RefreshIndicator(
         onRefresh: () async {
-          await ref.read(workoutProvider.notifier).refresh();
+          await ref.read(todaySchedulesProvider.notifier).refresh();
           await ref.read(nutritionProvider.notifier).refresh();
         },
         child: SingleChildScrollView(
@@ -55,16 +57,16 @@ class ClientDashboardWidget extends ConsumerWidget {
                 ),
                 const SizedBox(height: 24),
 
-                _buildDynamicStatsRow(workoutAsync, nutritionAsync),
+                _buildDynamicStatsRow(schedulesAsync, nutritionAsync),
 
                 const SizedBox(height: 20),
 
                 // كارد التمرين القادم
-                workoutAsync.when(
+                schedulesAsync.when(
                   loading: () => const Center(child: LinearProgressIndicator(color: primaryTeal)),
                   error: (err, _) => _buildErrorMiniCard('خطأ في جلب التمارين'),
-                  data: (workout) {
-                    if (workout == null || workout.exercises.isEmpty) {
+                  data: (schedules) {
+                    if (schedules.isEmpty) {
                       return _buildMainActionCard(
                         title: 'يوم راحة',
                         subtitle: 'لا توجد تمارين مجدولة اليوم',
@@ -75,21 +77,45 @@ class ClientDashboardWidget extends ConsumerWidget {
                       );
                     }
 
-                    final nextEx = workout.exercises.firstWhere(
-                      (e) => e.status != 'completed',
-                      orElse: () => workout.exercises.last,
-                    );
-                    final isAllDone = workout.exercises.every((e) => e.status == 'completed');
+                    TodaySchedule? targetSchedule;
+                    workout_v2.Exercise? nextEx;
+                    for (final s in schedules) {
+                      for (final ex in s.workout.exercises) {
+                        if (!s.isExerciseLogged(ex.id)) {
+                          targetSchedule = s;
+                          nextEx = ex;
+                          break;
+                        }
+                      }
+                      if (nextEx != null) break;
+                    }
+
+                    final isAllDone = nextEx == null;
+                    final title = schedules.length == 1
+                        ? schedules.first.workout.name
+                        : (isAllDone ? 'تمارين اليوم' : targetSchedule!.workout.name);
 
                     return _buildMainActionCard(
-                      title: workout.title,
-                      subtitle: isAllDone ? 'عاش! أنهيت تمارين اليوم' : 'التمرين القادم: ${nextEx.name}',
+                      title: title,
+                      subtitle: isAllDone
+                          ? 'عاش! أنهيت تمارين اليوم'
+                          : 'التمرين القادم: ${nextEx.name}',
                       buttonText: isAllDone ? 'تم الإنجاز بنجاح' : 'استكمال التمرين',
                       icon: Icons.fitness_center,
                       colors: isAllDone ? [Colors.green[400]!, Colors.green[600]!] : [primaryTeal, const Color(0xFF00B4B4)],
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => WorkoutDetailsScreen(exercise: nextEx, workout: workout)));
-                      },
+                      onPressed: isAllDone
+                          ? () {}
+                          : () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => WorkoutDetailScreen(
+                                    schedule: targetSchedule!,
+                                    exercise: nextEx!,
+                                  ),
+                                ),
+                              );
+                            },
                     );
                   },
                 ),
@@ -137,8 +163,9 @@ class ClientDashboardWidget extends ConsumerWidget {
     );
   }
 
-  Widget _buildDynamicStatsRow(AsyncValue workoutAsync, AsyncValue nutritionAsync) {
-    final workoutStats = _workoutStats(workoutAsync);
+  Widget _buildDynamicStatsRow(
+      AsyncValue<List<TodaySchedule>> schedulesAsync, AsyncValue nutritionAsync) {
+    final workoutStats = _workoutStats(schedulesAsync);
     final nutritionStats = _nutritionStats(nutritionAsync);
 
     return Column(
@@ -172,12 +199,25 @@ class ClientDashboardWidget extends ConsumerWidget {
     );
   }
 
-  _StatInfo _workoutStats(AsyncValue workoutAsync) {
-    return workoutAsync.maybeWhen(
-      data: (workout) {
-        if (workout == null || workout.exercises.isEmpty) return const _StatInfo(label: '0 / 0', progress: 0.0);
-        final done = workout.exercises.where((e) => e.status == 'completed').length;
-        return _StatInfo(label: '$done / ${workout.exercises.length}', progress: (done / workout.exercises.length).clamp(0.0, 1.0));
+  _StatInfo _workoutStats(AsyncValue<List<TodaySchedule>> schedulesAsync) {
+    return schedulesAsync.maybeWhen(
+      data: (schedules) {
+        if (schedules.isEmpty) {
+          return const _StatInfo(label: '0 / 0', progress: 0.0);
+        }
+        var total = 0;
+        var done = 0;
+        for (final s in schedules) {
+          for (final e in s.workout.exercises) {
+            total++;
+            if (s.isExerciseLogged(e.id)) done++;
+          }
+        }
+        if (total == 0) return const _StatInfo(label: '0 / 0', progress: 0.0);
+        return _StatInfo(
+          label: '$done / $total',
+          progress: (done / total).clamp(0.0, 1.0),
+        );
       },
       orElse: () => const _StatInfo(label: '0 / 0', progress: 0.0),
     );

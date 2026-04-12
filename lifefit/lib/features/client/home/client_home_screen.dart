@@ -24,7 +24,7 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
 
   final List<Widget> _pages = const [
     ClientDashboardWidget(),
-    WorkoutsScreen(),        
+    WorkoutsScreen(),
     NutritionScreen(),
     ProgressScreen(),
     

@@ -1,396 +1,46 @@
-import 'package:dio/dio.dart';
-import '../auth/token_storage.dart';
+import 'auth_service.dart';
+import 'workout_service.dart';
+import 'nutrition_service.dart';
+import 'profile_service.dart';
+import 'profile_web_service.dart';
+import 'social_service.dart';
 
+/// One-stop shop for all services to maintain backward compatibility
 class ApiService {
-  final String _baseUrl = "http://127.0.0.1:8000/api/";
-  final Dio _dio = Dio();
+  final auth = AuthService();
+  final workout = WorkoutService();
+  final nutrition = NutritionService();
+  final profile = ProfileService();
+  final profileWeb = ProfileWebService();
+  final social = SocialService();
 
-  Future<Response> login(String email, String password) async {
-    final response = await _dio.post(
-      "${_baseUrl}login",
-      data: {"email": email, "password": password},
-      options: Options(headers: {"Accept": "application/json"}),
-    );
+  // Mapping old methods to new modular services to avoid breaking changes
+  Future login(String email, String password) => auth.login(email, password);
+  Future register({required String name, required String email, required String password, required String role}) => 
+      auth.register(name: name, email: email, password: password, role: role);
 
-    final token = response.data['access_token'] ?? response.data['token'];
-    if (token != null) {
-      await TokenStorage.saveToken(token);
-    }
+  /// Web API: today's schedules (list).
+  Future fetchTodaySchedules() => workout.fetchTodaySchedules();
 
-    return response;
-  }
+  Future getProfileWeb() => profileWeb.fetchProfile();
+  Future updateProfileWeb(Map<String, dynamic> body) =>
+      profileWeb.updateProfile(body);
 
-  Future<Response> register({
-    required String name,
-    required String email,
-    required String password,
-    required String role,
-  }) async {
-    final response = await _dio.post(
-      "${_baseUrl}register",
-      data: {
-        "name": name,
-        "email": email,
-        "password": password,
-        "password_confirmation": password,
-        "role": role,
-      },
-      options: Options(headers: {"Accept": "application/json"}),
-    );
+  Future getTodayNutrition() => nutrition.getTodayNutrition();
+  Future saveDailyIntakeMealLog({String? logDate, required int mealId, required List<Map<String, dynamic>> items}) => 
+      nutrition.saveDailyIntakeMealLog(logDate: logDate, mealId: mealId, items: items);
 
-    final token = response.data['access_token'] ?? response.data['token'];
-    if (token != null) {
-      await TokenStorage.saveToken(token);
-    }
+  Future getProfile() => profile.getProfile();
+  Future saveProfile(Map<String, dynamic> body) => profile.saveProfile(body);
+  Future getExperts() => profile.getExperts();
+  Future getSubscriptions() => profile.getSubscriptions();
+  Future cancelSubscription(String id) => profile.cancelSubscription(id);
 
-    return response;
-  }
-
-  Future<Response?> getTodayWorkouts() async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.get(
-        "${_baseUrl}client/today-workouts",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } catch (e) {
-      print("Error fetching workouts: $e");
-      return null;
-    }
-  }
-
-  Future<Response?> getTodayNutrition() async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      //get request from today-nutrition endpoint
-      return await _dio.get(
-        "${_baseUrl}client/today-nutrition",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } catch (e) {
-      print("Error fetching nutrition: $e");
-      return null;
-    }
-  }
-
-  Future<Response?> getProfile() async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.get(
-        "${_baseUrl}client/profile",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } catch (e) {
-      print("Error fetching profile: $e");
-      return null;
-    }
-  }
-
-  Future<Response?> saveProfile(Map<String, dynamic> body) async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.post(
-        "${_baseUrl}client/profile",
-        data: body,
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } catch (e) {
-      if (e is DioException) {
-        return e.response;
-      }
-      print("Error saving profile: $e");
-      return null;
-    }
-  }
-
-  Future<Response?> saveWorkoutLog(Map<String, dynamic> body) async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.post(
-        "${_baseUrl}client/workout-logs",
-        data: body,
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } catch (e) {
-      print("Error saving workout log: $e");
-      return null;
-    }
-  }
-
-  Future<Response?> saveDailyIntakeMealLog({
-    String? logDate,
-    required int mealId,
-    required List<Map<String, dynamic>> items,
-  }) async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.post(
-        "${_baseUrl}client/daily-intake-logs",
-        data: {
-          if (logDate != null) 'log_date': logDate,
-          'meal_id': mealId,
-          'items': items,
-        },
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } on DioException catch (e) {
-      if (e.response != null) return e.response;
-      print("Error saving daily intake log: ${e.message}");
-      return null;
-    } catch (e) {
-      print("Error saving daily intake log: $e");
-      return null;
-    }
-  }
-
-  // method to get notifications
-  Future<Response?> getNotifications() async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.get(
-        "${_baseUrl}client/notifications",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } on DioException catch (e) {
-      if (e.response != null) return e.response;
-      print("Error fetching notifications: ${e.message}");
-      return null;
-    } catch (e) {
-      print("Error fetching notifications: $e");
-      return null;
-    }
-  }
-
-  Future<Response?> markNotificationAsRead(String id) async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.post(
-        "${_baseUrl}client/notifications/$id/read",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } on DioException catch (e) {
-      if (e.response != null) return e.response;
-      print("Error marking notification as read: ${e.message}");
-      return null;
-    } catch (e) {
-      print("Error marking notification as read: $e");
-      return null;
-    }
-  }
-
-  //method to get subscriptions
-  Future<Response?> getSubscriptions() async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.get(
-        "${_baseUrl}client/subscriptions",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } on DioException catch (e) {
-      if (e.response != null) return e.response;
-      print("Error fetching subscriptions: ${e.message}");
-      return null;
-    } catch (e) {
-      print("Error fetching subscriptions: $e");
-      return null;
-    }
-  }
-
-  //method to cancel subscription
-  Future<Response?> cancelSubscription(String id) async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.post(
-        "${_baseUrl}client/subscriptions/$id/cancel",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } on DioException catch (e) {
-      if (e.response != null) return e.response;
-      print("Error cancelling subscription: ${e.message}");
-      return null;
-    } catch (e) {
-      print("Error cancelling subscription: $e");
-      return null;
-    }
-  }
-
-  //method to get experts
-  Future<Response?> getExperts() async {
-    try {
-      final token = await TokenStorage.getToken();
-      if (token == null) return null;
-
-      return await _dio.get(
-        "${_baseUrl}client/experts",
-        options: Options(
-          headers: {
-            "Authorization": "Bearer $token",
-            "Accept": "application/json",
-          },
-        ),
-      );
-    } on DioException catch (e) {
-      if (e.response != null) return e.response;
-      print("Error fetching experts: ${e.message}");
-      return null;
-    } catch (e) {
-      print("Error fetching experts: $e");
-      return null;
-    }
-  }
-  //method to get msg
-  Future<Response?> getMessages(int conversationId) async {
-  try {
-    final token = await TokenStorage.getToken();
-    if (token == null) return null;
-
-    return await _dio.get(
-      "${_baseUrl}conversations/$conversationId/messages",
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-      ),
-    );
-  } catch (e) {
-    print("Error fetching messages: $e");
-    return null;
-  }
-  //method to send msg
-}
-Future<Response?> sendMessage(int conversationId, String body) async {
-  try {
-    final token = await TokenStorage.getToken();
-    if (token == null) return null;
-
-    return await _dio.post(
-      "${_baseUrl}messages",
-      data: {
-        "conversation_id": conversationId,
-        "body": body,
-      },
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-      ),
-    );
-  } catch (e) {
-    print("Error sending message: $e");
-    return null;
-  }
-}
-//method to mark conversation as read
-Future<Response?> markConversationRead(int conversationId) async {
-  try {
-    final token = await TokenStorage.getToken();
-    if (token == null) return null;
-
-    return await _dio.post(
-      "${_baseUrl}conversations/$conversationId/read",
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-      ),
-    );
-  } catch (e) {
-    print("Error marking read: $e");
-    return null;
-  }
-}
-Future<Response?> getConversations() async {
-  try {
-    final token = await TokenStorage.getToken();
-    if (token == null) return null;
-
-    return await _dio.get(
-      "${_baseUrl}conversations",
-      options: Options(
-        headers: {
-          "Authorization": "Bearer $token",
-          "Accept": "application/json",
-        },
-      ),
-    );
-  } catch (e) {
-    print("Error fetching conversations: $e");
-    return null;
-  }
+  Future getNotifications() => social.getNotifications();
+  Future markNotificationAsRead(String id) => social.markNotificationAsRead(id);
+  Future getConversations() => social.getConversations();
+  Future getMessages(int conversationId) => social.getMessages(conversationId);
+  Future sendMessage(int conversationId, String body) => social.sendMessage(conversationId, body);
+  Future markConversationRead(int conversationId) => social.markConversationRead(conversationId);
 }
 
-
-}
