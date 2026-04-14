@@ -1,3 +1,4 @@
+import '../models/user.dart';
 import 'auth_service.dart';
 import 'workout_service.dart';
 import 'nutrition_service.dart';
@@ -16,8 +17,11 @@ class ApiService {
 
   // Mapping old methods to new modular services to avoid breaking changes
   Future login(String email, String password) => auth.login(email, password);
-  Future register({required String name, required String email, required String password, required String role}) => 
+  Future register({required String name, required String email, required String password, required String role}) =>
       auth.register(name: name, email: email, password: password, role: role);
+
+  Future<User> fetchCurrentUser() => auth.fetchCurrentUser();
+  Future<void> logout() => auth.logout();
 
   /// Web API: today's schedules (list).
   Future fetchTodaySchedules() => workout.fetchTodaySchedules();

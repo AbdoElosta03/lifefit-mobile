@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../auth/auth_provider.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
 import '../../../features/client/experts/experts_screen.dart';
 import '../../../features/client/chats/chats_screen.dart';
 import '../../../features/client/profile_web/profile_screen_web.dart';
 import '../../../features/client/Subscriptions/subscriptions_screen.dart';
-class ClientDrawer extends StatelessWidget {
+class ClientDrawer extends ConsumerWidget {
   const ClientDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Drawer(
       // حواف دائرية ناعمة لتناسب التصميم الاحترافي
       shape: const RoundedRectangleBorder(
@@ -111,8 +114,9 @@ class ClientDrawer extends StatelessWidget {
 
           // 3. زر تسجيل الخروج
           const Divider(),
-          _buildDrawerItem(context, Icons.logout_rounded, 'تسجيل الخروج', () {
-            // كود تسجيل الخروج والربط مع Laravel مستقبلاً
+          _buildDrawerItem(context, Icons.logout_rounded, 'تسجيل الخروج', () async {
+            Navigator.pop(context);
+            await ref.read(authProvider.notifier).logout();
           }, isLogout: true),
           const SizedBox(height: 20),
         ],

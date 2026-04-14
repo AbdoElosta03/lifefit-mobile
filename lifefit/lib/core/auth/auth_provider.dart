@@ -1,8 +1,10 @@
+import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import 'auth_state.dart';
+import 'token_storage.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
-import 'package:dio/dio.dart';
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
   (ref) => AuthNotifier(),
@@ -13,6 +15,34 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   AuthNotifier() : super(const AuthState());
 
+  /// Call once on app start: restores [User] when a token exists in [TokenStorage].
+  Future<void> restoreSession() async {
+    if (!state.isInitializing) return;
+
+    try {
+      final hasToken = await TokenStorage.hasToken();
+      if (!hasToken) {
+        state = state.copyWith(isInitializing: false);
+        return;
+      }
+
+      final user = await _api.fetchCurrentUser();
+      state = state.copyWith(user: user, isInitializing: false, isLoading: false);
+    } catch (_) {
+      await TokenStorage.deleteToken();
+      state = state.copyWith(
+        isInitializing: false,
+        isLoading: false,
+        clearUser: true,
+      );
+    }
+  }
+
+  Future<void> logout() async {
+    await _api.logout();
+    state = const AuthState(isInitializing: false, isLoading: false);
+  }
+
   Future<void> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -20,9 +50,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final response = await _api.login(email, password);
       final user = User.fromJson(response.data['user']);
 
-      state = state.copyWith(user: user, isLoading: false);
-      
-
+      state = state.copyWith(
+        user: user,
+        isLoading: false,
+        isInitializing: false,
+      );
     } on DioException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: _toUserMessage(e));
     }
@@ -45,7 +77,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
       );
       final user = User.fromJson(response.data['user']);
 
-      state = state.copyWith(user: user, isLoading: false);
+      state = state.copyWith(
+        user: user,
+        isLoading: false,
+        isInitializing: false,
+      );
     } on DioException catch (e) {
       state = state.copyWith(isLoading: false, errorMessage: _toUserMessage(e));
     }

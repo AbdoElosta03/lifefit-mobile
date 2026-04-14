@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'goals_section.dart';
+import 'measurements_section.dart';
 import 'personal_records_preview_section.dart';
 
 class ProgressScreen extends ConsumerWidget {
@@ -29,6 +30,8 @@ class ProgressScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 22),
             const GoalsSection(),
+            const SizedBox(height: 22),
+            const MeasurementsSection(),
             const SizedBox(height: 22),
             const PersonalRecordsPreviewSection(),
           ],

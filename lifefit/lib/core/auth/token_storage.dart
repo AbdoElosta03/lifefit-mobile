@@ -37,7 +37,7 @@ class TokenStorage {
 
   // 4. دالة للتأكد هل المستخدم مسجل دخول أم لا (وجود توكن)
   static Future<bool> hasToken() async {
-    String? token = await getToken();
-    return token != null;
+    final token = await getToken();
+    return token != null && token.isNotEmpty;
   }
 }
