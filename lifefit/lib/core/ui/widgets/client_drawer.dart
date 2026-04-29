@@ -4,10 +4,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../auth/auth_provider.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
-import '../../../features/client/experts/experts_screen.dart';
+
 import '../../../features/client/chats/chats_screen.dart';
 import '../../../features/client/profile_web/profile_screen_web.dart';
-import '../../../features/client/Subscriptions/subscriptions_screen.dart';
+
+import '../../../features/client/programs/client_programs_screen.dart';
+import '../../../features/client/progress_photos/progress_photos_screen.dart';
+
 class ClientDrawer extends ConsumerWidget {
   const ClientDrawer({super.key});
 
@@ -68,13 +71,27 @@ class ClientDrawer extends ConsumerWidget {
                     MaterialPageRoute(builder: (context) => const ProfileScreenWeb()),
                   );
                 }),
-                _buildDrawerItem(context, Icons.group_rounded, 'الخبراء', () {
-                  Navigator.pop(context); 
+                _buildDrawerItem(context, Icons.playlist_add_check_rounded, 'برامجي', () {
+                  Navigator.pop(context);
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => const ExpertsScreen()),
+                    MaterialPageRoute(builder: (context) => const ClientProgramsScreen()),
                   );
                 }),
+                _buildDrawerItem(context, Icons.photo_camera_back_outlined, 'صور التقدم', () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProgressPhotosScreen()),
+                  );
+                }),
+                // _buildDrawerItem(context, Icons.group_rounded, 'الخبراء', () {
+                //   Navigator.pop(context); 
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(builder: (context) => const ExpertsScreen()),
+                //   );
+                // }),
                 _buildDrawerItem(context, Icons.chat_bubble_outline_rounded, 'المحادثات', () {
                   Navigator.pop(context); 
                   Navigator.push(
@@ -92,14 +109,14 @@ class ClientDrawer extends ConsumerWidget {
                     MaterialPageRoute(builder: (context) => const NotificationsScreen()),
                   );
                 }),
-                _buildDrawerItem(context, Icons.card_membership_rounded, 'الاشتراكات', () {
-                  Navigator.pop(context); // إغلاق الدرواير
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SubscriptionsScreen()),
-                  );
-                  // أضف وجهة الاشتراكات هنا
-                }),
+                // _buildDrawerItem(context, Icons.card_membership_rounded, 'الاشتراكات', () {
+                //   Navigator.pop(context); // إغلاق الدرواير
+                //   Navigator.push(
+                //     context,
+                //     MaterialPageRoute(builder: (context) => const SubscriptionsScreen()),
+                //   );
+                //   // أضف وجهة الاشتراكات هنا
+                // }),
                 _buildDrawerItem(context, Icons.settings_outlined, 'اعدادات الحساب', () {
                   // أضف وجهة الإعدادات هنا
                   Navigator.pop(context); // إغلاق الدرواير

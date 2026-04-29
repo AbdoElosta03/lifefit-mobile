@@ -1,19 +1,22 @@
 import '../models/user.dart';
 import 'auth_service.dart';
 import 'workout_service.dart';
-import 'nutrition_service.dart';
-import 'profile_service.dart';
+
+
 import 'profile_web_service.dart';
 import 'social_service.dart';
+import 'notification_service.dart';
+import '../models/notifications/paginated_notifications.dart';
 
 /// One-stop shop for all services to maintain backward compatibility
 class ApiService {
   final auth = AuthService();
   final workout = WorkoutService();
-  final nutrition = NutritionService();
-  final profile = ProfileService();
+ 
+
   final profileWeb = ProfileWebService();
   final social = SocialService();
+  final notification = NotificationService();
 
   // Mapping old methods to new modular services to avoid breaking changes
   Future login(String email, String password) => auth.login(email, password);
@@ -30,18 +33,10 @@ class ApiService {
   Future updateProfileWeb(Map<String, dynamic> body) =>
       profileWeb.updateProfile(body);
 
-  Future getTodayNutrition() => nutrition.getTodayNutrition();
-  Future saveDailyIntakeMealLog({String? logDate, required int mealId, required List<Map<String, dynamic>> items}) => 
-      nutrition.saveDailyIntakeMealLog(logDate: logDate, mealId: mealId, items: items);
-
-  Future getProfile() => profile.getProfile();
-  Future saveProfile(Map<String, dynamic> body) => profile.saveProfile(body);
-  Future getExperts() => profile.getExperts();
-  Future getSubscriptions() => profile.getSubscriptions();
-  Future cancelSubscription(String id) => profile.cancelSubscription(id);
-
-  Future getNotifications() => social.getNotifications();
-  Future markNotificationAsRead(String id) => social.markNotificationAsRead(id);
+  Future<PaginatedNotifications> fetchNotificationsPage({int page = 1}) =>
+      notification.fetchPage(page: page);
+  Future<void> markNotificationAsReadById(int id) => notification.markAsRead(id);
+  Future<void> markAllNotificationsRead() => notification.markAllRead();
   Future getConversations() => social.getConversations();
   Future getMessages(int conversationId) => social.getMessages(conversationId);
   Future sendMessage(int conversationId, String body) => social.sendMessage(conversationId, body);

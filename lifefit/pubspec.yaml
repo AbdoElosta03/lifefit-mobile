@@ -33,12 +33,14 @@ dependencies:
   flutter_riverpod: ^2.5.1
   flutter_secure_storage: ^8.1.0
   dio: ^5.2.1
+  image_picker: ^1.1.2
   url_launcher: ^6.3.1
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
   intl: ^0.20.2
+  audioplayers: ^6.1.0
   fl_chart: ^0.69.2
   laravel_echo: ^1.0.0-beta.1
   pusher_client_fixed: ^0.0.5
@@ -64,6 +66,9 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  assets:
+    - assets/sounds/notify.wav
   
   fonts:
     - family: Tajawal

@@ -1,16 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart'; // 1. أضف هذا السطر
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/ui/base_screen.dart';
 import '../../../core/ui/widgets/custom_app_bar.dart';
 import '../../../core/ui/widgets/bottom_navigation.dart';
 import '../../../core/ui/widgets/client_drawer.dart';
 import '../dashboard/client_dashboard_widget.dart';
-import '../nutrition/nutrition_screen.dart';
+
+import '../notifications/notification_provider.dart';
 import '../workouts/workouts_screen.dart';
 import '../progrees/progress_screen.dart';
 
-
-// 3. تغيير StatefulWidget إلى ConsumerStatefulWidget
 class ClientHomeScreen extends ConsumerStatefulWidget {
   const ClientHomeScreen({super.key});
 
@@ -18,17 +19,40 @@ class ClientHomeScreen extends ConsumerStatefulWidget {
   ConsumerState<ClientHomeScreen> createState() => _ClientHomeScreenState();
 }
 
-// 4. تغيير State إلى ConsumerState
-class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
+class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen>
+    with WidgetsBindingObserver {
   int _currentIndex = 0;
+  Timer? _notificationPollTimer;
 
   final List<Widget> _pages = const [
     ClientDashboardWidget(),
     WorkoutsScreen(),
-    NutritionScreen(),
     ProgressScreen(),
-    
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _notificationPollTimer = Timer.periodic(
+      const Duration(seconds: 45),
+      (_) => ref.read(notificationsProvider.notifier).pollForNewNotifications(),
+    );
+  }
+
+  @override
+  void dispose() {
+    _notificationPollTimer?.cancel();
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      ref.read(notificationsProvider.notifier).pollForNewNotifications();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +64,6 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen> {
       bottomNavigationBar: BottomNavigationWidget(
         currentIndex: _currentIndex,
         onTap: (index) {
-          // أولاً: نغير الصفحة باستخدام setState العادية
           setState(() {
             _currentIndex = index;
           });

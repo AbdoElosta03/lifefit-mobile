@@ -1,16 +1,53 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'notification_provider.dart';
 import 'package:intl/intl.dart';
 
-class NotificationsScreen extends ConsumerWidget {
+import 'notification_provider.dart';
+
+class NotificationsScreen extends ConsumerStatefulWidget {
   const NotificationsScreen({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    ref.read(NotificationProvider.provider.notifier).fetchNotifications();
+  ConsumerState<NotificationsScreen> createState() => _NotificationsScreenState();
+}
 
-    final notifications = ref.watch(NotificationProvider.provider);
+class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (!_scrollController.hasClients) return;
+    final pos = _scrollController.position;
+    if (pos.pixels >= pos.maxScrollExtent - 160) {
+      ref.read(notificationsProvider.notifier).loadMore();
+    }
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final state = ref.watch(notificationsProvider);
+    ref.listen<String?>(
+      notificationsProvider.select((s) => s.error),
+      (prev, next) {
+        if (next != null && next.isNotEmpty && context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(next)),
+          );
+        }
+      },
+    );
 
     return Scaffold(
       backgroundColor: const Color(0xFFF8F9FA),
@@ -30,60 +67,103 @@ class NotificationsScreen extends ConsumerWidget {
           ),
           onPressed: () => Navigator.pop(context),
         ),
+        actions: [
+          TextButton(
+            onPressed: state.items.any((n) => !n.isRead)
+                ? () => ref.read(notificationsProvider.notifier).markAllRead()
+                : null,
+            child: const Text(
+              'تعليم الكل كمقروء',
+              style: TextStyle(
+                color: Color(0xFF00D9D9),
+                fontWeight: FontWeight.w600,
+                fontSize: 13,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+        ],
       ),
-      // إضافة RefreshIndicator هنا
       body: RefreshIndicator(
-        color: const Color(0xFF00D9D9), // لون حلقة التحميل
-        onRefresh: () async {
-          // استدعاء دالة الجلب وانتظارها حتى تنتهي
-          await ref
-              .read(NotificationProvider.provider.notifier)
-              .fetchNotifications();
-        },
-        child: notifications.isEmpty
+        color: const Color(0xFF00D9D9),
+        onRefresh: () => ref.read(notificationsProvider.notifier).refresh(),
+        child: state.loading && state.items.isEmpty
             ? ListView(
-                // استخدمنا ListView هنا ليعمل السحب حتى لو القائمة فارغة
+                physics: const AlwaysScrollableScrollPhysics(),
                 children: const [
-                  SizedBox(height: 200),
-                  Center(child: Text('لا توجد إشعارات حالياً')),
+                  SizedBox(height: 120),
+                  Center(child: CircularProgressIndicator(color: Color(0xFF00D9D9))),
                 ],
               )
-            : ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification = notifications[index];
-
-                  return GestureDetector(
-                    onTap: () {
-                      if (!notification.isRead) {
-                        ref
-                            .read(NotificationProvider.provider.notifier)
-                            .markAsRead(int.parse(notification.id));
+            : state.items.isEmpty
+                ? ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    children: const [
+                      SizedBox(height: 200),
+                      Center(child: Text('لا توجد إشعارات حالياً')),
+                    ],
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(16),
+                    itemCount: state.items.length + (state.loadingMore ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index >= state.items.length) {
+                        return const Padding(
+                          padding: EdgeInsets.symmetric(vertical: 24),
+                          child: Center(
+                            child: SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: CircularProgressIndicator(
+                                color: Color(0xFF00D9D9),
+                                strokeWidth: 2,
+                              ),
+                            ),
+                          ),
+                        );
                       }
+                      final notification = state.items[index];
+                      final timeStr = notification.createdAt != null
+                          ? DateFormat('hh:mm a').format(notification.createdAt!.toLocal())
+                          : '';
+
+                      return GestureDetector(
+                        onTap: () {
+                          if (!notification.isRead) {
+                            ref.read(notificationsProvider.notifier).markOneRead(notification.id);
+                          }
+                        },
+                        child: _NotificationCard(
+                          title: notification.title,
+                          content: notification.body,
+                          time: timeStr,
+                          isRead: notification.isRead,
+                        ),
+                      );
                     },
-                    child: _buildNotificationCard(
-                      title: notification.title,
-                      content: notification.message,
-                      time: DateFormat(
-                        'hh:mm a',
-                      ).format(notification.timestamp),
-                      isRead: notification.isRead,
-                    ),
-                  );
-                },
-              ),
+                  ),
       ),
     );
   }
+}
 
-  // دالة بناء الكارد تبقى كما هي دون تغيير
-  Widget _buildNotificationCard({
-    required String title,
-    required String content,
-    required String time,
-    required bool isRead,
-  }) {
+class _NotificationCard extends StatelessWidget {
+  final String title;
+  final String content;
+  final String time;
+  final bool isRead;
+
+  const _NotificationCard({
+    required this.title,
+    required this.content,
+    required this.time,
+    required this.isRead,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),

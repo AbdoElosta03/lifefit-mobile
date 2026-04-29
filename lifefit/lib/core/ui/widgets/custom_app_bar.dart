@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-// تأكد من استيراد الملفات الخاصة بالصفحات هنا
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
 import '../../../features/client/profile_web/profile_screen_web.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
+import '../../../features/client/notifications/notification_provider.dart';
 
-
-
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
   final String title;
 
   const CustomAppBar({
@@ -14,24 +14,28 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unread = ref.watch(unreadNotificationCountProvider);
+    final hasUnread = unread > 0;
+    final badgeLabel = unread > 99 ? '99+' : '$unread';
+
     return AppBar(
       backgroundColor: Colors.white,
       elevation: 0.5,
       centerTitle: true,
       automaticallyImplyLeading: false,
-
-      // العنوان في المنتصف
-      title: Text(title,
-          style: const TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18)),
-
-      // الأيقونات جهة اليسار (الصورة الشخصية والتنبيهات)
-      leadingWidth: 110,
+      title: Text(
+        title,
+        style: const TextStyle(
+          color: Colors.black,
+          fontWeight: FontWeight.bold,
+          fontSize: 18,
+        ),
+      ),
+      leadingWidth: 124,
       leading: Row(
         children: [
           const SizedBox(width: 15),
-          // صورة الملف الشخصي (تذهب للملف الصحي)
           InkWell(
             onTap: () {
               Navigator.push(
@@ -45,29 +49,70 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(12),
                 image: const DecorationImage(
-                  image: NetworkImage('https://cdn-icons-png.flaticon.com/512/3135/3135715.png'), // صورة افتراضية من الإنترنت
+                  image: NetworkImage(
+                    'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                  ),
                   fit: BoxFit.cover,
                 ),
               ),
             ),
           ),
           const SizedBox(width: 10),
-          // أيقونة الإشعارات (تذهب لصفحة الإشعارات)
-          _buildActionIcon(
-            icon: Icons.notifications_none_rounded,
-            color: Colors.black87,
-            bgColor: const Color(0xFFF5F5F5),
+          InkWell(
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const NotificationsScreen()),
               );
             },
+            borderRadius: BorderRadius.circular(12),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFF5F5F5),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(
+                    hasUnread
+                        ? Icons.notifications_active_rounded
+                        : Icons.notifications_none_rounded,
+                    color: hasUnread ? const Color(0xFF00D9D9) : Colors.black87,
+                    size: 22,
+                  ),
+                ),
+                if (hasUnread)
+                  Positioned(
+                    right: -2,
+                    top: -2,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.redAccent,
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                      child: Text(
+                        badgeLabel,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          height: 1.2,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
           ),
         ],
       ),
-
-      // أيقونة المنيو جهة اليمين
       actions: [
         IconButton(
           icon: const Icon(Icons.notes_rounded, color: Colors.black, size: 28),
@@ -75,27 +120,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         const SizedBox(width: 10),
       ],
-    );
-  }
-
-  Widget _buildActionIcon({
-    required IconData icon,
-    required Color color,
-    required Color bgColor,
-    VoidCallback? onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Icon(icon, color: color, size: 22),
-      ),
     );
   }
 

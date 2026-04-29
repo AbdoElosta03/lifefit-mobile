@@ -4,6 +4,8 @@ import '../models/progress/body_measurement.dart';
 import '../models/progress/paginated_measurements.dart';
 import '../models/progress/personal_record.dart';
 import '../models/progress/client_goal.dart';
+import '../models/progress/progress_photo.dart';
+import '../models/progress/progress_photos_grouped.dart';
 
 /// Web client progress APIs (`/api/client/...`).
 class ProgressService extends BaseService {
@@ -111,6 +113,71 @@ class ProgressService extends BaseService {
         );
       }
       throw Exception('رد غير متوقع من الخادم');
+    } on DioException catch (e) {
+      _throwDio(e);
+    }
+  }
+
+  /// GET `/api/client/photos` → `{ "data": { "Y-m-d": [ ... ] } }` (grouped by date).
+  Future<List<ProgressPhotosDay>> fetchProgressPhotos() async {
+    try {
+      final response = await dio.get('client/photos');
+      if (response.statusCode == 200 && response.data is Map) {
+        final inner = (response.data as Map)['data'];
+        return ProgressPhotosDay.parseGroupedData(inner);
+      }
+      return [];
+    } on DioException catch (e) {
+      throw Exception(
+        e.response?.data?['message']?.toString() ??
+            'تعذر تحميل صور التقدم: ${e.message}',
+      );
+    }
+  }
+
+  /// POST `/api/client/photos` — multipart: date, photo, photo_type, optional notes.
+  Future<ProgressPhoto> storeProgressPhoto({
+    required DateTime date,
+    required List<int> bytes,
+    required String fileName,
+    required String photoType,
+    String? notes,
+  }) async {
+    var name = fileName.trim().isEmpty ? 'photo.jpg' : fileName.trim();
+    if (!name.contains('.')) {
+      name = '$name.jpg';
+    }
+    try {
+      final fields = <String, dynamic>{
+        'date': ClientGoal.formatDateForApi(date),
+        'photo': MultipartFile.fromBytes(bytes, filename: name),
+        'photo_type': photoType,
+      };
+      if (notes != null && notes.trim().isNotEmpty) {
+        fields['notes'] = notes.trim();
+      }
+      final form = FormData.fromMap(fields);
+      final response = await dio.post('client/photos', data: form);
+      if ((response.statusCode == 200 || response.statusCode == 201) &&
+          response.data is Map &&
+          (response.data as Map)['data'] != null) {
+        return ProgressPhoto.fromJson(
+          Map<String, dynamic>.from((response.data as Map)['data'] as Map),
+        );
+      }
+      throw Exception('Unexpected server response');
+    } on DioException catch (e) {
+      _throwDio(e);
+    }
+  }
+
+  /// DELETE `/api/client/photos/{id}`
+  Future<void> deleteProgressPhoto(int id) async {
+    try {
+      final response = await dio.delete('client/photos/$id');
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw Exception('Unexpected server response');
+      }
     } on DioException catch (e) {
       _throwDio(e);
     }

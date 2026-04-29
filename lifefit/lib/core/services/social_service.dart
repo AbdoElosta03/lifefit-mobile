@@ -2,24 +2,6 @@ import 'package:dio/dio.dart';
 import 'base_service.dart';
 
 class SocialService extends BaseService {
-  Future<Response?> getNotifications() async {
-    try {
-      return await dio.get("client/app-notifications");
-    } catch (e) {
-      if (e is DioException && e.response != null) return e.response;
-      return null;
-    }
-  }
-
-  Future<Response?> markNotificationAsRead(String id) async {
-    try {
-      return await dio.post("client/app-notifications/$id/read");
-    } catch (e) {
-      if (e is DioException && e.response != null) return e.response;
-      return null;
-    }
-  }
-
   Future<Response?> getConversations() async {
     try {
       return await dio.get("conversations");
