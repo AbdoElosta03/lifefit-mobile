@@ -11,6 +11,8 @@ import '../dashboard/client_dashboard_widget.dart';
 import '../notifications/notification_provider.dart';
 import '../workouts/workouts_screen.dart';
 import '../progrees/progress_screen.dart';
+import '../nutrition/nutrition_screen.dart';
+import 'client_home_provider.dart';
 
 class ClientHomeScreen extends ConsumerStatefulWidget {
   const ClientHomeScreen({super.key});
@@ -21,12 +23,12 @@ class ClientHomeScreen extends ConsumerStatefulWidget {
 
 class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen>
     with WidgetsBindingObserver {
-  int _currentIndex = 0;
   Timer? _notificationPollTimer;
 
-  final List<Widget> _pages = const [
+  static const List<Widget> _pages = [
     ClientDashboardWidget(),
     WorkoutsScreen(),
+    NutritionScreen(),
     ProgressScreen(),
   ];
 
@@ -56,20 +58,16 @@ class _ClientHomeScreenState extends ConsumerState<ClientHomeScreen>
 
   @override
   Widget build(BuildContext context) {
+    final currentIndex = ref.watch(clientHomeProvider.select((s) => s.selectedTab));
+
     return BaseScreen(
-      appBar: CustomAppBar(
-        title: 'lifeFit',
-      ),
+      appBar: CustomAppBar(title: 'lifeFit'),
       drawer: const ClientDrawer(),
       bottomNavigationBar: BottomNavigationWidget(
-        currentIndex: _currentIndex,
-        onTap: (index) {
-          setState(() {
-            _currentIndex = index;
-          });
-        },
+        currentIndex: currentIndex,
+        onTap: (index) => ref.read(clientHomeProvider.notifier).changeTab(index),
       ),
-      body: _pages[_currentIndex],
+      body: _pages[currentIndex],
     );
   }
 }

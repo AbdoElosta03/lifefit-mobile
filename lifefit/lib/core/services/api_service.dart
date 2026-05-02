@@ -1,8 +1,7 @@
 import '../models/user.dart';
 import 'auth_service.dart';
 import 'workout_service.dart';
-
-
+import 'nutrition_service.dart';
 import 'profile_web_service.dart';
 import 'social_service.dart';
 import 'notification_service.dart';
@@ -12,7 +11,7 @@ import '../models/notifications/paginated_notifications.dart';
 class ApiService {
   final auth = AuthService();
   final workout = WorkoutService();
- 
+  final nutrition = NutritionService();
 
   final profileWeb = ProfileWebService();
   final social = SocialService();
