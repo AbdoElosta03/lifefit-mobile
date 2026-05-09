@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../auth/auth_provider.dart';
 import '../../../features/client/profile_web/profile_screen_web.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/notifications/notification_provider.dart';
@@ -18,6 +19,8 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final unread = ref.watch(unreadNotificationCountProvider);
     final hasUnread = unread > 0;
     final badgeLabel = unread > 99 ? '99+' : '$unread';
+    final user = ref.watch(authProvider).user;
+    final avatarUrl = user?.avatar;
 
     return AppBar(
       backgroundColor: Colors.white,
@@ -40,22 +43,12 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
             onTap: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ProfileScreenWeb()),
+                MaterialPageRoute(
+                    builder: (context) => const ProfileScreenWeb()),
               );
             },
-            child: Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(12),
-                image: const DecorationImage(
-                  image: NetworkImage(
-                    'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                  ),
-                  fit: BoxFit.cover,
-                ),
-              ),
-            ),
+            borderRadius: BorderRadius.circular(12),
+            child: _AvatarWidget(url: avatarUrl),
           ),
           const SizedBox(width: 10),
           InkWell(
@@ -125,4 +118,37 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   @override
   Size get preferredSize => const Size.fromHeight(60);
+}
+
+class _AvatarWidget extends StatelessWidget {
+  final String? url;
+  const _AvatarWidget({this.url});
+
+  @override
+  Widget build(BuildContext context) {
+    if (url != null && url!.isNotEmpty) {
+      return Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          image: DecorationImage(
+            image: NetworkImage(url!),
+            fit: BoxFit.cover,
+            onError: (_, __) {},
+          ),
+          color: const Color(0xFF00D9D9).withValues(alpha: 0.1),
+        ),
+      );
+    }
+    return Container(
+      width: 38,
+      height: 38,
+      decoration: BoxDecoration(
+        color: const Color(0xFF00D9D9).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: const Icon(Icons.person, color: Color(0xFF00D9D9), size: 22),
+    );
+  }
 }

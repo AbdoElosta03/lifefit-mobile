@@ -82,19 +82,35 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     });
   }
 
+  TodaySchedule _scheduleForSubmit() {
+    final list = ref.read(todaySchedulesProvider).valueOrNull;
+    if (list != null) {
+      for (final s in list) {
+        if (s.scheduleId == widget.schedule.scheduleId) return s;
+      }
+    }
+    return widget.schedule;
+  }
+
   Future<void> _submitLog() async {
     if (_isSubmitting) return;
     FocusScope.of(context).unfocus();
     setState(() => _isSubmitting = true);
 
     try {
-      final exerciseLogs = <ExerciseLog>[];
+      final schedule = _scheduleForSubmit();
+      final existingFromOthers = schedule.workoutLog?.exerciseLogs
+              .where((l) => l.exerciseId != _exercise.id)
+              .toList() ??
+          [];
+
+      final newLogs = <ExerciseLog>[];
       for (var i = 0; i < _sets.length; i++) {
         final s = _sets[i];
         final actualReps = _intFrom(s.repsCtrl.text, s.targetReps);
         final actualWeight = _doubleFrom(s.weightCtrl.text, s.targetWeight);
 
-        exerciseLogs.add(ExerciseLog(
+        newLogs.add(ExerciseLog(
           exerciseId: _exercise.id,
           setNumber: i + 1,
           targetReps: s.targetReps,
@@ -107,8 +123,10 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
         ));
       }
 
+      final exerciseLogs = [...existingFromOthers, ...newLogs];
+
       final success = await ref.read(todaySchedulesProvider.notifier).saveWorkoutLog(
-            scheduleId: _schedule.scheduleId,
+            scheduleId: schedule.scheduleId,
             exerciseLogs: exerciseLogs,
           );
 
@@ -118,8 +136,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تم حفظ سجل التمرين بنجاح')),
         );
-        int count = 0;
-        Navigator.of(context).popUntil((_) => count++ >= 2);
+        Navigator.of(context).pop();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('تعذر حفظ السجل، حاول مجدداً')),

@@ -39,7 +39,15 @@ class TodaySchedulesNotifier
 
       state.whenData((schedules) {
         final newList = schedules.map((s) {
-          return s.scheduleId == updated.scheduleId ? updated : s;
+          if (s.scheduleId != updated.scheduleId) return s;
+          // The API response does not load workout.exercises, so we preserve
+          // the original workout (with exercises) and only patch status + log.
+          return TodaySchedule(
+            scheduleId: s.scheduleId,
+            status: updated.status,
+            workout: s.workout,
+            workoutLog: updated.workoutLog,
+          );
         }).toList();
         state = AsyncValue.data(newList);
       });

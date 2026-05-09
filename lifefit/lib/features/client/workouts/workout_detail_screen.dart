@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/workout/today_schedule.dart';
 import '../../../core/models/workout/exercise.dart';
 import 'exercise_video_card.dart';
 import 'workout_log_screen.dart';
+import 'workout_provider.dart';
 
-class WorkoutDetailScreen extends StatelessWidget {
+class WorkoutDetailScreen extends ConsumerWidget {
   final TodaySchedule schedule;
   final Exercise exercise;
 
@@ -16,16 +18,27 @@ class WorkoutDetailScreen extends StatelessWidget {
 
   static const _primary = Color(0xFF00D9D9);
 
-  bool get _isDone => schedule.isExerciseLogged(exercise.id);
+  /// Always read the live schedule from the provider so state stays fresh.
+  TodaySchedule _liveSchedule(WidgetRef ref) {
+    final list = ref.watch(todaySchedulesProvider).valueOrNull;
+    if (list != null) {
+      for (final s in list) {
+        if (s.scheduleId == schedule.scheduleId) return s;
+      }
+    }
+    return schedule;
+  }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final live = _liveSchedule(ref);
+    final isDone = live.isExerciseLogged(exercise.id);
     final pivot = exercise.pivot;
     final videoUrl = exercise.videoUrl;
     final hasVideo = videoUrl != null && videoUrl.trim().isNotEmpty;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: const Color(0xFFF8FAFC),
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
@@ -39,8 +52,7 @@ class WorkoutDetailScreen extends StatelessWidget {
           ),
         ),
         leading: IconButton(
-          icon:
-              const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -89,8 +101,8 @@ class WorkoutDetailScreen extends StatelessWidget {
                     child: _detailCard('العدات', pivot.reps, Icons.repeat)),
                 const SizedBox(width: 12),
                 Expanded(
-                    child: _detailCard(
-                        'المجموعات', '${pivot.sets}', Icons.layers)),
+                    child:
+                        _detailCard('المجموعات', '${pivot.sets}', Icons.layers)),
               ]),
               const SizedBox(height: 12),
               Row(children: [
@@ -100,38 +112,56 @@ class WorkoutDetailScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                     child: _detailCard(
-                        'الراحة',
-                        '${pivot.restSeconds ?? 60} ثانية',
-                        Icons.timer)),
+                        'الراحة', '${pivot.restSeconds ?? 60} ثانية', Icons.timer)),
               ]),
             ],
             const SizedBox(height: 40),
+            // Status badge
+            if (isDone)
+              Center(
+                child: Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF00D9D9).withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: const Text(
+                    'تم إكمال هذا التمرين — يمكنك إعادة التسجيل لتحديثه',
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Color(0xFF00D9D9),
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: _isDone ? Colors.grey : _primary,
+                  backgroundColor: _primary,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15)),
-                  elevation: _isDone ? 0 : 2,
+                  elevation: 2,
                 ),
-                onPressed: _isDone
-                    ? null
-                    : () => Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => WorkoutLogScreen(
-                              schedule: schedule,
-                              exercise: exercise,
-                            ),
-                          ),
-                        ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => WorkoutLogScreen(
+                      schedule: live,
+                      exercise: exercise,
+                    ),
+                  ),
+                ),
                 child: Text(
-                  _isDone ? 'تم إكمال التمرين بنجاح' : 'ابدأ تسجيل المجموعات',
-                  style: TextStyle(
+                  isDone ? 'تعديل التسجيل' : 'ابدأ تسجيل المجموعات',
+                  style: const TextStyle(
                     fontSize: 18,
-                    color: _isDone ? Colors.white70 : Colors.white,
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -171,11 +201,13 @@ class WorkoutDetailScreen extends StatelessWidget {
                   );
                 },
                 errorBuilder: (_, __, ___) => const Center(
-                  child: Icon(Icons.fitness_center, size: 50, color: Colors.grey),
+                  child:
+                      Icon(Icons.fitness_center, size: 50, color: Colors.grey),
                 ),
               )
             : const Center(
-                child: Icon(Icons.fitness_center, size: 50, color: Colors.grey),
+                child:
+                    Icon(Icons.fitness_center, size: 50, color: Colors.grey),
               ),
       ),
     );
@@ -202,8 +234,8 @@ class WorkoutDetailScreen extends StatelessWidget {
               style: const TextStyle(fontSize: 12, color: Colors.grey)),
           const SizedBox(height: 2),
           Text(value,
-              style:
-                  const TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+              style: const TextStyle(
+                  fontSize: 15, fontWeight: FontWeight.bold)),
         ],
       ),
     );

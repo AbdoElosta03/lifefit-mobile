@@ -77,18 +77,32 @@ class _WorkoutCard extends ConsumerWidget {
       );
     }
 
-    final first = schedules.first;
-    final total = first.workout.exercises.length;
-    final done = first.workoutLog?.exerciseLogs.length ?? 0;
-    final progress = total > 0 ? done / total : 0.0;
-    final isCompleted = first.isCompleted;
+    // Aggregate across ALL schedules for the day
+    var totalExercises = 0;
+    var doneExercises = 0;
+    for (final s in schedules) {
+      totalExercises += s.workout.exercises.length;
+      if (s.workoutLog != null) {
+        final loggedIds =
+            s.workoutLog!.exerciseLogs.map((l) => l.exerciseId).toSet();
+        doneExercises +=
+            s.workout.exercises.where((e) => loggedIds.contains(e.id)).length;
+      }
+    }
+
+    final remaining = totalExercises - doneExercises;
+    final progress =
+        totalExercises > 0 ? doneExercises / totalExercises : 0.0;
+    final allDone = totalExercises > 0 && remaining == 0;
 
     return _ActivityCard(
-      icon: isCompleted ? Icons.check_circle_rounded : Icons.fitness_center_rounded,
+      icon: allDone
+          ? Icons.check_circle_rounded
+          : Icons.fitness_center_rounded,
       color: const Color(0xFF00D9D9),
       label: 'تمرين اليوم',
-      value: isCompleted ? 'مكتمل ✓' : '$done/$total',
-      sub: first.workout.name,
+      value: allDone ? 'مكتمل ✓' : '$remaining متبقي',
+      sub: '$doneExercises/$totalExercises تمرين',
       progress: progress,
       onTap: () => ref.read(clientHomeProvider.notifier).changeTab(1),
     );
