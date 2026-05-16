@@ -5,7 +5,7 @@ import '../../auth/auth_provider.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
 
-import '../../../features/client/chats/chats_screen.dart';
+import '../../../features/client/chats/screens/chat_list_screen.dart';
 import '../../../features/client/profile_web/profile_screen_web.dart';
 
 import '../../../features/client/programs/client_programs_screen.dart';

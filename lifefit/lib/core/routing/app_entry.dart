@@ -8,6 +8,7 @@ import '../../features/client/login/login_screen.dart';
 const Color _kPrimary = Color(0xFF00D9D9);
 
 /// Resolves session from secure storage on launch, then shows login or home.
+/// Online presence for chat is handled only in [ChatDetailsScreen], not here.
 class AppEntry extends ConsumerStatefulWidget {
   const AppEntry({super.key});
 

@@ -3,7 +3,7 @@ import 'auth_service.dart';
 import 'workout_service.dart';
 import 'nutrition_service.dart';
 import 'profile_web_service.dart';
-import 'social_service.dart';
+
 import 'notification_service.dart';
 import '../models/notifications/paginated_notifications.dart';
 
@@ -14,7 +14,7 @@ class ApiService {
   final nutrition = NutritionService();
 
   final profileWeb = ProfileWebService();
-  final social = SocialService();
+
   final notification = NotificationService();
 
   // Mapping old methods to new modular services to avoid breaking changes
@@ -36,9 +36,7 @@ class ApiService {
       notification.fetchPage(page: page);
   Future<void> markNotificationAsReadById(int id) => notification.markAsRead(id);
   Future<void> markAllNotificationsRead() => notification.markAllRead();
-  Future getConversations() => social.getConversations();
-  Future getMessages(int conversationId) => social.getMessages(conversationId);
-  Future sendMessage(int conversationId, String body) => social.sendMessage(conversationId, body);
-  Future markConversationRead(int conversationId) => social.markConversationRead(conversationId);
+  
+
 }
 
