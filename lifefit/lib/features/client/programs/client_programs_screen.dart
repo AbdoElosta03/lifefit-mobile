@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -19,7 +21,7 @@ class ClientProgramsScreen extends ConsumerWidget {
     final service = ClientProgramService();
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: async.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: _primary, strokeWidth: 2.5),

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/models/subscription/expert_model.dart';
@@ -87,7 +89,7 @@ class _ExpertServiceSelectionSheetState
                 decoration: BoxDecoration(
                   color: isSelected
                       ? _primary.withOpacity(0.07)
-                      : const Color(0xFFF8FAFC),
+                      : AppColors.background,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
                     color: isSelected ? _primary : Colors.grey.shade200,

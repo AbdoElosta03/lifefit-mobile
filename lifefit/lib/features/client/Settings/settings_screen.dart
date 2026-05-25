@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -6,7 +8,7 @@ class SettingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8F9FA),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('إعدادات الحساب', 
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),

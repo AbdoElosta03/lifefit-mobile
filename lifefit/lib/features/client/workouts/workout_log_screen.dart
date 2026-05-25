@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/workout/today_schedule.dart';
 import '../../../core/models/workout/exercise.dart';
@@ -164,7 +166,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F9),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,

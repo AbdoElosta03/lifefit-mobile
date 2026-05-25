@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ui/app_colors.dart';
 import '../../progrees/goals_provider.dart';
 import '../../profile_web/profile_provider_web.dart';
 
@@ -69,9 +70,9 @@ class _GoalCard extends StatelessWidget {
   }
 
   Color get _progressColor {
-    if (_progress >= 0.8) return const Color(0xFF22C55E);
-    if (_progress >= 0.5) return const Color(0xFF00D9D9);
-    return const Color(0xFF3ABEF9);
+    if (_progress >= 0.8) return AppColors.primaryDark;
+    if (_progress >= 0.5) return AppColors.primary;
+    return AppColors.primaryLight;
   }
 
   @override
@@ -84,7 +85,7 @@ class _GoalCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -100,14 +101,14 @@ class _GoalCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00D9D9).withOpacity(0.1),
+                  color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Text(
                   'الهدف: ${targetWeight.toStringAsFixed(1)} كغ',
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF00D9D9),
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -123,7 +124,7 @@ class _GoalCard extends StatelessWidget {
                     style: const TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const Text(
@@ -140,7 +141,7 @@ class _GoalCard extends StatelessWidget {
             child: LinearProgressIndicator(
               value: _progress,
               minHeight: 10,
-              backgroundColor: Colors.grey.withOpacity(0.1),
+              backgroundColor: Colors.grey.withValues(alpha: 0.1),
               valueColor: AlwaysStoppedAnimation<Color>(_progressColor),
             ),
           ),
@@ -188,11 +189,11 @@ class _SectionTitle extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(width: 6),
-        Icon(icon, size: 18, color: const Color(0xFF00D9D9)),
+        Icon(icon, size: 18, color: AppColors.primary),
       ],
     );
   }
@@ -204,7 +205,7 @@ class _CardSkeleton extends StatelessWidget {
     return Container(
       height: 100,
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.08),
+        color: Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
       ),
     );

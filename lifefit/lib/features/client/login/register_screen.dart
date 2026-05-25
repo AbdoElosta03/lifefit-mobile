@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/auth/auth_provider.dart';
 import '../../../core/routing/app_entry.dart';
@@ -53,7 +55,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authState = ref.watch(authProvider);
     return Scaffold(
       // خلفية فاتحة موحدة (نفس شاشة الدخول)
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: GestureDetector(
         onTap: () => FocusScope.of(context).unfocus(),
         child: Container(

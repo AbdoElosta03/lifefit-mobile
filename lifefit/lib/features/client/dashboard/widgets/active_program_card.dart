@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ui/app_colors.dart';
 import '../../programs/client_programs_provider.dart';
 
 /// Displays the first active/recent program assigned to the client.
@@ -35,15 +36,11 @@ class ActiveProgramCard extends ConsumerWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E293B), Color(0xFF334155)],
-                    begin: Alignment.topRight,
-                    end: Alignment.bottomLeft,
-                  ),
+                  gradient: AppColors.primaryGradient,
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF1E293B).withOpacity(0.2),
+                      color: AppColors.primaryDark.withValues(alpha: 0.25),
                       blurRadius: 12,
                       offset: const Offset(0, 6),
                     ),
@@ -61,8 +58,8 @@ class ActiveProgramCard extends ConsumerWidget {
                               horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
                             color: program.status == 'active'
-                                ? const Color(0xFF00D9D9).withOpacity(0.2)
-                                : Colors.white.withOpacity(0.1),
+                                ? Colors.white.withValues(alpha: 0.25)
+                                : Colors.white.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
@@ -70,7 +67,7 @@ class ActiveProgramCard extends ConsumerWidget {
                             style: TextStyle(
                               fontSize: 11,
                               color: program.status == 'active'
-                                  ? const Color(0xFF00D9D9)
+                                  ? Colors.white
                                   : Colors.white70,
                               fontWeight: FontWeight.w600,
                             ),
@@ -112,12 +109,12 @@ class ActiveProgramCard extends ConsumerWidget {
                           height: 28,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
-                            color: const Color(0xFF00D9D9).withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.25),
                           ),
                           child: const Icon(
                             Icons.person_outline,
                             size: 16,
-                            color: Color(0xFF00D9D9),
+                            color: Colors.white,
                           ),
                         ),
                       ],
@@ -191,11 +188,11 @@ class _SectionTitle extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(width: 6),
-        Icon(icon, size: 18, color: const Color(0xFF00D9D9)),
+        Icon(icon, size: 18, color: AppColors.primary),
       ],
     );
   }
@@ -207,7 +204,7 @@ class _CardSkeleton extends StatelessWidget {
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: Colors.grey.withOpacity(0.08),
+        color: Colors.grey.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(20),
       ),
     );

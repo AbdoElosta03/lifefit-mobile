@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/workout/today_schedule.dart';
@@ -11,7 +13,7 @@ class WorkoutsScreen extends ConsumerWidget {
   const WorkoutsScreen({super.key});
 
   static const _primary = Color(0xFF00D9D9);
-  static const _bg = Color(0xFFF8FAFC);
+  static const _bg = AppColors.background;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

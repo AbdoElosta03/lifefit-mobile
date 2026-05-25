@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../../core/models/subscription/expert_model.dart';
@@ -53,6 +55,7 @@ class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
           builder: (_) => ChatDetailsScreen(
             chatId: response.firebaseChatId,
             title: response.coachName,
+            peerId: response.coachId.toString(),
           ),
         ),
       );
@@ -74,7 +77,7 @@ class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
     final expertsAsync = ref.watch(expertsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: _primary,
         foregroundColor: Colors.white,

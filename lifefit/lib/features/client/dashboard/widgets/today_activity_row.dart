@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/workout/today_schedule.dart';
 import '../../../../core/models/nutrition/today_meals_response.dart';
 import '../../workouts/workout_provider.dart';
@@ -23,12 +24,12 @@ class TodayActivityRow extends ConsumerWidget {
             child: workoutsAsync.when(
               loading: () => _ActivityCard.loading(
                 icon: Icons.fitness_center_rounded,
-                color: const Color(0xFF00D9D9),
+                color: AppColors.primary,
                 label: 'تمرين اليوم',
               ),
               error: (_, __) => _ActivityCard.empty(
                 icon: Icons.fitness_center_rounded,
-                color: const Color(0xFF00D9D9),
+                color: AppColors.primary,
                 label: 'تمرين اليوم',
                 sub: 'لا يوجد',
               ),
@@ -40,12 +41,12 @@ class TodayActivityRow extends ConsumerWidget {
             child: nutritionAsync.when(
               loading: () => _ActivityCard.loading(
                 icon: Icons.restaurant_rounded,
-                color: const Color(0xFF3ABEF9),
+                color: AppColors.primaryLight,
                 label: 'التغذية',
               ),
               error: (_, __) => _ActivityCard.empty(
                 icon: Icons.restaurant_rounded,
-                color: const Color(0xFF3ABEF9),
+                color: AppColors.primaryLight,
                 label: 'التغذية',
                 sub: 'لا توجد بيانات',
               ),
@@ -71,7 +72,7 @@ class _WorkoutCard extends ConsumerWidget {
     if (schedules.isEmpty) {
       return _ActivityCard.empty(
         icon: Icons.self_improvement_rounded,
-        color: const Color(0xFF00D9D9),
+        color: AppColors.primary,
         label: 'تمرين اليوم',
         sub: 'يوم راحة',
       );
@@ -99,7 +100,7 @@ class _WorkoutCard extends ConsumerWidget {
       icon: allDone
           ? Icons.check_circle_rounded
           : Icons.fitness_center_rounded,
-      color: const Color(0xFF00D9D9),
+      color: AppColors.primary,
       label: 'تمرين اليوم',
       value: allDone ? 'مكتمل ✓' : '$remaining متبقي',
       sub: '$doneExercises/$totalExercises تمرين',
@@ -122,7 +123,7 @@ class _NutritionCard extends ConsumerWidget {
     if (data.meals.isEmpty) {
       return _ActivityCard.empty(
         icon: Icons.restaurant_outlined,
-        color: const Color(0xFF3ABEF9),
+        color: AppColors.primaryLight,
         label: 'التغذية',
         sub: 'لا توجد وجبات',
       );
@@ -136,7 +137,7 @@ class _NutritionCard extends ConsumerWidget {
 
     return _ActivityCard(
       icon: Icons.restaurant_rounded,
-      color: const Color(0xFF3ABEF9),
+      color: AppColors.primaryLight,
       label: 'التغذية',
       value: '${consumed.toStringAsFixed(0)} سعرة',
       sub: 'من ${target.toStringAsFixed(0)} | $eatenCount/$totalCount وجبة',
@@ -197,7 +198,7 @@ class _ActivityCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -212,7 +213,7 @@ class _ActivityCard extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(7),
                   decoration: BoxDecoration(
-                    color: color.withOpacity(0.1),
+                    color: color.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: Icon(icon, color: color, size: 18),
@@ -235,7 +236,10 @@ class _ActivityCard extends StatelessWidget {
                   child: SizedBox(
                     width: 18,
                     height: 18,
-                    child: CircularProgressIndicator(strokeWidth: 2),
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               )
@@ -245,7 +249,9 @@ class _ActivityCard extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: value == 'مكتمل ✓' ? Colors.green : const Color(0xFF1E293B),
+                  color: value == 'مكتمل ✓'
+                      ? AppColors.primaryDark
+                      : AppColors.textPrimary,
                 ),
                 textAlign: TextAlign.right,
                 maxLines: 1,
@@ -268,7 +274,7 @@ class _ActivityCard extends StatelessWidget {
                 value: progress,
                 minHeight: 5,
                 borderRadius: BorderRadius.circular(8),
-                backgroundColor: color.withOpacity(0.1),
+                backgroundColor: color.withValues(alpha: 0.1),
                 valueColor: AlwaysStoppedAnimation<Color>(color),
               ),
             ],

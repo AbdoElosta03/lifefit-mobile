@@ -1,6 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -226,7 +228,7 @@ class _AddProgressPhotoBodyState extends ConsumerState<_AddProgressPhotoBody> {
 
   Widget _dateRow(BuildContext context) {
     return Material(
-      color: const Color(0xFFF8F9FA),
+      color: AppColors.background,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: _saving

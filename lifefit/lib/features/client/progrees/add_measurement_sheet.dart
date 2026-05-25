@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/progress/client_goal.dart';
 import '../profile_web/profile_provider_web.dart';
@@ -188,7 +190,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
 
   Widget _dateTile() {
     return Material(
-      color: const Color(0xFFF8F9FA),
+      color: AppColors.background,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         onTap: _pickDate,

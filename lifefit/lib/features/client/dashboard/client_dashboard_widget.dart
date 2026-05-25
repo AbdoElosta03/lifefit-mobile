@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/auth/auth_provider.dart';
 import '../../client/workouts/workout_provider.dart';
@@ -32,9 +34,9 @@ class ClientDashboardWidget extends ConsumerWidget {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: RefreshIndicator(
-        color: const Color(0xFF00D9D9),
+        color: AppColors.primary,
         onRefresh: doRefresh,
         child: CustomScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
@@ -93,11 +95,11 @@ class _SectionLabel extends StatelessWidget {
             style: const TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w700,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(width: 6),
-          Icon(icon, size: 18, color: const Color(0xFF00D9D9)),
+          Icon(icon, size: 18, color: AppColors.primary),
         ],
       ),
     );

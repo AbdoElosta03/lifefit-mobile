@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_colors.dart';
+
 class BaseScreen extends StatelessWidget {
   final PreferredSizeWidget? appBar;
   final Widget body;
@@ -23,7 +25,7 @@ class BaseScreen extends StatelessWidget {
       body: body,
       endDrawer: drawer,
       bottomNavigationBar: bottomNavigationBar,
-      backgroundColor: backgroundColor ?? const Color(0xFFF5F5F5),
+      backgroundColor: backgroundColor ?? AppColors.background,
     );
   }
 }

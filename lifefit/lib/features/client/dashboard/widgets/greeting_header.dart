@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/models/user.dart';
+import '../../../../core/ui/app_colors.dart';
 
 class GreetingHeader extends StatelessWidget {
   final User? user;
@@ -42,7 +43,7 @@ class GreetingHeader extends StatelessWidget {
             style: const TextStyle(
               fontSize: 26,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 4),

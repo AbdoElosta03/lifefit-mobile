@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/services/subscription_service.dart';
@@ -53,7 +55,7 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
 
     _controller = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(const Color(0xFFF8FAFC))
+      ..setBackgroundColor(AppColors.background)
       ..setNavigationDelegate(NavigationDelegate(
         onPageFinished: (_) => setState(() => _isLoading = false),
       ))
@@ -110,7 +112,7 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,

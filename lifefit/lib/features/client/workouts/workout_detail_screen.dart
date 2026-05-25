@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/workout/today_schedule.dart';
 import '../../../core/models/workout/exercise.dart';
@@ -38,7 +40,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
     final hasVideo = videoUrl != null && videoUrl.trim().isNotEmpty;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,

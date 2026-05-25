@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'subscription_provider.dart';
@@ -24,7 +26,7 @@ class _TrainersScreenState extends ConsumerState<TrainersScreen> {
     final async = ref.watch(expertsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: async.when(
         loading: () =>
             const Center(child: CircularProgressIndicator(color: _primary)),

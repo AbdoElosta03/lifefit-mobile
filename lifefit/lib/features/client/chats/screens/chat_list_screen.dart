@@ -64,9 +64,7 @@ class ChatListScreen extends ConsumerWidget {
                   itemBuilder: (context, index) {
                     final chat = chats[index];
                     final title = _chatTitle(chat, role);
-                    final peerId = userId != null
-                        ? chat.otherParticipantId(userId)
-                        : '';
+                    final peerId = chat.otherParticipantId(userId);
                     return ChatListTile(
                       chat: chat,
                       title: title,

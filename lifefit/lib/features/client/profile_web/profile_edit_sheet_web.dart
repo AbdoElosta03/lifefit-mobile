@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
 import 'profile_provider_web.dart';
@@ -232,7 +234,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
         labelText: label,
         prefixIcon: Icon(icon, color: _accent, size: 20),
         filled: true,
-        fillColor: const Color(0xFFF8F9FA),
+        fillColor: AppColors.background,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
@@ -248,7 +250,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
         labelText: 'مستوى النشاط',
         prefixIcon: const Icon(Icons.directions_run, color: _accent, size: 20),
         filled: true,
-        fillColor: const Color(0xFFF8F9FA),
+        fillColor: AppColors.background,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,

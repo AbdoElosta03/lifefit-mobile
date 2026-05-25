@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ui/app_colors.dart';
 import '../../profile_web/profile_provider_web.dart';
 
 /// Three tiles: current weight, body fat %, muscle mass — from profile API.
@@ -34,7 +35,7 @@ class BodyStatsRow extends ConsumerWidget {
                     Expanded(
                       child: _StatTile(
                         icon: Icons.scale_outlined,
-                        color: const Color(0xFF6366F1),
+                        color: AppColors.primaryDark,
                         label: 'الوزن',
                         value: '${stats.weightKg!.toStringAsFixed(1)} كغ',
                       ),
@@ -45,7 +46,7 @@ class BodyStatsRow extends ConsumerWidget {
                     Expanded(
                       child: _StatTile(
                         icon: Icons.water_drop_outlined,
-                        color: const Color(0xFFEF4444),
+                        color: AppColors.primary,
                         label: 'الدهون',
                         value: '${stats.bodyFatPct!.toStringAsFixed(1)}%',
                       ),
@@ -56,7 +57,7 @@ class BodyStatsRow extends ConsumerWidget {
                     Expanded(
                       child: _StatTile(
                         icon: Icons.bolt_outlined,
-                        color: const Color(0xFF00D9D9),
+                        color: AppColors.primaryLight,
                         label: 'العضلات',
                         value: '${stats.muscleMassKg!.toStringAsFixed(1)} كغ',
                       ),
@@ -87,11 +88,11 @@ class _SectionTitle extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(width: 6),
-        Icon(icon, size: 18, color: const Color(0xFF00D9D9)),
+        Icon(icon, size: 18, color: AppColors.primary),
       ],
     );
   }
@@ -118,7 +119,7 @@ class _StatTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
@@ -129,7 +130,7 @@ class _StatTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: color, size: 20),
@@ -161,7 +162,7 @@ class _StatsRowSkeleton extends StatelessWidget {
             height: 90,
             margin: const EdgeInsets.only(right: 10),
             decoration: BoxDecoration(
-              color: Colors.grey.withOpacity(0.1),
+              color: Colors.grey.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(18),
             ),
           ),

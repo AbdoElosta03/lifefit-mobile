@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/nutrition/meal_schedule.dart';
@@ -16,7 +18,7 @@ class NutritionScreen extends ConsumerWidget {
     final state = ref.watch(nutritionProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppColors.background,
       body: state.when(
         loading: () => const Center(
           child: CircularProgressIndicator(color: Color(0xFF00D9D9)),

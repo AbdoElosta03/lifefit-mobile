@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
 import '../../../core/models/profile_web/current_body_stats.dart';
@@ -12,7 +14,7 @@ class ProfileScreenWeb extends ConsumerWidget {
 
   static const _accent = Color(0xFF00D9D9);
   static const _dark = Color(0xFF0E5E68);
-  static const _bg = Color(0xFFF8F9FA);
+  static const _bg = AppColors.background;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

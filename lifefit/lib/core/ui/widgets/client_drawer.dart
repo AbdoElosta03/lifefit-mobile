@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../app_colors.dart';
 import '../../auth/auth_provider.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
@@ -36,7 +37,7 @@ class ClientDrawer extends ConsumerWidget {
             width: double.infinity,
             padding: const EdgeInsets.only(top: 60, bottom: 30),
             decoration: const BoxDecoration(
-              color: Color(0xFF00D9D9),
+              gradient: AppColors.primaryGradient,
               borderRadius: BorderRadius.only(topLeft: Radius.circular(35)),
             ),
             child: Column(
@@ -172,11 +173,11 @@ class ClientDrawer extends ConsumerWidget {
         decoration: BoxDecoration(
           color: isLogout
               ? Colors.red[50]
-              : const Color(0xFF00D9D9).withValues(alpha: 0.08),
+              : AppColors.primary.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(10),
         ),
         child: Icon(icon,
-            color: isLogout ? Colors.redAccent : const Color(0xFF00D9D9),
+            color: isLogout ? Colors.redAccent : AppColors.primary,
             size: 22),
       ),
       title: Text(
@@ -212,9 +213,9 @@ class _UserAvatar extends StatelessWidget {
     }
     return CircleAvatar(
       radius: radius,
-      backgroundColor: const Color(0xFF00D9D9).withValues(alpha: 0.15),
+      backgroundColor: AppColors.primary.withValues(alpha: 0.15),
       child: Icon(Icons.person,
-          size: radius * 1.1, color: const Color(0xFF00D9D9)),
+          size: radius * 1.1, color: AppColors.primary),
     );
   }
 }
