@@ -7,7 +7,7 @@ import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
 
 import '../../../features/client/chats/screens/chat_list_screen.dart';
-import '../../../features/client/profile_web/profile_screen_web.dart';
+import '../../../features/client/profile/profile_screen.dart';
 
 import '../../../features/client/programs/client_programs_screen.dart';
 import '../../../features/client/progress_photos/progress_photos_screen.dart';
@@ -76,7 +76,7 @@ class ClientDrawer extends ConsumerWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => const ProfileScreenWeb()),
+                        builder: (_) => const ProfileScreen()),
                   );
                 }),
                 _item(context, Icons.playlist_add_check_rounded, 'برامجي',

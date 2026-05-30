@@ -18,7 +18,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
     required this.exercise,
   });
 
-  static const _primary = Color(0xFF00D9D9);
+  static const _primary = AppColors.primary;
 
   /// Always read the live schedule from the provider so state stays fresh.
   TodaySchedule _liveSchedule(WidgetRef ref) {
@@ -63,12 +63,14 @@ class WorkoutDetailScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Media header.
             _buildImage(),
             if (hasVideo) ...[
               const SizedBox(height: 16),
               ExerciseVideoCard(videoUrl: videoUrl.trim(), primary: _primary),
             ],
             const SizedBox(height: 24),
+            // Exercise name.
             Text(
               exercise.name,
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
@@ -76,6 +78,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
             if (exercise.description != null &&
                 exercise.description!.trim().isNotEmpty) ...[
               const SizedBox(height: 8),
+              // Exercise description.
               Text(
                 exercise.description!,
                 textAlign: TextAlign.right,
@@ -86,6 +89,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
             if (exercise.muscles != null &&
                 exercise.muscles!.trim().isNotEmpty) ...[
               const SizedBox(height: 8),
+              // Muscle list.
               Text(
                 'العضلات: ${exercise.muscles}',
                 style: const TextStyle(fontSize: 13, color: Colors.grey),
@@ -98,6 +102,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
             ),
             const SizedBox(height: 16),
             if (pivot != null) ...[
+              // Training details.
               Row(children: [
                 Expanded(
                     child: _detailCard('العدات', pivot.reps, Icons.repeat)),
@@ -118,7 +123,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
               ]),
             ],
             const SizedBox(height: 40),
-            // Status badge
+            // Status badge.
             if (isDone)
               Center(
                 child: Container(
@@ -126,14 +131,14 @@ class WorkoutDetailScreen extends ConsumerWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF00D9D9).withValues(alpha: 0.1),
+                    color: _primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
                   child: const Text(
                     'تم إكمال هذا التمرين — يمكنك إعادة التسجيل لتحديثه',
                     style: TextStyle(
                       fontSize: 12,
-                      color: Color(0xFF00D9D9),
+                      color: _primary,
                       fontWeight: FontWeight.w600,
                     ),
                     textAlign: TextAlign.center,
@@ -177,6 +182,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
 
   Widget _buildImage() {
     final url = exercise.imageUrl;
+    // Exercise image preview.
     return Container(
       height: 250,
       width: double.infinity,
@@ -216,6 +222,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
   }
 
   Widget _detailCard(String label, String value, IconData icon) {
+    // Small info card.
     return Container(
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
@@ -244,6 +251,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
   }
 
   String _weightText(double? w) {
+    // Format target weight.
     if (w == null || w == 0) return 'حسب قدرتك';
     return '${w.toStringAsFixed(w % 1 == 0 ? 0 : 1)} كجم';
   }

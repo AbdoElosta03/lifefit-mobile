@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/ui/app_colors.dart';
 import '../../../core/models/progress/body_measurement.dart';
 import 'add_measurement_sheet.dart';
 import 'goals_provider.dart';
 import 'measurements_provider.dart';
 import 'weight_progress_chart.dart';
 
-const Color _kPrimary = Color(0xFF00D9D9);
+const Color _kPrimary =  AppColors.primary;
 const Color _kDark = Color(0xFF1E293B);
 
 /// Body measurements history, latest metrics, weight chart vs goal target.
@@ -52,6 +53,7 @@ class MeasurementsSection extends ConsumerWidget {
       orElse: () => null,
     );
 
+    // Main section content by provider state.
     return async.when(
       loading: () => _loadingCard(),
       error: (e, _) => _errorCard(e.toString(), ref),
@@ -65,9 +67,11 @@ class MeasurementsSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Header row: action + title.
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Add measurement action.
                 TextButton.icon(
                   onPressed: () => showAddMeasurementSheet(context),
                   icon: const Icon(Icons.add_circle_outline, color: _kPrimary, size: 22),
@@ -79,6 +83,7 @@ class MeasurementsSection extends ConsumerWidget {
                     ),
                   ),
                 ),
+                // Section title.
                 const Text(
                   'قياسات الجسم',
                   style: TextStyle(
@@ -90,8 +95,10 @@ class MeasurementsSection extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
+            // Latest metrics grid.
             _metricGrid(latest),
             const SizedBox(height: 18),
+            // Weight chart card.
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(16),
@@ -103,6 +110,7 @@ class MeasurementsSection extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  // Chart title.
                   const Text(
                     'تطور الوزن',
                     style: TextStyle(
@@ -113,6 +121,7 @@ class MeasurementsSection extends ConsumerWidget {
                   ),
                   if (targetWeight != null) ...[
                     const SizedBox(height: 4),
+                    // Target line hint.
                     Text(
                       'خط أفقي = هدف الوزن من أهدافك (${targetWeight.toStringAsFixed(1)} كجم)',
                       textAlign: TextAlign.right,
@@ -120,6 +129,7 @@ class MeasurementsSection extends ConsumerWidget {
                     ),
                   ],
                   const SizedBox(height: 12),
+                  // Weight progress chart widget.
                   WeightProgressChart(
                     sortedAsc: asc,
                     targetWeightKg: targetWeight,
@@ -133,6 +143,7 @@ class MeasurementsSection extends ConsumerWidget {
     );
   }
 
+  // Latest measurement cards.
   Widget _metricGrid(BodyMeasurement? m) {
     return GridView.count(
       crossAxisCount: 2,
@@ -142,14 +153,19 @@ class MeasurementsSection extends ConsumerWidget {
       crossAxisSpacing: 10,
       childAspectRatio: 1.65,
       children: [
+        // Current weight card.
         _miniCard('الوزن الحالي', _fmt(m?.weightKg), 'كجم'),
+        // Body fat card.
         _miniCard('نسبة الدهون', _fmt(m?.bodyFatPct), '%'),
+        // Muscle mass card.
         _miniCard('كتلة العضلات', _fmt(m?.muscleMassKg), 'كجم'),
+        // Waist circumference card.
         _miniCard('محيط الخصر', _fmt(m?.waistCm), 'سم'),
       ],
     );
   }
 
+  // Single metric mini card.
   Widget _miniCard(String label, String value, String unit) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
@@ -162,6 +178,7 @@ class MeasurementsSection extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.end,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
+          // Metric label.
           Text(
             label,
             style: TextStyle(
@@ -172,6 +189,7 @@ class MeasurementsSection extends ConsumerWidget {
             textAlign: TextAlign.right,
           ),
           const SizedBox(height: 6),
+          // Metric value + unit.
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -207,6 +225,7 @@ class MeasurementsSection extends ConsumerWidget {
     return v.toStringAsFixed(1);
   }
 
+  // Loading state card.
   Widget _loadingCard() {
     return Container(
       padding: const EdgeInsets.all(20),
@@ -224,6 +243,7 @@ class MeasurementsSection extends ConsumerWidget {
     );
   }
 
+  // Error state card with retry.
   Widget _errorCard(String msg, WidgetRef ref) {
     return Container(
       width: double.infinity,
@@ -235,12 +255,14 @@ class MeasurementsSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          // Error message.
           Text(
             msg,
             textAlign: TextAlign.right,
             style: TextStyle(color: Colors.red.shade800, fontSize: 13),
           ),
           const SizedBox(height: 10),
+          // Retry button.
           Align(
             alignment: Alignment.centerLeft,
             child: TextButton(
@@ -253,6 +275,7 @@ class MeasurementsSection extends ConsumerWidget {
     );
   }
 
+  // Empty state card with CTA.
   Widget _emptyState(BuildContext context, WidgetRef ref) {
     return Container(
       width: double.infinity,
@@ -265,6 +288,7 @@ class MeasurementsSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Empty state title.
           const Text(
             'قياسات الجسم',
             style: TextStyle(
@@ -274,12 +298,14 @@ class MeasurementsSection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
+          // Empty state description.
           Text(
             'لا توجد قياسات بعد. سجّل أول قياس لمتابعة وزنك ومقاييسك.',
             textAlign: TextAlign.right,
             style: TextStyle(color: Colors.grey[600], fontSize: 13, height: 1.4),
           ),
           const SizedBox(height: 14),
+          // Primary CTA.
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(

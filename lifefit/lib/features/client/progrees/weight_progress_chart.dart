@@ -3,9 +3,10 @@ import 'dart:math' as math;
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../core/ui/app_colors.dart';
 import '../../../core/models/progress/body_measurement.dart';
 
-const Color _kPrimary = Color(0xFF00D9D9);
+const Color _kPrimary = AppColors.primary;
 const Color _kDark = Color(0xFF1E293B);
 
 /// Weight vs time (index axis) with optional horizontal target line.
@@ -26,6 +27,7 @@ class WeightProgressChart extends StatelessWidget {
         .toList();
 
     if (withWeight.isEmpty) {
+      // Empty state for the chart area.
       return SizedBox(
         height: 180,
         child: Center(
@@ -62,12 +64,14 @@ class WeightProgressChart extends StatelessWidget {
 
     return SizedBox(
       height: 220,
+      // Line chart widget.
       child: LineChart(
         LineChartData(
           minX: 0,
           maxX: maxX,
           minY: minY,
           maxY: maxY,
+          // Chart grid lines.
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
@@ -77,6 +81,7 @@ class WeightProgressChart extends StatelessWidget {
               strokeWidth: 1,
             ),
           ),
+          // Axis titles.
           titlesData: FlTitlesData(
             topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
             rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
@@ -111,6 +116,7 @@ class WeightProgressChart extends StatelessWidget {
             ),
           ),
           borderData: FlBorderData(show: false),
+          // Target weight line.
           extraLinesData: ExtraLinesData(
             horizontalLines: [
               if (t != null)
@@ -133,6 +139,7 @@ class WeightProgressChart extends StatelessWidget {
                 ),
             ],
           ),
+          // Main series line.
           lineBarsData: [
             LineChartBarData(
               spots: spots,
@@ -146,6 +153,7 @@ class WeightProgressChart extends StatelessWidget {
               ),
             ),
           ],
+          // Tooltip on touch.
           lineTouchData: LineTouchData(
             touchTooltipData: LineTouchTooltipData(
               getTooltipItems: (touched) {

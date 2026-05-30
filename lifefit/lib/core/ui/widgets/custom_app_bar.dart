@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app_colors.dart';
 import '../../auth/auth_provider.dart';
-import '../../../features/client/profile_web/profile_screen_web.dart';
+import '../../../features/client/profile/profile_screen.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/notifications/notification_provider.dart';
 
@@ -51,7 +51,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const ProfileScreenWeb()),
+                    builder: (context) => const ProfileScreen()),
               );
             },
             borderRadius: BorderRadius.circular(12),

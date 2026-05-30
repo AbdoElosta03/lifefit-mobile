@@ -3,18 +3,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'personal_records_provider.dart';
 import 'personal_records_screen.dart';
 import 'personal_record_tile.dart';
+import '../../../core/ui/app_colors.dart';
 
 /// Preview (max 3) + "عرض الكل" on the Progress tab.
 class PersonalRecordsPreviewSection extends ConsumerWidget {
   const PersonalRecordsPreviewSection({super.key});
 
-  static const _primary = Color(0xFF00D9D9);
+  static const _primary = AppColors.primary;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(personalRecordsProvider);
 
     return async.when(
+      // Loading state card.
       loading: () => Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
@@ -29,6 +31,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
           ),
         ),
       ),
+      // Error state card.
       error: (e, _) => _errorCard(e.toString()),
       data: (list) {
         if (list.isEmpty) {
@@ -38,9 +41,11 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Header row: title + view all.
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                // Section title.
                 const Text(
                   'أحدث الأرقام القياسية',
                   style: TextStyle(
@@ -49,6 +54,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
                     color: Color(0xFF1E293B),
                   ),
                 ),
+                // View all action.
                 TextButton(
                   onPressed: () {
                     Navigator.of(context).push(
@@ -68,6 +74,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
+            // Preview record tiles.
             ...preview.map(
               (r) => PersonalRecordTile(record: r, compact: true),
             ),
@@ -77,6 +84,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
     );
   }
 
+  // Empty state card.
   Widget _emptyCard() {
     return Container(
       width: double.infinity,
@@ -89,6 +97,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Empty state title.
           const Text(
             'أحدث الأرقام القياسية',
             style: TextStyle(
@@ -98,6 +107,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
             ),
           ),
           const SizedBox(height: 8),
+          // Empty state description.
           Text(
             'لا توجد أرقام قياسية بعد. سجّل تمارينك ليظهر تقدّمك هنا.',
             textAlign: TextAlign.right,
@@ -108,6 +118,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
     );
   }
 
+  // Error state card.
   Widget _errorCard(String msg) {
     return Container(
       width: double.infinity,
@@ -116,6 +127,7 @@ class PersonalRecordsPreviewSection extends ConsumerWidget {
         color: Colors.red.shade50,
         borderRadius: BorderRadius.circular(16),
       ),
+      // Error message.
       child: Text(
         msg,
         textAlign: TextAlign.right,

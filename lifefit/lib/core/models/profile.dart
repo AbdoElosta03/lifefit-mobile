@@ -3,7 +3,6 @@ class Profile {
   final double? heightCm;
   final double? targetWeightKg;
   final String? goalNotes;
-  final String? activityLevel;
   // final String? birthDate;
 
   Profile({
@@ -11,7 +10,6 @@ class Profile {
     this.heightCm,
     this.targetWeightKg,
     this.goalNotes,
-    this.activityLevel,
     // this.birthDate,
   });
 
@@ -22,7 +20,6 @@ class Profile {
       heightCm: _toDouble(json['height_cm']),
       targetWeightKg: _toDouble(json['target_weight_kg']),
       goalNotes: json['goal_notes'] as String?,
-      activityLevel: json['current_activity_level'] as String?,
     );
   }
 }

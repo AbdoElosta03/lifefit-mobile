@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../core/ui/app_colors.dart';
 import '../../../core/models/progress/personal_record.dart';
 
 class PersonalRecordTile extends StatelessWidget {
@@ -26,6 +27,7 @@ class PersonalRecordTile extends StatelessWidget {
         ? '${_fmtNum(w)} × $reps'
         : (w != null ? _fmtNum(w) : (reps != null ? '$reps عدّة' : '—'));
 
+    // Record card container.
     return Container(
       margin: EdgeInsets.only(bottom: compact ? 10 : 12),
       padding: EdgeInsets.all(compact ? 12 : 14),
@@ -44,6 +46,7 @@ class PersonalRecordTile extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Exercise name.
           Text(
             record.displayExerciseName,
             style: TextStyle(
@@ -56,6 +59,7 @@ class PersonalRecordTile extends StatelessWidget {
           ),
           if (muscles != null && muscles.trim().isNotEmpty) ...[
             const SizedBox(height: 4),
+            // Muscles list.
             Text(
               muscles,
               style: TextStyle(
@@ -68,25 +72,30 @@ class PersonalRecordTile extends StatelessWidget {
             ),
           ],
           SizedBox(height: compact ? 8 : 10),
+          // Date and record values row.
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Recorded date.
               Text(
                 at != null ? _dateFmt.format(at.toLocal()) : '—',
                 style: TextStyle(fontSize: compact ? 11 : 12, color: Colors.grey),
               ),
+              // Weight/reps and 1RM column.
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  // Weight x reps label.
                   Text(
                     wxr,
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
                       fontSize: 15,
-                      color: Color(0xFF00D9D9),
+                      color: AppColors.primary,
                     ),
                   ),
                   if (e1 != null)
+                    // Estimated 1RM label.
                     Text(
                       'تقدير 1RM: ${_fmtNum(e1)} كجم',
                       style: TextStyle(fontSize: 11, color: Colors.grey[700]),

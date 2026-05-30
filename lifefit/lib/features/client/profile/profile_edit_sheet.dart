@@ -3,19 +3,18 @@ import '../../../core/ui/app_colors.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
-import 'profile_provider_web.dart';
+import 'profile_provider.dart';
 
-class ProfileEditSheetWeb extends ConsumerStatefulWidget {
+class ProfileEditSheet extends ConsumerStatefulWidget {
   final ClientProfileBundle initial;
 
-  const ProfileEditSheetWeb({super.key, required this.initial});
+  const ProfileEditSheet({super.key, required this.initial});
 
   @override
-  ConsumerState<ProfileEditSheetWeb> createState() =>
-      _ProfileEditSheetWebState();
+  ConsumerState<ProfileEditSheet> createState() => _ProfileEditSheetState();
 }
 
-class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
+class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   late final TextEditingController _nameCtrl;
   late final TextEditingController _birthCtrl;
   late final TextEditingController _heightCtrl;
@@ -24,17 +23,9 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
   late final TextEditingController _muscleCtrl;
   late final TextEditingController _fatCtrl;
   late final TextEditingController _notesCtrl;
-  String? _activity;
   bool _saving = false;
 
-  static const _accent = Color(0xFF00D9D9);
-  static const Map<String, String> _activityLabels = {
-    'sedentary': 'خامل',
-    'low': 'منخفض',
-    'moderate': 'متوسط',
-    'active': 'نشط',
-    'athlete': 'رياضي',
-  };
+  static const _accent = AppColors.primary;
 
   @override
   void initState() {
@@ -52,7 +43,6 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
         TextEditingController(text: s.muscleMassKg?.toString() ?? '');
     _fatCtrl = TextEditingController(text: s.bodyFatPct?.toString() ?? '');
     _notesCtrl = TextEditingController(text: p.goalNotes ?? '');
-    _activity = p.currentActivityLevel;
   }
 
   @override
@@ -77,7 +67,6 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
     }
     _putNum(body, 'height_cm', _heightCtrl.text);
     _putNum(body, 'target_weight_kg', _targetWeightCtrl.text);
-    if (_activity != null) body['current_activity_level'] = _activity;
     _putNum(body, 'weight_kg', _weightCtrl.text);
     _putNum(body, 'muscle_mass_kg', _muscleCtrl.text);
     _putNum(body, 'body_fat_pct', _fatCtrl.text);
@@ -86,7 +75,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
     }
 
     try {
-      await ref.read(clientProfileWebProvider.notifier).update(body);
+      await ref.read(clientProfileProvider.notifier).update(body);
       if (mounted) {
         Navigator.pop(context);
         ScaffoldMessenger.of(context).showSnackBar(
@@ -116,6 +105,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
 
   @override
   Widget build(BuildContext context) {
+    // Bottom sheet container.
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
@@ -132,6 +122,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Drag handle.
             Center(
               child: Container(
                 width: 40,
@@ -143,14 +134,17 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
               ),
             ),
             const SizedBox(height: 20),
+            // Sheet title.
             const Text(
               'تعديل الملف الشخصي',
               textAlign: TextAlign.center,
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 16),
+            // Name field.
             _field('الاسم', _nameCtrl, Icons.person_outline),
             const SizedBox(height: 12),
+            // Birth date field.
             _field(
               'تاريخ الميلاد (YYYY-MM-DD)',
               _birthCtrl,
@@ -158,6 +152,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
               keyboard: TextInputType.datetime,
             ),
             const SizedBox(height: 12),
+            // Height and target weight row.
             Row(
               children: [
                 Expanded(child: _field('الطول (سم)', _heightCtrl, Icons.height)),
@@ -168,13 +163,13 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
               ],
             ),
             const SizedBox(height: 12),
-            _activityDropdown(),
-            const SizedBox(height: 12),
+            // Current stats title.
             const Text(
               'القياسات الحالية',
               style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
             ),
             const SizedBox(height: 8),
+            // Current stats row.
             Row(
               children: [
                 Expanded(
@@ -185,10 +180,13 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
               ],
             ),
             const SizedBox(height: 12),
+            // Body fat field.
             _field('نسبة الدهون %', _fatCtrl, Icons.pie_chart_outline),
             const SizedBox(height: 12),
+            // Notes field.
             _field('ملاحظات الأهداف', _notesCtrl, Icons.notes, maxLines: 3),
             const SizedBox(height: 24),
+            // Save button.
             SizedBox(
               height: 52,
               child: ElevatedButton(
@@ -225,6 +223,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
     TextInputType keyboard = TextInputType.text,
     int maxLines = 1,
   }) {
+    // Input field.
     return TextField(
       controller: c,
       maxLines: maxLines,
@@ -232,6 +231,7 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
       textAlign: TextAlign.right,
       decoration: InputDecoration(
         labelText: label,
+        // Leading icon.
         prefixIcon: Icon(icon, color: _accent, size: 20),
         filled: true,
         fillColor: AppColors.background,
@@ -243,23 +243,5 @@ class _ProfileEditSheetWebState extends ConsumerState<ProfileEditSheetWeb> {
     );
   }
 
-  Widget _activityDropdown() {
-    return DropdownButtonFormField<String>(
-      value: _activity,
-      decoration: InputDecoration(
-        labelText: 'مستوى النشاط',
-        prefixIcon: const Icon(Icons.directions_run, color: _accent, size: 20),
-        filled: true,
-        fillColor: AppColors.background,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
-        ),
-      ),
-      items: _activityLabels.entries
-          .map((e) => DropdownMenuItem(value: e.key, child: Text(e.value)))
-          .toList(),
-      onChanged: (v) => setState(() => _activity = v),
-    );
-  }
+  
 }

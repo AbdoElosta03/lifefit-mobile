@@ -4,10 +4,12 @@ import '../../../core/models/notifications/app_notification.dart';
 import '../../../core/services/notification_service.dart';
 import '../../../core/services/notification_sound.dart';
 
+// Provider for notification service.
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   return NotificationService();
 });
 
+// State model for notifications list and paging.
 class NotificationsState {
   final List<AppNotification> items;
   final int currentPage;
@@ -25,8 +27,10 @@ class NotificationsState {
     this.error,
   });
 
+  // Pagination flag.
   bool get hasMore => currentPage < lastPage;
 
+  // State copy helper.
   NotificationsState copyWith({
     List<AppNotification>? items,
     int? currentPage,
@@ -47,8 +51,10 @@ class NotificationsState {
   }
 }
 
+// Notifier for fetching, polling, and updating notifications.
 class NotificationsNotifier extends StateNotifier<NotificationsState> {
   NotificationsNotifier(this._service) : super(const NotificationsState()) {
+    // Initial fetch.
     refresh(isInitial: true);
   }
 
@@ -56,11 +62,13 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   int _baselineMaxId = 0;
   bool _pollSoundEnabled = false;
 
+  // Track highest notification id for polling.
   int _maxId(List<AppNotification> list) {
     if (list.isEmpty) return _baselineMaxId;
     return list.map((n) => n.id).reduce((a, b) => a > b ? a : b);
   }
 
+  // Refresh list, optionally silent.
   Future<void> refresh({bool isInitial = false, bool silent = false}) async {
     if (!silent) {
       state = state.copyWith(loading: true, clearError: true);
@@ -87,6 +95,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     }
   }
 
+  // Poll for new unread notifications and play sound.
   Future<void> pollForNewNotifications() async {
     if (!_pollSoundEnabled) return;
     try {
@@ -103,6 +112,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     } catch (_) {}
   }
 
+  // Load next page of notifications.
   Future<void> loadMore() async {
     if (!state.hasMore || state.loadingMore || state.loading) return;
     state = state.copyWith(loadingMore: true, clearError: true);
@@ -124,6 +134,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     }
   }
 
+  // Mark a single notification as read.
   Future<void> markOneRead(int id) async {
     try {
       await _service.markAsRead(id);
@@ -137,6 +148,7 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
     }
   }
 
+  // Mark all notifications as read.
   Future<void> markAllRead() async {
     try {
       await _service.markAllRead();
@@ -149,16 +161,19 @@ class NotificationsNotifier extends StateNotifier<NotificationsState> {
   }
 }
 
+// Provider for notifications list state.
 final notificationsProvider =
     StateNotifierProvider<NotificationsNotifier, NotificationsState>((ref) {
   return NotificationsNotifier(ref.watch(notificationServiceProvider));
 });
 
+// Provider for unread notification count.
 final unreadNotificationCountProvider = Provider<int>((ref) {
   final s = ref.watch(notificationsProvider);
   return s.items.where((n) => !n.isRead).length;
 });
 
+// Provider for unread flag.
 final hasUnreadNotificationsProvider = Provider<bool>((ref) {
   return ref.watch(unreadNotificationCountProvider) > 0;
 });

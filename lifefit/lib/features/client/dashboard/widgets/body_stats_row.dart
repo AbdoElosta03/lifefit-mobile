@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/ui/app_colors.dart';
-import '../../profile_web/profile_provider_web.dart';
+import '../../profile/profile_provider.dart';
 
 /// Three tiles: current weight, body fat %, muscle mass — from profile API.
 class BodyStatsRow extends ConsumerWidget {
@@ -9,7 +9,7 @@ class BodyStatsRow extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final profileAsync = ref.watch(clientProfileWebProvider);
+    final profileAsync = ref.watch(clientProfileProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../../../core/ui/app_colors.dart';
-
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/models/workout/today_schedule.dart';
@@ -9,11 +8,11 @@ import 'workout_provider.dart';
 import 'workout_detail_screen.dart';
 import 'exercise_thumbnail.dart';
 
+const Color _primary = AppColors.primary;
+const Color _bg = AppColors.background;
+
 class WorkoutsScreen extends ConsumerWidget {
   const WorkoutsScreen({super.key});
-
-  static const _primary = Color(0xFF00D9D9);
-  static const _bg = AppColors.background;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -47,10 +46,6 @@ class WorkoutsScreen extends ConsumerWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Main list (aligned with NutritionScreen: CustomScrollView + sections)
-// ---------------------------------------------------------------------------
-
 class _WorkoutsList extends StatelessWidget {
   final List<TodaySchedule> schedules;
   final Future<void> Function() onRefresh;
@@ -78,7 +73,7 @@ class _WorkoutsList extends StatelessWidget {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF00D9D9),
+      color: _primary,
       onRefresh: onRefresh,
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -89,6 +84,7 @@ class _WorkoutsList extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  // Screen title.
                   const Text(
                     'تمارين اليوم',
                     style: TextStyle(
@@ -101,6 +97,7 @@ class _WorkoutsList extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
+                      // Date label.
                       Text(
                         today,
                         style: const TextStyle(fontSize: 14, color: Colors.grey),
@@ -111,14 +108,14 @@ class _WorkoutsList extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00D9D9).withOpacity(0.1),
+                            color: _primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             '${schedules.length} جلسات',
                             style: const TextStyle(
                               fontSize: 11,
-                              color: Color(0xFF00D9D9),
+                              color: _primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -202,14 +199,14 @@ class _WorkoutsSummaryCard extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF00D9D9), Color(0xFF0099AA)],
+          colors: [AppColors.primary, AppColors.primaryDark],
           begin: Alignment.topRight,
           end: Alignment.bottomLeft,
         ),
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00D9D9).withValues(alpha: 0.28),
+            color: _primary.withValues(alpha: 0.28),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -225,6 +222,7 @@ class _WorkoutsSummaryCard extends StatelessWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
+                  // Summary label.
                   Text(
                     'التمارين المنجزة',
                     style: TextStyle(
@@ -233,6 +231,7 @@ class _WorkoutsSummaryCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 2),
+                  // Summary value.
                   Text(
                     '$done/$total تمرين',
                     style: const TextStyle(
@@ -246,6 +245,7 @@ class _WorkoutsSummaryCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 16),
+          // Progress bar.
           ClipRRect(
             borderRadius: BorderRadius.circular(12),
             child: LinearProgressIndicator(
@@ -259,6 +259,7 @@ class _WorkoutsSummaryCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Session count.
               Text(
                 'جلسات اليوم: ${schedules.length}',
                 style: TextStyle(
@@ -266,6 +267,7 @@ class _WorkoutsSummaryCard extends StatelessWidget {
                   fontSize: 12,
                 ),
               ),
+              // Completed count.
               Text(
                 'مكتمل: $completedWorkouts',
                 style: TextStyle(
@@ -302,6 +304,7 @@ class _WorkoutSectionHeader extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
+        // Per-workout completion count.
         Text(
           '$done/$total',
           style: const TextStyle(fontSize: 12, color: Colors.grey),
@@ -324,16 +327,12 @@ class _WorkoutSectionHeader extends StatelessWidget {
         Icon(
           schedule.isCompleted ? Icons.check_circle_outline : Icons.fitness_center,
           size: 18,
-          color: const Color(0xFF00D9D9),
+          color: _primary,
         ),
       ],
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Exercise row — MealCard-style
-// ---------------------------------------------------------------------------
 
 class _WorkoutExerciseCard extends StatelessWidget {
   final TodaySchedule schedule;
@@ -349,6 +348,7 @@ class _WorkoutExerciseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final pivot = exercise.pivot;
+    // Tap to open detail screen.
     return GestureDetector(
       onTap: () => Navigator.push(
         context,
@@ -366,7 +366,7 @@ class _WorkoutExerciseCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: isDone
-                ? const Color(0xFF00D9D9).withOpacity(0.4)
+                ? _primary.withOpacity(0.4)
                 : Colors.grey.withOpacity(0.08),
           ),
           boxShadow: [
@@ -404,7 +404,7 @@ class _WorkoutExerciseCard extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 12,
                         color: isDone
-                            ? const Color(0xFF00D9D9)
+                            ? _primary
                             : Colors.grey,
                       ),
                       textAlign: TextAlign.right,
@@ -474,12 +474,12 @@ class _ExerciseStatusIcon extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: const Color(0xFF00D9D9).withOpacity(0.12),
+          color: _primary.withOpacity(0.12),
           shape: BoxShape.circle,
         ),
         child: const Icon(
           Icons.check_circle,
-          color: Color(0xFF00D9D9),
+          color: _primary,
           size: 22,
         ),
       );
@@ -500,10 +500,6 @@ class _ExerciseStatusIcon extends StatelessWidget {
   }
 }
 
-// ---------------------------------------------------------------------------
-// Rest Day View
-// ---------------------------------------------------------------------------
-
 class _RestDayView extends StatelessWidget {
   final VoidCallback onRefresh;
 
@@ -520,13 +516,13 @@ class _RestDayView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF00D9D9).withOpacity(0.08),
+                color: _primary.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.fitness_center,
                 size: 60,
-                color: Color(0xFF00D9D9),
+                color: _primary,
               ),
             ),
             const SizedBox(height: 20),
@@ -548,7 +544,7 @@ class _RestDayView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRefresh,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D9D9),
+                backgroundColor: _primary,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
@@ -568,10 +564,6 @@ class _RestDayView extends StatelessWidget {
     );
   }
 }
-
-// ---------------------------------------------------------------------------
-// Error View
-// ---------------------------------------------------------------------------
 
 class _ErrorView extends StatelessWidget {
   final String message;
@@ -607,7 +599,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D9D9),
+                backgroundColor: _primary,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

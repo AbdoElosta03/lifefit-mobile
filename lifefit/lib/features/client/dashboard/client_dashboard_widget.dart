@@ -8,7 +8,7 @@ import '../../client/nutrition/nutrition_provider.dart';
 import '../../client/progrees/measurements_provider.dart';
 import '../../client/progrees/goals_provider.dart';
 import '../../client/programs/client_programs_provider.dart';
-import '../../client/profile_web/profile_provider_web.dart';
+import '../profile/profile_provider.dart';
 import 'widgets/greeting_header.dart';
 import 'widgets/today_activity_row.dart';
 import 'widgets/body_stats_row.dart';
@@ -26,7 +26,7 @@ class ClientDashboardWidget extends ConsumerWidget {
       await Future.wait([
         ref.read(todaySchedulesProvider.notifier).refresh(),
         ref.read(nutritionProvider.notifier).refresh(),
-        ref.read(clientProfileWebProvider.notifier).refresh(),
+        ref.read(clientProfileProvider.notifier).refresh(),
         ref.read(goalsProvider.notifier).refresh(),
         ref.read(measurementsProvider.notifier).refresh(),
         ref.read(clientProgramsProvider.notifier).refresh(),

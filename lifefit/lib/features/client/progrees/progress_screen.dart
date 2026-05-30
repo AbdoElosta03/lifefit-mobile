@@ -11,13 +11,16 @@ class ProgressScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Screen scaffold for overall progress.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // Scrollable content.
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 30),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Section label.
             const Text(
               'التقدم',
               style: TextStyle(
@@ -26,15 +29,19 @@ class ProgressScreen extends ConsumerWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            // Main title.
             const Text(
               'تتبع إنجازاتك',
               style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 22),
+            // Goals widget section.
             const GoalsSection(),
             const SizedBox(height: 22),
+            // Measurements widget section.
             const MeasurementsSection(),
             const SizedBox(height: 22),
+            // Personal records preview widget.
             const PersonalRecordsPreviewSection(),
           ],
         ),

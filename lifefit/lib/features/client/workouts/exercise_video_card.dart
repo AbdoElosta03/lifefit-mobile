@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/ui/app_colors.dart';
 
 /// Opens [videoUrl] in the browser / external player — no autoplay in-app.
 class ExerciseVideoCard extends StatelessWidget {
@@ -9,10 +10,11 @@ class ExerciseVideoCard extends StatelessWidget {
   const ExerciseVideoCard({
     super.key,
     required this.videoUrl,
-    this.primary = const Color(0xFF00D9D9),
+    this.primary = AppColors.primary,
   });
 
   Future<void> _open() async {
+    // Launch video in external player.
     final uri = Uri.tryParse(videoUrl);
     if (uri == null) return;
     if (await canLaunchUrl(uri)) {
@@ -39,6 +41,7 @@ class ExerciseVideoCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Card header.
           Row(
             children: [
               Icon(Icons.play_circle_filled_rounded, color: primary, size: 28),
@@ -56,6 +59,7 @@ class ExerciseVideoCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
+          // Open video action.
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(

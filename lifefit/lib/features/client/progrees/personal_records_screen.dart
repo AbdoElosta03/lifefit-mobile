@@ -9,14 +9,14 @@ import 'personal_record_tile.dart';
 class PersonalRecordsScreen extends ConsumerWidget {
   const PersonalRecordsScreen({super.key});
 
-  static const _primary = Color(0xFF00D9D9);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(personalRecordsProvider);
 
+    // Screen scaffold for the full personal records list.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // App bar: title + back action.
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
@@ -29,15 +29,18 @@ class PersonalRecordsScreen extends ConsumerWidget {
             fontSize: 18,
           ),
         ),
+        // Back button.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
+      // Body content by provider state.
       body: async.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: _primary),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
+        // Error state with retry.
         error: (e, _) => Center(
           child: Padding(
             padding: const EdgeInsets.all(24),
@@ -52,6 +55,7 @@ class PersonalRecordsScreen extends ConsumerWidget {
                   style: const TextStyle(color: Colors.grey),
                 ),
                 const SizedBox(height: 16),
+                // Retry button.
                 TextButton(
                   onPressed: () =>
                       ref.read(personalRecordsProvider.notifier).refresh(),
@@ -63,6 +67,7 @@ class PersonalRecordsScreen extends ConsumerWidget {
         ),
         data: (list) {
           if (list.isEmpty) {
+            // Empty state.
             return Center(
               child: Padding(
                 padding: const EdgeInsets.all(32),
@@ -74,8 +79,9 @@ class PersonalRecordsScreen extends ConsumerWidget {
               ),
             );
           }
+          // Pull-to-refresh list.
           return RefreshIndicator(
-            color: _primary,
+            color: AppColors.primary,
             onRefresh: () =>
                 ref.read(personalRecordsProvider.notifier).refresh(),
             child: ListView.builder(
@@ -85,6 +91,7 @@ class PersonalRecordsScreen extends ConsumerWidget {
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
               itemCount: list.length,
               itemBuilder: (context, i) {
+                // Record card tile.
                 return PersonalRecordTile(record: list[i], compact: false);
               },
             ),

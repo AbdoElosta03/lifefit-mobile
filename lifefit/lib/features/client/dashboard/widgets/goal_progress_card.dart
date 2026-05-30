@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/ui/app_colors.dart';
 import '../../progrees/goals_provider.dart';
-import '../../profile_web/profile_provider_web.dart';
+import '../../profile/profile_provider.dart';
 
 /// Shows target weight vs current weight with a progress bar.
 class GoalProgressCard extends ConsumerWidget {
@@ -11,7 +11,7 @@ class GoalProgressCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goalsAsync = ref.watch(goalsProvider);
-    final profileAsync = ref.watch(clientProfileWebProvider);
+    final profileAsync = ref.watch(clientProfileProvider);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),

@@ -30,7 +30,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   int _restRemaining = 60;
   bool _restRunning = false;
 
-  static const _primary = Color(0xFF00D9D9);
+  static const _primary = AppColors.primary;
 
   Exercise get _exercise => widget.exercise;
   TodaySchedule get _schedule => widget.schedule;
@@ -38,6 +38,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   @override
   void initState() {
     super.initState();
+    // Initialize set fields from pivot.
     final pivot = _exercise.pivot;
     final count = (pivot?.sets ?? 1).clamp(1, 20);
     final targetReps = _parseFirstInt(pivot?.reps);
@@ -70,6 +71,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   void _startRestTimer() {
     _restTimer?.cancel();
     final restSec = _exercise.pivot?.restSeconds ?? 60;
+    // Start local rest timer.
     setState(() {
       _restRemaining = restSec;
       _restRunning = true;
@@ -85,6 +87,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   }
 
   TodaySchedule _scheduleForSubmit() {
+    // Prefer the latest schedule from provider state.
     final list = ref.read(todaySchedulesProvider).valueOrNull;
     if (list != null) {
       for (final s in list) {
@@ -96,6 +99,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   Future<void> _submitLog() async {
     if (_isSubmitting) return;
+    // Dismiss keyboard before submit.
     FocusScope.of(context).unfocus();
     setState(() => _isSubmitting = true);
 
@@ -184,8 +188,10 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
+            // Header card.
             _buildHeader(),
             const SizedBox(height: 12),
+            // Rest timer.
             _buildRestTimer(),
             const SizedBox(height: 16),
             const Text('المجموعات',
@@ -229,6 +235,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   Widget _buildHeader() {
     final pivot = _exercise.pivot;
+    // Exercise header info.
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -322,6 +329,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   Widget _buildSetCard(int index) {
     final s = _sets[index];
+    // Input card for a set.
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -399,6 +407,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
       );
 
   String _weightLabel(double? w) {
+    // Format weight label.
     if (w == null || w == 0) return 'بوزن الجسم';
     return '${w.toStringAsFixed(w % 1 == 0 ? 0 : 1)} كجم';
   }

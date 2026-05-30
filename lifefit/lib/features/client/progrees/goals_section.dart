@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/ui/app_colors.dart';
 import '../../../core/models/progress/client_goal.dart';
-import '../profile_web/profile_provider_web.dart';
+import '../profile/profile_provider.dart';
 import 'edit_goals_screen.dart';
 import 'goals_provider.dart';
 
-const Color _kPrimary = Color(0xFF00D9D9);
+const Color _kPrimary = AppColors.primary;
 const Color _kDark = Color(0xFF1E293B);
 
 /// First section on Progress: active goal (`data.first`) vs profile current stats.
@@ -15,8 +16,9 @@ class GoalsSection extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final goalsAsync = ref.watch(goalsProvider);
-    final profileAsync = ref.watch(clientProfileWebProvider);
+    final profileAsync = ref.watch(clientProfileProvider);
 
+    // Section content by provider state.
     return goalsAsync.when(
       loading: () => _loadingCard(),
       error: (e, _) => _errorCard(e.toString()),
@@ -38,6 +40,7 @@ class GoalsSection extends ConsumerWidget {
     );
   }
 
+  // Loading state card.
   Widget _loadingCard() {
     return Container(
       height: 150,
@@ -50,6 +53,7 @@ class GoalsSection extends ConsumerWidget {
     );
   }
 
+  // Error state card.
   Widget _errorCard(String msg) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -57,6 +61,7 @@ class GoalsSection extends ConsumerWidget {
         color: Colors.red.shade50,
         borderRadius: BorderRadius.circular(16),
       ),
+      // Error message.
       child: Text(msg, textAlign: TextAlign.right),
     );
   }
@@ -67,6 +72,7 @@ class GoalsSection extends ConsumerWidget {
     required double? weight,
     required double? fat,
   }) {
+    // Outer gradient card shell.
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(22),
@@ -84,6 +90,7 @@ class GoalsSection extends ConsumerWidget {
         ],
       ),
       padding: const EdgeInsets.all(2),
+      // Inner content card.
       child: Container(
         decoration: BoxDecoration(
           color: Colors.white,
@@ -93,6 +100,7 @@ class GoalsSection extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Section title.
             const Align(
               alignment: Alignment.centerRight,
               child: Text(
@@ -106,6 +114,7 @@ class GoalsSection extends ConsumerWidget {
             ),
             if (goal == null) ...[
               const SizedBox(height: 6),
+              // Empty state hint.
               Text(
                 'حدّد هدف الوزن والدهون لمتابعة تقدّمك.',
                 textAlign: TextAlign.right,
@@ -113,6 +122,7 @@ class GoalsSection extends ConsumerWidget {
               ),
             ] else ...[
               const SizedBox(height: 10),
+              // Weight comparison row.
               _comparisonRow(
                 labelCurrent: 'وزنك الحالي',
                 labelTarget: 'هدف الوزن',
@@ -122,6 +132,7 @@ class GoalsSection extends ConsumerWidget {
               ),
               if (goal.targetBodyFat != null || fat != null) ...[
                 const SizedBox(height: 14),
+                // Body fat comparison row.
                 _comparisonRow(
                   labelCurrent: 'دهونك الحالية',
                   labelTarget: 'هدف الدهون',
@@ -132,10 +143,12 @@ class GoalsSection extends ConsumerWidget {
               ],
               if (weight != null && goal.targetWeight != null) ...[
                 const SizedBox(height: 10),
+                // Delta hint text.
                 _deltaHint(weight, goal.targetWeight!),
               ],
             ],
             const SizedBox(height: 12),
+            // Edit goals CTA.
             SizedBox(
               width: double.infinity,
               child: OutlinedButton(
@@ -175,6 +188,7 @@ class GoalsSection extends ConsumerWidget {
     required double? target,
     required String unit,
   }) {
+    // Current vs target comparison row.
     return Row(
       children: [
         Expanded(
@@ -185,6 +199,7 @@ class GoalsSection extends ConsumerWidget {
             highlight: true,
           ),
         ),
+        // Divider.
         Container(
           width: 1,
           height: 54,
@@ -209,9 +224,11 @@ class GoalsSection extends ConsumerWidget {
     required String unit,
     required bool highlight,
   }) {
+    // Single metric block.
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
+        // Metric label.
         Text(
           label,
           style: TextStyle(
@@ -221,6 +238,7 @@ class GoalsSection extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 4),
+        // Metric value + unit.
         Row(
           mainAxisAlignment: MainAxisAlignment.end,
           crossAxisAlignment: CrossAxisAlignment.baseline,
@@ -258,6 +276,7 @@ class GoalsSection extends ConsumerWidget {
   Widget _deltaHint(double currentKg, double targetKg) {
     final d = (currentKg - targetKg).abs();
     if (d < 0.15) {
+      // Near-target hint.
       return Text(
         'قريب جداً من هدف الوزن. استمر!',
         textAlign: TextAlign.right,
@@ -269,6 +288,7 @@ class GoalsSection extends ConsumerWidget {
         ? 'متبقي نحو ${d.toStringAsFixed(1)} كغ للوصول لهدف الوزن'
         : 'يتبقى نحو ${d.toStringAsFixed(1)} كغ لزيادة الوزن حتى الهدف';
 
+    // Delta hint text.
     return Text(
       text,
       textAlign: TextAlign.right,

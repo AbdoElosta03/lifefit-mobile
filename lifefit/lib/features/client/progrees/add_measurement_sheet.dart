@@ -3,11 +3,12 @@ import '../../../core/ui/app_colors.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/progress/client_goal.dart';
-import '../profile_web/profile_provider_web.dart';
+import '../profile/profile_provider.dart';
 import 'measurements_provider.dart';
 
-const Color _kPrimary = Color(0xFF00D9D9);
+const Color _kPrimary = AppColors.primary;
 
+// Opens the add measurement bottom sheet.
 Future<void> showAddMeasurementSheet(BuildContext context) {
   return showModalBottomSheet<void>(
     context: context,
@@ -76,7 +77,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
     setState(() => _saving = true);
     try {
       await ref.read(measurementsProvider.notifier).submit(body);
-      await ref.read(clientProfileWebProvider.notifier).refresh();
+      await ref.read(clientProfileProvider.notifier).refresh();
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
@@ -114,6 +115,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Drag handle.
                 Center(
                   child: Container(
                     width: 40,
@@ -125,6 +127,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
                   ),
                 ),
                 const SizedBox(height: 14),
+                // Sheet title.
                 const Text(
                   'قياس جديد',
                   textAlign: TextAlign.right,
@@ -135,22 +138,29 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
                   ),
                 ),
                 const SizedBox(height: 6),
+                // Helper description.
                 Text(
                   'التاريخ مطلوب. يمكن ترك الحقول الفارغة لاستخدام آخر قيمة مسجّلة قبل هذا التاريخ.',
                   textAlign: TextAlign.right,
                   style: TextStyle(fontSize: 12, color: Colors.grey[700], height: 1.35),
                 ),
                 const SizedBox(height: 16),
+                // Date picker tile.
                 _dateTile(),
                 const SizedBox(height: 12),
+                // Weight input field.
                 _field('الوزن (كجم)', _weightCtrl, Icons.monitor_weight_outlined),
                 const SizedBox(height: 10),
+                // Body fat input field.
                 _field('نسبة الدهون (%)', _fatCtrl, Icons.pie_chart_outline),
                 const SizedBox(height: 10),
+                // Muscle mass input field.
                 _field('كتلة العضلات (كجم)', _muscleCtrl, Icons.fitness_center_outlined),
                 const SizedBox(height: 10),
+                // Waist input field.
                 _field('محيط الخصر (سم)', _waistCtrl, Icons.straighten_outlined),
                 const SizedBox(height: 22),
+                // Save button.
                 SizedBox(
                   height: 50,
                   child: ElevatedButton(
@@ -199,6 +209,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           child: Row(
             children: [
+              // Date label.
               Expanded(
                 child: Text(
                   'تاريخ القياس',
@@ -206,6 +217,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
                   textAlign: TextAlign.right,
                 ),
               ),
+              // Selected date.
               Text(
                 ClientGoal.formatDateForApi(_date),
                 style: const TextStyle(
@@ -214,6 +226,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
                 ),
               ),
               const SizedBox(width: 8),
+              // Calendar icon.
               const Icon(Icons.calendar_today_outlined, size: 18, color: _kPrimary),
             ],
           ),
@@ -229,6 +242,7 @@ class _AddMeasurementSheetBodyState extends ConsumerState<_AddMeasurementSheetBo
       textAlign: TextAlign.right,
       decoration: InputDecoration(
         labelText: label,
+        // Leading input icon.
         prefixIcon: Icon(icon, color: _kPrimary),
         filled: true,
         fillColor: Colors.white,

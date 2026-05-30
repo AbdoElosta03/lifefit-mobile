@@ -2,8 +2,8 @@ import 'package:dio/dio.dart';
 import 'base_service.dart';
 import '../models/profile_web/client_profile_bundle.dart';
 
-/// Web client profile: GET/PUT `/api/client/profile`.
-class ProfileWebService extends BaseService {
+/// Client profile: GET/PUT `/api/client/profile`.
+class ProfileService extends BaseService {
   Future<ClientProfileBundle> fetchProfile() async {
     final response = await dio.get('client/profile');
     if (response.statusCode == 200 && response.data is Map<String, dynamic>) {

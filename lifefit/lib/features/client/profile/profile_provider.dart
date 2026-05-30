@@ -2,14 +2,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
 import '../../../core/services/profile_web_service.dart';
 
-class ClientProfileWebNotifier
+// State notifier for web profile bundle.
+class ClientProfileNotifier
     extends StateNotifier<AsyncValue<ClientProfileBundle>> {
-  final ProfileWebService _service;
+  final ProfileService _service;
 
-  ClientProfileWebNotifier(this._service) : super(const AsyncValue.loading()) {
+  ClientProfileNotifier(this._service) : super(const AsyncValue.loading()) {
+    // Load initial data on creation.
     fetch();
   }
 
+  // Fetch profile bundle from API.
   Future<void> fetch() async {
     state = const AsyncValue.loading();
     try {
@@ -20,15 +23,18 @@ class ClientProfileWebNotifier
     }
   }
 
+  // Explicit refresh alias.
   Future<void> refresh() => fetch();
 
+  // Update profile and refresh state.
   Future<void> update(Map<String, dynamic> body) async {
     final bundle = await _service.updateProfile(body);
     state = AsyncValue.data(bundle);
   }
 }
 
-final clientProfileWebProvider = StateNotifierProvider<ClientProfileWebNotifier,
+// Provider for client profile bundle state.
+final clientProfileProvider = StateNotifierProvider<ClientProfileNotifier,
     AsyncValue<ClientProfileBundle>>((ref) {
-  return ClientProfileWebNotifier(ProfileWebService());
+  return ClientProfileNotifier(ProfileService());
 });

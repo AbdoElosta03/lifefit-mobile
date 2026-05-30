@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/ui/app_colors.dart';
 
 /// Compact thumbnail for exercise list rows — image only, no video.
 class ExerciseThumbnail extends StatelessWidget {
@@ -16,6 +17,7 @@ class ExerciseThumbnail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final url = imageUrl;
+    // Compact thumbnail preview.
     return ClipRRect(
       borderRadius: BorderRadius.circular(14),
       child: SizedBox(
@@ -38,7 +40,7 @@ class ExerciseThumbnail extends StatelessWidget {
                         height: 22,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: Color(0xFF00D9D9),
+                          color: AppColors.primary,
                         ),
                       ),
                     ),
@@ -49,6 +51,7 @@ class ExerciseThumbnail extends StatelessWidget {
             else
               _placeholder(),
             if (dimmed)
+              // Done overlay.
               ColoredBox(
                 color: Colors.black.withValues(alpha: 0.35),
                 child: const Icon(Icons.done_all, color: Colors.white, size: 26),

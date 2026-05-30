@@ -13,7 +13,7 @@ class ApiService {
   final workout = WorkoutService();
   final nutrition = NutritionService();
 
-  final profileWeb = ProfileWebService();
+    final profile = ProfileService();
 
   final notification = NotificationService();
 
@@ -28,9 +28,9 @@ class ApiService {
   /// Web API: today's schedules (list).
   Future fetchTodaySchedules() => workout.fetchTodaySchedules();
 
-  Future getProfileWeb() => profileWeb.fetchProfile();
+  Future getProfileWeb() => profile.fetchProfile();
   Future updateProfileWeb(Map<String, dynamic> body) =>
-      profileWeb.updateProfile(body);
+      profile.updateProfile(body);
 
   Future<PaginatedNotifications> fetchNotificationsPage({int page = 1}) =>
       notification.fetchPage(page: page);

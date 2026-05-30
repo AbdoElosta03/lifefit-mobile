@@ -40,6 +40,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(notificationsProvider);
+    // Listen for error messages.
     ref.listen<String?>(
       notificationsProvider.select((s) => s.error),
       (prev, next) {
@@ -51,8 +52,10 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
       },
     );
 
+    // Screen scaffold for notifications.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // App bar: title + actions.
       appBar: AppBar(
         title: const Text(
           'الإشعارات',
@@ -61,6 +64,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
         centerTitle: true,
         backgroundColor: Colors.white,
         elevation: 0.5,
+        // Back button.
         leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios_new_rounded,
@@ -70,6 +74,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         actions: [
+          // Mark all as read action.
           TextButton(
             onPressed: state.items.any((n) => !n.isRead)
                 ? () => ref.read(notificationsProvider.notifier).markAllRead()
@@ -77,7 +82,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
             child: const Text(
               'تعليم الكل كمقروء',
               style: TextStyle(
-                color: Color(0xFF00D9D9),
+                color: AppColors.primary,
                 fontWeight: FontWeight.w600,
                 fontSize: 13,
               ),
@@ -86,18 +91,21 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
           const SizedBox(width: 4),
         ],
       ),
+      // Pull-to-refresh list.
       body: RefreshIndicator(
-        color: const Color(0xFF00D9D9),
+        color: AppColors.primary,
         onRefresh: () => ref.read(notificationsProvider.notifier).refresh(),
         child: state.loading && state.items.isEmpty
+            // Initial loading state.
             ? ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: const [
                   SizedBox(height: 120),
-                  Center(child: CircularProgressIndicator(color: Color(0xFF00D9D9))),
+                  Center(child: CircularProgressIndicator(color: AppColors.primary)),
                 ],
               )
             : state.items.isEmpty
+                // Empty state.
                 ? ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     children: const [
@@ -105,6 +113,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                       Center(child: Text('لا توجد إشعارات حالياً')),
                     ],
                   )
+                // Notifications list.
                 : ListView.builder(
                     controller: _scrollController,
                     physics: const AlwaysScrollableScrollPhysics(),
@@ -112,6 +121,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                     itemCount: state.items.length + (state.loadingMore ? 1 : 0),
                     itemBuilder: (context, index) {
                       if (index >= state.items.length) {
+                        // Pagination loading indicator.
                         return const Padding(
                           padding: EdgeInsets.symmetric(vertical: 24),
                           child: Center(
@@ -119,7 +129,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                               width: 24,
                               height: 24,
                               child: CircularProgressIndicator(
-                                color: Color(0xFF00D9D9),
+                                color: AppColors.primary,
                                 strokeWidth: 2,
                               ),
                             ),
@@ -131,6 +141,7 @@ class _NotificationsScreenState extends ConsumerState<NotificationsScreen> {
                           ? DateFormat('hh:mm a').format(notification.createdAt!.toLocal())
                           : '';
 
+                      // Notification tap to mark read.
                       return GestureDetector(
                         onTap: () {
                           if (!notification.isRead) {
@@ -166,6 +177,7 @@ class _NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Notification card container.
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -182,13 +194,14 @@ class _NotificationCard extends StatelessWidget {
         border: isRead
             ? null
             : Border.all(
-                color: const Color(0xFF00D9D9).withOpacity(0.3),
+                color: AppColors.primary.withOpacity(0.3),
                 width: 1,
               ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Time label.
           Text(time, style: TextStyle(color: Colors.grey[400], fontSize: 11)),
           const Spacer(),
           Expanded(
@@ -196,16 +209,18 @@ class _NotificationCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                // Notification title.
                 Text(
                   title,
                   textAlign: TextAlign.right,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 15,
-                    color: isRead ? Colors.black87 : const Color(0xFF00D9D9),
+                    color: isRead ? Colors.black87 : AppColors.primary,
                   ),
                 ),
                 const SizedBox(height: 5),
+                // Notification body.
                 Text(
                   content,
                   textAlign: TextAlign.right,
@@ -219,19 +234,20 @@ class _NotificationCard extends StatelessWidget {
             ),
           ),
           const SizedBox(width: 12),
+          // Status icon.
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: isRead
                   ? const Color(0xFFF5F5F5)
-                  : const Color(0xFF00D9D9).withOpacity(0.1),
+                  : AppColors.primary.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               isRead
                   ? Icons.notifications_none_rounded
                   : Icons.notifications_active_rounded,
-              color: isRead ? Colors.grey : const Color(0xFF00D9D9),
+              color: isRead ? Colors.grey : AppColors.primary,
               size: 22,
             ),
           ),

@@ -2,13 +2,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/progress/client_goal.dart';
 import '../../../core/services/progress_service.dart';
 
+// State notifier for fetching and refreshing client goals.
 class GoalsNotifier extends StateNotifier<AsyncValue<List<ClientGoal>>> {
   final ProgressService _service;
 
   GoalsNotifier(this._service) : super(const AsyncValue.loading()) {
+    // Load initial data on creation.
     fetch();
   }
 
+  // Fetch goals from the API.
   Future<void> fetch() async {
     state = const AsyncValue.loading();
     try {
@@ -19,9 +22,11 @@ class GoalsNotifier extends StateNotifier<AsyncValue<List<ClientGoal>>> {
     }
   }
 
+  // Explicit refresh alias.
   Future<void> refresh() => fetch();
 }
 
+// Provider for client goals list state.
 final goalsProvider =
     StateNotifierProvider<GoalsNotifier, AsyncValue<List<ClientGoal>>>((ref) {
   return GoalsNotifier(ProgressService());

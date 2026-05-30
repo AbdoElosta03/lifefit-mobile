@@ -24,7 +24,7 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
   DateTime? _targetDate;
   bool _saving = false;
 
-  static const _primary = Color(0xFF00D9D9);
+  static const _primary = AppColors.primary;
 
   @override
   void initState() {
@@ -115,8 +115,10 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Screen scaffold for editing goals.
     return Scaffold(
       backgroundColor: AppColors.background,
+      // App bar: title + back action.
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0.5,
@@ -129,34 +131,40 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
             fontSize: 18,
           ),
         ),
+        // Back button.
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
+      // Scrollable content.
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            // Target weight field.
             _field(
               label: 'هدف الوزن (كجم)',
               ctrl: _weightCtrl,
               icon: Icons.flag_outlined,
             ),
             const SizedBox(height: 14),
+            // Target body fat field.
             _field(
               label: 'هدف نسبة الدهون (%)',
               ctrl: _fatCtrl,
               icon: Icons.pie_chart_outline,
             ),
             const SizedBox(height: 20),
+            // Start date tile.
             _dateTile(
               title: 'تاريخ البدء',
               date: _startDate,
               onTap: _pickStart,
             ),
             const SizedBox(height: 10),
+            // Target date tile.
             _dateTile(
               title: 'التاريخ المستهدف (اختياري)',
               date: _targetDate,
@@ -165,6 +173,7 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
               onClear: () => setState(() => _targetDate = null),
             ),
             const SizedBox(height: 28),
+            // Save button.
             SizedBox(
               height: 52,
               child: ElevatedButton(
@@ -205,12 +214,14 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
     required TextEditingController ctrl,
     required IconData icon,
   }) {
+    // Input field.
     return TextField(
       controller: ctrl,
       keyboardType: const TextInputType.numberWithOptions(decimal: true),
       textAlign: TextAlign.right,
       decoration: InputDecoration(
         labelText: label,
+        // Leading icon.
         prefixIcon: Icon(icon, color: _primary),
         filled: true,
         fillColor: Colors.white,
@@ -229,6 +240,7 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
     bool allowClear = false,
     VoidCallback? onClear,
   }) {
+    // Date picker tile.
     return Material(
       color: Colors.white,
       borderRadius: BorderRadius.circular(14),
@@ -240,11 +252,13 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
           child: Row(
             children: [
               if (allowClear && date != null && onClear != null)
+                // Clear date action.
                 IconButton(
                   onPressed: onClear,
                   icon: const Icon(Icons.close, size: 20),
                   color: Colors.grey,
                 ),
+              // Tile title.
               Expanded(
                 child: Text(
                   title,
@@ -252,6 +266,7 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
                   textAlign: TextAlign.right,
                 ),
               ),
+              // Selected date.
               Text(
                 date == null
                     ? '—'
@@ -262,6 +277,7 @@ class _EditGoalsScreenState extends ConsumerState<EditGoalsScreen> {
                 ),
               ),
               const SizedBox(width: 8),
+              // Calendar icon.
               const Icon(Icons.calendar_today_outlined, size: 18, color: _primary),
             ],
           ),
