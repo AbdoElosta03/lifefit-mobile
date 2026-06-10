@@ -18,8 +18,6 @@ Future<void> showAddProgressPhotoSheet(BuildContext context) {
   );
 }
 
-const Color _kPrimary = Color(0xFF00D9D9);
-
 class _AddProgressPhotoBody extends ConsumerStatefulWidget {
   const _AddProgressPhotoBody();
 
@@ -81,7 +79,7 @@ class _AddProgressPhotoBodyState extends ConsumerState<_AddProgressPhotoBody> {
       if (!mounted) return;
       Navigator.of(context).pop();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('تم رفع الصورة'), backgroundColor: _kPrimary),
+        const SnackBar(content: Text('تم رفع الصورة'), backgroundColor: AppColors.primary),
       );
     } catch (e) {
       if (!mounted) return;
@@ -129,7 +127,7 @@ class _AddProgressPhotoBodyState extends ConsumerState<_AddProgressPhotoBody> {
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w800,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -172,18 +170,18 @@ class _AddProgressPhotoBodyState extends ConsumerState<_AddProgressPhotoBody> {
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: _saving ? null : () => _pick(ImageSource.gallery),
-                        icon: const Icon(Icons.photo_library_outlined, color: _kPrimary),
+                        icon: const Icon(Icons.photo_library_outlined, color: AppColors.primary),
                         label: const Text('معرض'),
-                        style: OutlinedButton.styleFrom(foregroundColor: _kPrimary),
+                        style: OutlinedButton.styleFrom(foregroundColor: AppColors.primary),
                       ),
                     ),
                     const SizedBox(width: 10),
                     Expanded(
                       child: OutlinedButton.icon(
                         onPressed: _saving ? null : () => _pick(ImageSource.camera),
-                        icon: const Icon(Icons.camera_alt_outlined, color: _kPrimary),
+                        icon: const Icon(Icons.camera_alt_outlined, color: AppColors.primary),
                         label: const Text('كاميرا'),
-                        style: OutlinedButton.styleFrom(foregroundColor: _kPrimary),
+                        style: OutlinedButton.styleFrom(foregroundColor: AppColors.primary),
                       ),
                     ),
                   ],
@@ -205,7 +203,7 @@ class _AddProgressPhotoBodyState extends ConsumerState<_AddProgressPhotoBody> {
                   child: ElevatedButton(
                     onPressed: _saving ? null : _submit,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: _kPrimary,
+                      backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                     ),
@@ -256,10 +254,10 @@ class _AddProgressPhotoBodyState extends ConsumerState<_AddProgressPhotoBody> {
               ),
               Text(
                 ClientGoal.formatDateForApi(_date),
-                style: const TextStyle(color: _kPrimary, fontWeight: FontWeight.bold),
+                style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold),
               ),
               const SizedBox(width: 8),
-              const Icon(Icons.calendar_today_outlined, size: 18, color: _kPrimary),
+              const Icon(Icons.calendar_today_outlined, size: 18, color: AppColors.primary),
             ],
           ),
         ),

@@ -30,14 +30,14 @@ class TodaySchedulesNotifier
   Future<bool> saveWorkoutLog({
     required int scheduleId,
     required List<ExerciseLog> exerciseLogs,
-    int? totalDurationSeconds,
+    int? actualDurationMinutes,
     String? notes,
   }) async {
     try {
       final updated = await _service.saveWorkoutLog(
         scheduleId: scheduleId,
         exerciseLogs: exerciseLogs,
-        totalDurationSeconds: totalDurationSeconds,
+        actualDurationMinutes: actualDurationMinutes,
         notes: notes,
       );
 

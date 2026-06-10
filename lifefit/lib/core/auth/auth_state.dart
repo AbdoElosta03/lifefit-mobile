@@ -1,5 +1,6 @@
 import '../models/user.dart';
 
+/// Immutable snapshot consumed by routing, drawer, and auth screens.
 class AuthState {
   /// True until [AuthNotifier.restoreSession] finishes (cold start / secure storage check).
   final bool isInitializing;
@@ -14,8 +15,10 @@ class AuthState {
     this.user,
   });
 
+  /// Derived from [user]; token alone does not count as authenticated until restore completes.
   bool get isAuthenticated => user != null;
 
+  /// Pass [clearUser: true] to log out without replacing other fields individually.
   AuthState copyWith({
     bool? isInitializing,
     bool? isLoading,

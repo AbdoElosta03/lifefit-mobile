@@ -1,6 +1,7 @@
 import 'workout.dart';
 import 'workout_log.dart';
 
+/// Today's assigned workout from the client dashboard API.
 class TodaySchedule {
   final int scheduleId;
   final String status;
@@ -14,6 +15,7 @@ class TodaySchedule {
     this.workoutLog,
   });
 
+  /// Completed when status says so or a log exists (client may have logged early).
   bool get isCompleted => status == 'completed' || workoutLog != null;
   bool get isMissed => status == 'missed';
   bool get isScheduled => status == 'scheduled';
@@ -38,6 +40,7 @@ class TodaySchedule {
     );
   }
 
+  /// Optimistic UI update after the client finishes logging a workout.
   TodaySchedule copyWithLog(WorkoutLog log) {
     return TodaySchedule(
       scheduleId: scheduleId,

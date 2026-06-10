@@ -3,6 +3,7 @@ import 'meal_detail.dart';
 double? _dOpt(dynamic v) => v == null ? null : double.tryParse(v.toString());
 double _d(dynamic v) => v == null ? 0 : double.tryParse(v.toString()) ?? 0;
 
+/// One meal slot in today's plan with targets and optional intake log values.
 class MealSchedule {
   final int scheduleId;
   final String mealType;
@@ -70,6 +71,7 @@ class MealSchedule {
       meal: mealJson is Map<String, dynamic>
           ? MealDetail.fromJson(mealJson)
           : null,
+      // API may omit reference weight; 100g is the portion baseline for macro scaling.
       referenceWeightG: _d(json['reference_weight_g']) > 0 ? _d(json['reference_weight_g']) : 100,
       targetCalories: _d(json['target_calories']),
       targetProtein: _d(json['target_protein']),

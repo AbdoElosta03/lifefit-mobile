@@ -10,12 +10,13 @@ import 'widgets/macros_summary_card.dart';
 import 'widgets/meal_card.dart';
 import 'log_meal_sheet.dart';
 
+/// Today's meal plan — groups schedules, shows macros, opens [LogMealSheet].
+/// Data flow: [nutritionProvider] → [_MealsList] → [MealCard] → sheet → provider.
 class NutritionScreen extends ConsumerWidget {
   const NutritionScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Watches the nutrition state (loading, error, or data)
     final state = ref.watch(nutritionProvider);
 
     return Scaffold(
@@ -40,6 +41,7 @@ class NutritionScreen extends ConsumerWidget {
 // Main meals list view
 // ─────────────────────────────────────────
 
+/// Scrollable content: header, [MacrosSummaryCard], grouped [MealCard] lists.
 class _MealsList extends ConsumerWidget {
   final TodayMealsResponse data;
   const _MealsList({required this.data});
@@ -202,7 +204,7 @@ class _MealsList extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────
-// Section header (e.g. "فطور • 2 وجبة")
+// Section header per meal type (e.g. breakfast • 2/3 eaten)
 // ─────────────────────────────────────────
 
 class _SectionHeader extends StatelessWidget {

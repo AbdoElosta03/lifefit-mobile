@@ -1,5 +1,6 @@
 import 'exercise_pivot.dart';
 
+/// Exercise catalog entry. [pivot] is present when loaded via a [Workout] relation.
 class Exercise {
   final int id;
   final String name;

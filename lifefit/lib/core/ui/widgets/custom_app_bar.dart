@@ -22,7 +22,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final hasUnread = unread > 0;
     final badgeLabel = unread > 99 ? '99+' : '$unread';
     final user = ref.watch(authProvider).user;
-    final avatarUrl = user?.avatar;
+    final avatarUrl = user?.displayAvatarUrl;
 
     return AppBar(
       backgroundColor: Colors.white,

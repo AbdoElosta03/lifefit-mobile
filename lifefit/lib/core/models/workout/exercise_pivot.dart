@@ -1,3 +1,4 @@
+/// Laravel `workout_exercise` pivot: prescription for one exercise inside a workout.
 class ExercisePivot {
   final int sets;
   final String reps;
@@ -67,5 +68,51 @@ class ExercisePivot {
     if (v is double) return v;
     if (v is num) return v.toDouble();
     return double.tryParse(v.toString());
+  }
+
+  /// Defaults to `'weight'` when the API omits [intensityType].
+  String get effectiveIntensityType {
+    final type = intensityType?.trim().toLowerCase();
+    if (type == null || type.isEmpty) return 'weight';
+    return type;
+  }
+
+  bool get isWeightBased => effectiveIntensityType == 'weight';
+  bool get isPercentageBased => effectiveIntensityType == 'percentage';
+  bool get isRpeBased => effectiveIntensityType == 'rpe';
+  bool get isTimeBased => effectiveIntensityType == 'time';
+
+  String get intensityTypeLabel {
+    switch (effectiveIntensityType) {
+      case 'percentage':
+        return 'نسبة من 1RM';
+      case 'rpe':
+        return 'مستوى الجهد';
+      case 'time':
+        return 'المدة';
+      default:
+        return 'الوزن';
+    }
+  }
+
+  String get targetIntensityText {
+    switch (effectiveIntensityType) {
+      case 'percentage':
+        return targetPercentage != null ? '$targetPercentage%' : '—';
+      case 'rpe':
+        return rpeTarget != null ? 'RPE $rpeTarget' : '—';
+      case 'time':
+        return targetDurationSeconds != null
+            ? '$targetDurationSeconds ث'
+            : '—';
+      default:
+        return formatWeight(targetWeight);
+    }
+  }
+
+  static String formatWeight(double? weight) {
+    if (weight == null || weight == 0) return 'بوزن الجسم';
+    final fixed = weight % 1 == 0 ? 0 : 1;
+    return '${weight.toStringAsFixed(fixed)} كجم';
   }
 }

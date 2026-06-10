@@ -7,6 +7,7 @@ import '../models/workout/exercise_log.dart';
 
 /// Web client workouts: `GET /client/today`, `POST /client/workout-logs`.
 class WorkoutService extends BaseService {
+  /// GET `/api/client/today` — today's scheduled workouts with status.
   Future<List<TodaySchedule>> fetchTodaySchedules() async {
     try {
       final response = await dio.get('client/today');
@@ -31,17 +32,18 @@ class WorkoutService extends BaseService {
     }
   }
 
+  /// POST `/api/client/workout-logs` — saves exercise sets and marks schedule complete.
   Future<TodaySchedule> saveWorkoutLog({
     required int scheduleId,
     required List<ExerciseLog> exerciseLogs,
-    int? totalDurationSeconds,
+    int? actualDurationMinutes,
     String? notes,
   }) async {
     final body = {
       'schedule_id': scheduleId,
       'exercise_logs': exerciseLogs.map((l) => l.toJson()).toList(),
-      if (totalDurationSeconds != null)
-        'total_duration_seconds': totalDurationSeconds,
+      if (actualDurationMinutes != null)
+        'actual_duration_minutes': actualDurationMinutes,
       if (notes != null && notes.isNotEmpty) 'notes': notes,
     };
 
@@ -61,6 +63,7 @@ class WorkoutService extends BaseService {
     }
   }
 
+  /// Maps the Laravel schedule resource shape to [TodaySchedule].
   TodaySchedule _scheduleResourceToTodaySchedule(Map<String, dynamic> json) {
     WorkoutLog? log;
     final logJson = json['log'];

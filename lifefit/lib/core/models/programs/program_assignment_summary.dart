@@ -1,4 +1,4 @@
-/// عنصر من `GET /api/client/programs` → `data[]` (ProgramAssignmentResource).
+/// List item from `GET /api/client/programs` → `data[]` (ProgramAssignmentResource).
 class ProgramAssignmentSummary {
   final int id;
   final int programId;

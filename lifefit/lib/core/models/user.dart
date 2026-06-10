@@ -1,11 +1,14 @@
+/// User model from GET /api/user and login/register responses.
 class User {
   final int id;
   final String email;
   final String name;
+  /// 'client' | 'trainer' | 'nutritionist' | 'admin'
   final String role;
 
   final String? phone;
-  final String? avatar;
+  final String? avatar;    // Relative storage path (avatars/...)
+  final String? avatarUrl; // Full display URL from the API
   final String? bio;
 
   final DateTime? emailVerifiedAt;
@@ -20,6 +23,7 @@ class User {
     required this.role,
     this.phone,
     this.avatar,
+    this.avatarUrl,
     this.bio,
     this.emailVerifiedAt,
     required this.createdAt,
@@ -27,26 +31,57 @@ class User {
     this.deletedAt,
   });
 
+  bool get isEmailVerified => emailVerifiedAt != null;
+
+  /// Prefer this in UI over [avatar].
+  String? get displayAvatarUrl {
+    final url = avatarUrl?.trim();
+    if (url != null && url.isNotEmpty) return url;
+    return null;
+  }
+
+  /// Local merge after profile/account edits; does not PATCH the API by itself.
+  User copyWith({
+    String? name,
+    String? email,
+    String? phone,
+    String? avatar,
+    String? avatarUrl,
+    DateTime? emailVerifiedAt,
+  }) {
+    return User(
+      id: id,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      role: role,
+      phone: phone ?? this.phone,
+      avatar: avatar ?? this.avatar,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
+      bio: bio,
+      emailVerifiedAt: emailVerifiedAt ?? this.emailVerifiedAt,
+      createdAt: createdAt,
+      updatedAt: updatedAt,
+      deletedAt: deletedAt,
+    );
+  }
+
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
-      id: json['id'],
-      email: json['email'],
-      name: json['name'],
-      role: json['role'],
-
-      phone: json['phone'],
-      avatar: json['avatar'],
-      bio: json['bio'],
-
+      id: json['id'] as int,
+      email: (json['email'] ?? '').toString(),
+      name: (json['name'] ?? '').toString(),
+      role: (json['role'] ?? '').toString(),
+      phone: json['phone']?.toString(),
+      avatar: json['avatar']?.toString(),
+      avatarUrl: json['avatar_url']?.toString(),
+      bio: json['bio']?.toString(),
       emailVerifiedAt: json['email_verified_at'] != null
-          ? DateTime.parse(json['email_verified_at'])
+          ? DateTime.parse(json['email_verified_at'].toString())
           : null,
-
-      createdAt: DateTime.parse(json['created_at']),
-      updatedAt: DateTime.parse(json['updated_at']),
-
+      createdAt: DateTime.parse(json['created_at'].toString()),
+      updatedAt: DateTime.parse(json['updated_at'].toString()),
       deletedAt: json['deleted_at'] != null
-          ? DateTime.parse(json['deleted_at'])
+          ? DateTime.parse(json['deleted_at'].toString())
           : null,
     );
   }

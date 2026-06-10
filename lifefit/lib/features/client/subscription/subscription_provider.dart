@@ -5,7 +5,10 @@ import '../../../core/models/subscription/my_subscription_model.dart';
 import '../../../core/services/subscription_service.dart';
 
 // ─── Experts Provider ─────────────────────────────────────────────────────────
+// Used by: TrainersScreen → TrainersExpertCard
+// Fetches trainers/nutritionists with per-expert subscription status.
 
+/// Holds the list of available experts (trainers + nutritionists).
 class ExpertsNotifier
     extends StateNotifier<AsyncValue<List<ExpertModel>>> {
   final SubscriptionService _service;
@@ -14,6 +17,7 @@ class ExpertsNotifier
     fetch();
   }
 
+  /// Loads experts from API; transitions loading → data or error.
   Future<void> fetch() async {
     state = const AsyncValue.loading();
     try {
@@ -23,16 +27,21 @@ class ExpertsNotifier
     }
   }
 
+  /// Re-fetch — called after successful payment or pull-to-refresh.
   Future<void> refresh() => fetch();
 }
 
+/// Watched by [TrainersScreen]; refreshed via [ExpertsNotifier.refresh].
 final expertsProvider = StateNotifierProvider<
     ExpertsNotifier, AsyncValue<List<ExpertModel>>>(
   (ref) => ExpertsNotifier(SubscriptionService()),
 );
 
 // ─── My Subscriptions Provider ────────────────────────────────────────────────
+// Used by: MySubscriptionsScreen
+// Fetches current/past subscriptions; reload via ref.invalidate.
 
+/// Client subscription history — List<MySubscription>.
 final mySubscriptionsProvider =
     FutureProvider.autoDispose<List<MySubscription>>((ref) {
   return SubscriptionService().fetchMySubscriptions();

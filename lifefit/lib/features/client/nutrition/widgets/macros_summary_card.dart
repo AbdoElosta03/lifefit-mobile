@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/nutrition/today_meals_response.dart';
 
-/// Displays a summary card of total nutrition progress (Calories and Macros).
+/// Daily totals from [TodayMealsResponse] — calories bar + macro rings.
+/// Pure display widget; parent passes aggregated [data].
 class MacrosSummaryCard extends StatelessWidget {
   final TodayMealsResponse data;
 
@@ -152,6 +153,7 @@ class _CaloriesCard extends StatelessWidget {
   }
 }
 
+/// Circular progress for one macro (protein / carbs / fat).
 class _MacroBar extends StatelessWidget {
   final String label;
   final double consumed;

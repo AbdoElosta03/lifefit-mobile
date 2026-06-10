@@ -1,13 +1,10 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
+/// Persists the Sanctum bearer token. Read by [ApiService] on each request.
 class TokenStorage {
-  // إنشاء نسخة واحدة من المكتبة (Singleton)
   static const _storage = FlutterSecureStorage();
-
-  // مفتاح تخزين التوكن
   static const _keyToken = 'auth_token';
 
-  // 1. دالة حفظ التوكن
   static Future<void> saveToken(String token) async {
     try {
       await _storage.write(key: _keyToken, value: token);
@@ -16,7 +13,6 @@ class TokenStorage {
     }
   }
 
-  // 2. دالة جلب التوكن
   static Future<String?> getToken() async {
     try {
       return await _storage.read(key: _keyToken);
@@ -26,7 +22,7 @@ class TokenStorage {
     }
   }
 
-  // 3. دالة مسح التوكن (عند تسجيل الخروج)
+  /// Called on logout and when [AuthNotifier.restoreSession] fails.
   static Future<void> deleteToken() async {
     try {
       await _storage.delete(key: _keyToken);
@@ -35,7 +31,7 @@ class TokenStorage {
     }
   }
 
-  // 4. دالة للتأكد هل المستخدم مسجل دخول أم لا (وجود توكن)
+  /// Fast check used before hitting `/api/user` on cold start.
   static Future<bool> hasToken() async {
     final token = await getToken();
     return token != null && token.isNotEmpty;

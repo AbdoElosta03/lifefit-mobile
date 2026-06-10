@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../core/ui/app_colors.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/auth/auth_provider.dart';
 import '../../../core/routing/app_entry.dart';
+import 'widgets/auth_widgets.dart';
 
+/// Client registration screen.
+/// Data flow: form → authProvider.register → AppEntry on success.
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
 
@@ -31,6 +33,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     super.dispose();
   }
 
+  /// Submits registration; navigates to [AppEntry] when user is created.
   Future<void> _onRegister() async {
     if (!_formKey.currentState!.validate()) return;
 
@@ -38,7 +41,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
-          role: 'client', 
+          role: 'client',
         );
 
     final state = ref.read(authProvider);
@@ -53,196 +56,73 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authProvider);
-    return Scaffold(
-      // خلفية فاتحة موحدة (نفس شاشة الدخول)
-      backgroundColor: AppColors.background,
-      body: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Color(0xFFFFFFFF), Color(0xFFF1F5F9)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ),
-          ),
-          child: SafeArea(
-            child: Center(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 24),
-                child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        // أيقونة إنشاء حساب
-                        const Icon(
-                          Icons.person_add_alt_1,
-                          size: 80,
-                          color: Color(0xFF00C2C2),
-                        ),
-                        const SizedBox(height: 10),
-                        const Text(
-                          'إنشاء حساب جديد',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
-                            color: Color(0xFF0f172a),
-                          ),
-                        ),
-                        const Text(
-                          'انضم إلى لايف فت\n  وابدأ رحلتك اليوم',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(color: Color(0xFF64748b), fontSize: 15),
-                        ),
-                        const SizedBox(height: 35),
 
-                        _buildField(
-                          controller: _nameController,
-                          label: 'الاسم الكامل',
-                          icon: Icons.person_outline,
-                          validator: (v) => v!.isEmpty ? 'الاسم مطلوب' : null,
-                        ),
-                        const SizedBox(height: 14),
-
-                        _buildField(
-                          controller: _emailController,
-                          label: 'البريد الإلكتروني',
-                          icon: Icons.email_outlined,
-                          validator: (v) {
-                            if (v == null || v.isEmpty) return 'البريد مطلوب';
-                            if (!v.contains('@')) return 'صيغة البريد غير صحيحة';
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 14),
-
-                        _buildField(
-                          controller: _passwordController,
-                          label: 'كلمة المرور',
-                          icon: Icons.lock_outline,
-                          isPassword: true,
-                          obscure: _obscurePassword,
-                          onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
-                          validator: (v) => v!.length < 8 ? '8 أحرف على الأقل' : null,
-                        ),
-                        const SizedBox(height: 14),
-
-                        _buildField(
-                          controller: _confirmController,
-                          label: 'تأكيد كلمة المرور',
-                          icon: Icons.lock_reset,
-                          isPassword: true,
-                          obscure: _obscureConfirm,
-                          onToggle: () => setState(() => _obscureConfirm = !_obscureConfirm),
-                          validator: (v) => v != _passwordController.text ? 'لا يوجد تطابق' : null,
-                        ),
-
-                        if (authState.errorMessage != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 15),
-                            child: Text(
-                              authState.errorMessage!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.redAccent, fontSize: 13),
-                            ),
-                          ),
-
-                        const SizedBox(height: 30),
-
-                        // زر الإنشاء
-                        SizedBox(
-                          height: 55,
-                          child: ElevatedButton(
-                            onPressed: authState.isLoading ? null : _onRegister,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF00D9D9),
-                              foregroundColor: Colors.white,
-                              elevation: 0,
-                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-                            ),
-                            child: authState.isLoading
-                                ? const SizedBox(
-                                    width: 24,
-                                    height: 24,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                  )
-                                : const Text('إنشاء الحساب', style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text('لديك حساب بالفعل؟', style: TextStyle(color: Color(0xFF64748b))),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context),
-                              child: const Text(
-                                'سجل دخولك',
-                                style: TextStyle(color: Color(0xFF00C2C2), fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
+    return AuthScreenLayout(
+      formKey: _formKey,
+      children: [
+        const AuthHeader(
+          title: 'إنشاء حساب جديد',
+          subtitle: 'انضم إلى لايف فت وابدأ رحلتك اليوم',
         ),
-      ),
-    );
-  }
-
-  Widget _buildField({
-    required TextEditingController controller,
-    required String label,
-    required IconData icon,
-    bool isPassword = false,
-    bool obscure = false,
-    VoidCallback? onToggle,
-    String? Function(String?)? validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      obscureText: obscure,
-      style: const TextStyle(color: Color(0xFF1e293b)),
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: const TextStyle(color: Color(0xFF64748b), fontSize: 14),
-        prefixIcon: Icon(icon, color: const Color(0xFF00C2C2), size: 22),
-        suffixIcon: isPassword
-            ? IconButton(
-                icon: Icon(obscure ? Icons.visibility_off : Icons.visibility, color: Colors.grey, size: 20),
-                onPressed: onToggle,
-              )
-            : null,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+        AuthTextField(
+          controller: _nameController,
+          hint: 'الاسم الكامل',
+          icon: Icons.person_outline,
+          validator: (v) =>
+              (v == null || v.isEmpty) ? 'الاسم مطلوب' : null,
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Color(0xFF00C2C2), width: 1.5),
+        const SizedBox(height: 14),
+        AuthTextField(
+          controller: _emailController,
+          hint: 'البريد الإلكتروني',
+          icon: Icons.email_outlined,
+          keyboardType: TextInputType.emailAddress,
+          validator: (v) {
+            if (v == null || v.isEmpty) return 'البريد مطلوب';
+            if (!v.contains('@')) return 'بريد غير صالح';
+            return null;
+          },
         ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(15),
-          borderSide: const BorderSide(color: Colors.redAccent),
+        const SizedBox(height: 14),
+        AuthTextField(
+          controller: _passwordController,
+          hint: 'كلمة المرور',
+          icon: Icons.lock_outline,
+          isPassword: true,
+          obscure: _obscurePassword,
+          onToggleVisibility: () =>
+              setState(() => _obscurePassword = !_obscurePassword),
+          validator: (v) =>
+              (v == null || v.length < 8) ? '8 أحرف على الأقل' : null,
         ),
-      ),
-      validator: validator,
+        const SizedBox(height: 14),
+        AuthTextField(
+          controller: _confirmController,
+          hint: 'تأكيد كلمة المرور',
+          icon: Icons.lock_reset,
+          isPassword: true,
+          obscure: _obscureConfirm,
+          onToggleVisibility: () =>
+              setState(() => _obscureConfirm = !_obscureConfirm),
+          validator: (v) =>
+              (v != _passwordController.text) ? 'لا يوجد تطابق' : null,
+        ),
+        AuthErrorMessage(
+          message: authState.errorMessage,
+          padding: const EdgeInsets.only(top: 12, bottom: 12),
+        ),
+        AuthPrimaryButton(
+          label: 'إنشاء الحساب',
+          isLoading: authState.isLoading,
+          onPressed: _onRegister,
+        ),
+        const AuthSocialSection(),
+        AuthFooterLink(
+          prompt: 'لديك حساب بالفعل؟',
+          actionLabel: 'سجل دخولك',
+          onPressed: () => Navigator.pop(context),
+        ),
+      ],
     );
   }
 }

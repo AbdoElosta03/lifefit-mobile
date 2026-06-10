@@ -4,9 +4,9 @@ import '../models/subscription/expert_model.dart';
 import '../models/subscription/my_subscription_model.dart';
 import 'base_service.dart';
 
+/// Client subscription flow: browse experts, pay, and view active subscriptions.
 class SubscriptionService extends BaseService {
-  // ─── GET /api/client/available-experts ───────────────────────────────────
-
+  /// GET `/api/client/available-experts` — coaches/services the client can subscribe to.
   Future<List<ExpertModel>> fetchExperts() async {
     try {
       final response = await dio.get('client/available-experts');
@@ -24,8 +24,7 @@ class SubscriptionService extends BaseService {
     }
   }
 
-  // ─── POST /api/client/services/{id}/initiate-payment ─────────────────────
-
+  /// POST `/api/client/services/{id}/initiate-payment` — starts payment gateway session.
   Future<Map<String, dynamic>> initiatePayment(int serviceId) async {
     try {
       final response =
@@ -37,8 +36,7 @@ class SubscriptionService extends BaseService {
     }
   }
 
-  // ─── POST /api/client/payments/confirm ────────────────────────────────────
-
+  /// POST `/api/client/payments/confirm` — called after successful gateway callback.
   Future<void> confirmPayment({
     required String merchantReference,
     String? networkReference,
@@ -54,8 +52,7 @@ class SubscriptionService extends BaseService {
     }
   }
 
-  // ─── POST /api/client/payments/fail ───────────────────────────────────────
-
+  /// POST `/api/client/payments/fail` — best-effort; swallows errors silently.
   Future<void> failPayment({
     required String merchantReference,
     String? errorCode,
@@ -68,8 +65,7 @@ class SubscriptionService extends BaseService {
     } catch (_) {}
   }
 
-  // ─── GET /api/client/my-subscriptions ────────────────────────────────────
-
+  /// GET `/api/client/my-subscriptions` — active and past subscriptions.
   Future<List<MySubscription>> fetchMySubscriptions() async {
     try {
       final response = await dio.get('client/my-subscriptions');

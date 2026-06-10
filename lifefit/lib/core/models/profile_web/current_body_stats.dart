@@ -1,3 +1,4 @@
+/// Latest body metrics snapshot embedded in [ClientProfileBundle].
 class CurrentBodyStats {
   final double? weightKg;
   final double? bodyFatPct;

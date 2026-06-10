@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'base_service.dart';
 import '../models/nutrition/today_meals_response.dart';
 
+/// Daily meal plan and intake logging for the client.
 class NutritionService extends BaseService {
   /// GET /api/client/today-meals
   Future<TodayMealsResponse> fetchTodayMeals() async {

@@ -1,5 +1,6 @@
 import 'exercise.dart';
 
+/// Workout template with ordered [exercises] and optional pivot prescriptions.
 class Workout {
   final int id;
   final String name;

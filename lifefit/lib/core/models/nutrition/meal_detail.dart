@@ -2,6 +2,7 @@ import 'meal_ingredient.dart';
 
 double _d(dynamic v) => v == null ? 0 : double.tryParse(v.toString()) ?? 0;
 
+/// Meal recipe with macro totals and ingredient breakdown.
 class MealDetail {
   final int id;
   final String name;

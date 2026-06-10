@@ -4,6 +4,7 @@ import '../../../core/ui/app_colors.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/workout/today_schedule.dart';
 import '../../../core/models/workout/exercise.dart';
+import '../../../core/models/workout/exercise_pivot.dart';
 import 'exercise_video_card.dart';
 import 'workout_log_screen.dart';
 import 'workout_provider.dart';
@@ -124,8 +125,10 @@ class WorkoutDetailScreen extends ConsumerWidget {
               const SizedBox(height: 12),
               Row(children: [
                 Expanded(
-                    child: _detailCard('الوزن',
-                        _weightText(pivot.targetWeight), Icons.fitness_center)),
+                    child: _detailCard(
+                        pivot.intensityTypeLabel,
+                        pivot.targetIntensityText,
+                        _intensityIcon(pivot))),
                 const SizedBox(width: 12),
                 Expanded(
                     child: _detailCard(
@@ -260,9 +263,16 @@ class WorkoutDetailScreen extends ConsumerWidget {
     );
   }
 
-  String _weightText(double? w) {
-    // Format target weight.
-    if (w == null || w == 0) return 'حسب قدرتك';
-    return '${w.toStringAsFixed(w % 1 == 0 ? 0 : 1)} كجم';
+  IconData _intensityIcon(ExercisePivot pivot) {
+    switch (pivot.effectiveIntensityType) {
+      case 'percentage':
+        return Icons.percent;
+      case 'rpe':
+        return Icons.speed;
+      case 'time':
+        return Icons.timer_outlined;
+      default:
+        return Icons.fitness_center;
+    }
   }
 }

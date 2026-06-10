@@ -6,10 +6,12 @@ import 'token_storage.dart';
 import '../models/user.dart';
 import '../services/api_service.dart';
 
+/// Global auth state. Watch via `ref.watch(authProvider)`; mutate via `ref.read(authProvider.notifier)`.
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
   (ref) => AuthNotifier(),
 );
 
+/// Handles login/register/logout and session restore. Token persistence lives in [TokenStorage].
 class AuthNotifier extends StateNotifier<AuthState> {
   final ApiService _api = ApiService();
 
@@ -29,6 +31,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       final user = await _api.fetchCurrentUser();
       state = state.copyWith(user: user, isInitializing: false, isLoading: false);
     } catch (_) {
+      // Stale or invalid token — clear storage so the user is sent to login.
       await TokenStorage.deleteToken();
       state = state.copyWith(
         isInitializing: false,
@@ -38,11 +41,18 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Clears API token and resets state; does not set [AuthState.isInitializing] back to true.
   Future<void> logout() async {
     await _api.logout();
     state = const AuthState(isInitializing: false, isLoading: false);
   }
 
+  /// Keeps drawer/app bar in sync after account settings change.
+  void updateUser(User user) {
+    state = state.copyWith(user: user);
+  }
+
+  /// On success, [ApiService] stores the token; this notifier only updates [User].
   Future<void> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
@@ -87,6 +97,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
+  /// Maps [DioException] to Arabic user-facing strings for login/register screens.
   String _toUserMessage(DioException e) {
     if (e.response != null) {
       final status = e.response!.statusCode;

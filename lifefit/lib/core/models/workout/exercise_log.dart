@@ -1,3 +1,4 @@
+/// One logged set: prescribed (target_*) vs performed (actual_*) values.
 class ExerciseLog {
   final int? id;
   final int exerciseId;
@@ -53,6 +54,7 @@ class ExerciseLog {
     );
   }
 
+  /// Payload shape for `POST`/`PUT` workout log endpoints (omits null fields).
   Map<String, dynamic> toJson() => {
         'exercise_id': exerciseId,
         'set_number': setNumber,

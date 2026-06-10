@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/nutrition/meal_schedule.dart';
 
-/// A card representing a specific meal in the schedule.
+/// Displays one scheduled meal; callbacks delegate actions to parent screen.
+/// Receives [MealSchedule] only — no direct provider access.
 class MealCard extends StatelessWidget {
   final MealSchedule schedule;
   final VoidCallback onLog;
@@ -220,10 +221,10 @@ class _MealImage extends StatelessWidget {
       width: 58,
       height: 58,
       decoration: BoxDecoration(
-        color: const Color(0xFF00D9D9).withOpacity(0.08),
+        color: AppColors.primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(12),
       ),
-      child: const Icon(Icons.restaurant, color: Color(0xFF00D9D9), size: 28),
+      child: const Icon(Icons.restaurant, color: AppColors.primary, size: 28),
     );
   }
 }

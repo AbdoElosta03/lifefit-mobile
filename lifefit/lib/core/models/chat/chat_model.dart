@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Firestore chat thread metadata; denormalized names avoid extra user lookups.
 class ChatModel {
   final String id;
   final List<String> participants;
@@ -44,6 +45,7 @@ class ChatModel {
     );
   }
 
+  /// Returns the first participant that is not [currentUserId] (1:1 chats).
   String otherParticipantId(String currentUserId) {
     for (final id in participants) {
       if (id != currentUserId) return id;

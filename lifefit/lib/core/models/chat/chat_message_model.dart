@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Firestore document under `chats/{chatId}/messages/{messageId}`.
 class ChatMessageModel {
   final String id;
   final String chatId;
@@ -52,6 +53,7 @@ class ChatMessageModel {
     );
   }
 
+  /// Fields written when sending a new message (server sets `createdAt` via Timestamp).
   Map<String, dynamic> toMap() {
     return {
       'senderId': senderId,

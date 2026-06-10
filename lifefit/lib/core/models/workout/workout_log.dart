@@ -1,11 +1,13 @@
 import 'exercise_log.dart';
 
+/// Client session log for a scheduled workout, including per-set [exerciseLogs].
 class WorkoutLog {
   final int id;
   final int scheduleId;
   final String status;
   final bool trainerReviewed;
-  final int? totalDurationSeconds;
+  final int? actualDurationMinutes;
+  final int? targetDurationMinutes;
   final String? notes;
   final List<ExerciseLog> exerciseLogs;
 
@@ -14,7 +16,8 @@ class WorkoutLog {
     required this.scheduleId,
     required this.status,
     this.trainerReviewed = false,
-    this.totalDurationSeconds,
+    this.actualDurationMinutes,
+    this.targetDurationMinutes,
     this.notes,
     this.exerciseLogs = const [],
   });
@@ -33,10 +36,29 @@ class WorkoutLog {
       scheduleId: (json['schedule_id'] as num?)?.toInt() ?? 0,
       status: (json['status'] ?? 'pending').toString(),
       trainerReviewed: json['trainer_reviewed'] == true,
-      totalDurationSeconds: (json['total_duration_seconds'] as num?)?.toInt(),
+      actualDurationMinutes: _readMinutes(
+        json['actual_duration_minutes'],
+        json['total_duration_seconds'],
+      ),
+      targetDurationMinutes: (json['target_duration_minutes'] as num?)?.toInt(),
       notes: json['notes']?.toString(),
       exerciseLogs: logs,
     );
+  }
+
+  /// Prefers `actual_duration_minutes`; falls back to legacy `total_duration_seconds`.
+  static int? _readMinutes(dynamic minutes, dynamic legacySeconds) {
+    if (minutes != null) {
+      if (minutes is int) return minutes;
+      if (minutes is num) return minutes.toInt();
+      return int.tryParse(minutes.toString());
+    }
+    if (legacySeconds == null) return null;
+    final seconds = legacySeconds is num
+        ? legacySeconds.toInt()
+        : int.tryParse(legacySeconds.toString());
+    if (seconds == null) return null;
+    return (seconds / 60).ceil();
   }
 
   bool hasLogForExercise(int exerciseId) {

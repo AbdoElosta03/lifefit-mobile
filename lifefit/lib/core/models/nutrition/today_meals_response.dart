@@ -1,5 +1,6 @@
 import 'meal_schedule.dart';
 
+/// Root payload for today's nutrition dashboard; totals are computed client-side.
 class TodayMealsResponse {
   final List<MealSchedule> meals;
   final String? planName;
@@ -16,6 +17,7 @@ class TodayMealsResponse {
   double get totalTargetCalories =>
       meals.fold(0, (sum, m) => sum + m.targetCalories);
 
+  /// Uses actual macros when logged; otherwise falls back to targets for eaten meals.
   double get totalConsumedCalories =>
       meals.where((m) => m.isEaten).fold(0, (sum, m) => sum + (m.actualCalories ?? m.targetCalories));
 
@@ -55,6 +57,7 @@ class TodayMealsResponse {
     );
   }
 
+  /// Immutable replace-one-meal helper for local state after logging intake.
   TodayMealsResponse withUpdatedMeal(MealSchedule updated) {
     return TodayMealsResponse(
       meals: meals.map((m) => m.scheduleId == updated.scheduleId ? updated : m).toList(),

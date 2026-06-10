@@ -1,3 +1,4 @@
+/// Editable fitness profile fields from `/api/client/profile` → `profile`.
 class ClientProfileData {
   final double? heightCm;
   final double? targetWeightKg;

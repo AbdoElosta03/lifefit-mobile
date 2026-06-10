@@ -3,6 +3,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/chat/chat_message_model.dart';
 import '../models/chat/chat_model.dart';
 
+/// Real-time chat layer on Firestore (messages, typing, presence).
+/// Chat metadata is created by Laravel; this service handles live messaging.
 class FirestoreChatService {
   FirestoreChatService(this._firestore);
 
@@ -68,6 +70,7 @@ class FirestoreChatService {
     await ref.set(payload, SetOptions(merge: true));
   }
 
+  /// Live list of chats where [userId] is a participant, newest activity first.
   Stream<List<ChatModel>> watchChats(String userId) {
     return _chats
         .where('participants', arrayContains: userId)
@@ -80,6 +83,7 @@ class FirestoreChatService {
         );
   }
 
+  /// Live stream of the latest [limit] messages in a chat (newest first).
   Stream<List<ChatMessageModel>> watchMessages(String chatId, int limit) {
     return _chats
         .doc(chatId)
@@ -94,6 +98,7 @@ class FirestoreChatService {
         );
   }
 
+  /// Atomically writes a message and updates the chat's lastMessage preview.
   Future<void> sendMessage({
     required String chatId,
     required String senderId,
@@ -131,6 +136,7 @@ class FirestoreChatService {
     await batch.commit();
   }
 
+  /// Marks up to 50 unread messages from the other participant as read.
   Future<void> markMessagesAsRead({
     required String chatId,
     required String userId,
@@ -153,6 +159,7 @@ class FirestoreChatService {
     await batch.commit();
   }
 
+  /// Updates the `typing` map on the chat doc for the given [userId].
   Future<void> setTyping({
     required String chatId,
     required String userId,
@@ -166,6 +173,7 @@ class FirestoreChatService {
     );
   }
 
+  /// Live map of userId → isTyping for a chat room.
   Stream<Map<String, bool>> watchTyping(String chatId) {
     return _chats.doc(chatId).snapshots().map((doc) {
       final data = doc.data();
@@ -199,6 +207,7 @@ class FirestoreChatService {
         .map((snap) => snap.data() ?? {});
   }
 
+  /// One-shot pagination: loads messages older than [before] for scroll-up.
   Future<List<ChatMessageModel>> fetchOlderMessages({
     required String chatId,
     required DateTime before,

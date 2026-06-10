@@ -2,17 +2,20 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
 import '../../../core/services/profile_web_service.dart';
 
-// State notifier for web profile bundle.
+// ─── Client Profile Provider ──────────────────────────────────────────────────
+// Used by: ProfileScreen (read), ProfileEditSheet (write via update).
+// Bundle = user + profile fields + current body stats.
+
+/// Manages [ClientProfileBundle] from GET/PUT /api/client/profile.
 class ClientProfileNotifier
     extends StateNotifier<AsyncValue<ClientProfileBundle>> {
   final ProfileService _service;
 
   ClientProfileNotifier(this._service) : super(const AsyncValue.loading()) {
-    // Load initial data on creation.
     fetch();
   }
 
-  // Fetch profile bundle from API.
+  /// Initial load and manual refresh.
   Future<void> fetch() async {
     state = const AsyncValue.loading();
     try {
@@ -23,17 +26,16 @@ class ClientProfileNotifier
     }
   }
 
-  // Explicit refresh alias.
   Future<void> refresh() => fetch();
 
-  // Update profile and refresh state.
+  /// PUT partial body; replaces state with the server response.
   Future<void> update(Map<String, dynamic> body) async {
     final bundle = await _service.updateProfile(body);
     state = AsyncValue.data(bundle);
   }
 }
 
-// Provider for client profile bundle state.
+/// Watched by [ProfileScreen]; updated by [ProfileEditSheet._save].
 final clientProfileProvider = StateNotifierProvider<ClientProfileNotifier,
     AsyncValue<ClientProfileBundle>>((ref) {
   return ClientProfileNotifier(ProfileService());

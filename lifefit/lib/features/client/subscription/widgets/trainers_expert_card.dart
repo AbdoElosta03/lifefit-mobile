@@ -5,6 +5,7 @@ import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/subscription/expert_model.dart';
 import 'expert_subscription_payment.dart';
 
+/// Single expert row; passes [ExpertModel] down and triggers payment via [ref].
 class TrainersExpertCard extends ConsumerWidget {
   final ExpertModel expert;
 
@@ -211,6 +212,7 @@ class TrainersExpertCard extends ConsumerWidget {
   }
 }
 
+/// Avatar with gradient ring — green when [active] (subscribed).
 class _GradientAvatar extends StatelessWidget {
   final String? url;
   final bool active;
@@ -261,6 +263,7 @@ class _GradientAvatar extends StatelessWidget {
       );
 }
 
+/// Small colored tag for role, specialty, or experience.
 class _InfoChip extends StatelessWidget {
   final String label;
   final Color color;

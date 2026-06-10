@@ -7,10 +7,11 @@ import 'package:intl/intl.dart';
 import '../../../core/models/subscription/my_subscription_model.dart';
 import 'subscription_provider.dart';
 
+/// Read-only list of the client's subscriptions.
+/// Data flow: [mySubscriptionsProvider] → [_SubscriptionCard] per item.
 class MySubscriptionsScreen extends ConsumerWidget {
   const MySubscriptionsScreen({super.key});
 
-  /// Main screen showing the list of active or past subscriptions for the client.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(mySubscriptionsProvider);

@@ -1,3 +1,4 @@
+/// Lightweight client profile fields (legacy shape; see [ClientProfileData] for the full API).
 class Profile {
   final int? age;
   final double? heightCm;
@@ -24,6 +25,7 @@ class Profile {
   }
 }
 
+/// Accepts int, double, or numeric string from JSON.
 double? _toDouble(dynamic v) {
   if (v == null) return null;
   if (v is num) return v.toDouble();

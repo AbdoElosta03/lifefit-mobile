@@ -1,5 +1,6 @@
 import 'app_notification.dart';
 
+/// Laravel paginator wrapper for `GET /api/client/notifications`.
 class PaginatedNotifications {
   final List<AppNotification> data;
   final int currentPage;

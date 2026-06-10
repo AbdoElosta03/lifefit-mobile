@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
 import '../auth/token_storage.dart';
 
+/// Shared HTTP client for all Laravel API services.
+/// Configures Dio with the base URL and auto-injects the Bearer token.
 class BaseService {
+  /// 10.0.2.2 = Android emulator alias for host machine localhost.
   final String baseUrl = "http://10.0.2.2:8000/api/";
   late Dio dio;
 
@@ -13,7 +16,7 @@ class BaseService {
       },
     ));
 
-    // إضافة Interceptor لإدراج التوكن تلقائياً في كل طلب
+    // Attach Bearer token from secure storage on every request.
     dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await TokenStorage.getToken();
@@ -23,7 +26,7 @@ class BaseService {
         return handler.next(options);
       },
       onError: (DioException e, handler) {
-        // معالجة مركزية للأخطاء
+        // Centralized error logging; callers handle user-facing messages.
         print("API Error [${e.response?.statusCode}]: ${e.message}");
         return handler.next(e);
       },

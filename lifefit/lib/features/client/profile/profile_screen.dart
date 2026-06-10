@@ -10,7 +10,8 @@ import 'profile_edit_sheet.dart';
 import 'profile_labels.dart';
 import 'profile_provider.dart';
 
-/// Profile screen backed by `GET/PUT /api/client/profile`.
+/// Client profile — read-only view with edit entry point.
+/// Data flow: clientProfileProvider + goalsProvider → _ProfileBody → ProfileEditSheet.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
 
@@ -23,15 +24,14 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(clientProfileProvider);
     final goalsAsync = ref.watch(goalsProvider);
+    // Target weight: prefer goals provider, fall back to profile field.
     final fallbackTarget = goalsAsync.maybeWhen(
       data: (g) => g.isNotEmpty ? g.first.targetWeight : null,
       orElse: () => null,
     );
 
-    // Screen scaffold for profile.
     return Scaffold(
       backgroundColor: _bg,
-      // Content based on provider state.
       body: async.when(
         loading: () =>
             const Center(child: CircularProgressIndicator(color: _accent)),
@@ -42,7 +42,6 @@ class ProfileScreen extends ConsumerWidget {
         data: (bundle) => _ProfileBody(
           bundle: bundle,
           targetWeight: fallbackTarget,
-          // Edit action opens the sheet.
           onEdit: () => showModalBottomSheet<void>(
             context: context,
             isScrollControlled: true,
@@ -55,6 +54,7 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
+/// Scrollable layout: header, stats, personal info, notes, edit card.
 class _ProfileBody extends StatelessWidget {
   final ClientProfileBundle bundle;
   final double? targetWeight;

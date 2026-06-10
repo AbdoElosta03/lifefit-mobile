@@ -66,6 +66,7 @@ class PersonalRecord {
     );
   }
 
+  /// Arabic fallback when the nested `exercise` relation was not eager-loaded.
   String get displayExerciseName => exercise?.name ?? 'تمرين #$exerciseId';
 
   static double? _toDouble(dynamic v) {

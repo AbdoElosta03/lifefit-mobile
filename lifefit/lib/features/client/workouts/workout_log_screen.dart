@@ -6,9 +6,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/workout/today_schedule.dart';
 import '../../../core/models/workout/exercise.dart';
 import '../../../core/models/workout/exercise_log.dart';
+import '../../../core/models/workout/exercise_pivot.dart';
 import 'workout_provider.dart';
 
-/// Screen for logging user performance (sets, reps, weight) for a specific exercise.
+/// Screen for logging user performance per set based on exercise intensity type.
 class WorkoutLogScreen extends ConsumerStatefulWidget {
   final TodaySchedule schedule;
   final Exercise exercise;
@@ -20,12 +21,12 @@ class WorkoutLogScreen extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<WorkoutLogScreen> createState() =>
-      _WorkoutLogScreenState();
+  ConsumerState<WorkoutLogScreen> createState() => _WorkoutLogScreenState();
 }
 
 class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   late List<_SetFields> _sets;
+  late String _intensityType;
   bool _isSubmitting = false;
   Timer? _restTimer;
   int _restRemaining = 60;
@@ -35,28 +36,34 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   Exercise get _exercise => widget.exercise;
   TodaySchedule get _schedule => widget.schedule;
+  ExercisePivot? get _pivot => _exercise.pivot;
 
   @override
   void initState() {
     super.initState();
-    // Initialize text controllers for each set based on target volume.
-    final pivot = _exercise.pivot;
+    final pivot = _pivot;
+    _intensityType = pivot?.effectiveIntensityType ?? 'weight';
     final count = (pivot?.sets ?? 1).clamp(1, 20);
-    final targetReps = _parseFirstInt(pivot?.reps);
-    final targetWeight = pivot?.targetWeight;
 
-    _sets = List.generate(
-      count,
-      (_) => _SetFields(
-        targetReps: targetReps,
-        targetWeight: targetWeight,
-      ),
-    );
+    final existingLogs = _schedule.workoutLog?.exerciseLogs
+            .where((l) => l.exerciseId == _exercise.id)
+            .toList() ??
+        []
+      ..sort((a, b) => a.setNumber.compareTo(b.setNumber));
+
+    _sets = List.generate(count, (index) {
+      final existing =
+          index < existingLogs.length ? existingLogs[index] : null;
+      return _SetFields.fromTargets(
+        intensityType: _intensityType,
+        pivot: pivot,
+        existing: existing,
+      );
+    });
   }
 
   @override
   void dispose() {
-    // Clean up timers and controllers.
     for (final s in _sets) {
       s.dispose();
     }
@@ -64,18 +71,9 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     super.dispose();
   }
 
-  /// Extracts the first integer from a string (e.g. "10-12 reps" -> 10).
-  int? _parseFirstInt(String? text) {
-    if (text == null) return null;
-    final match = RegExp(r'(\d+)').firstMatch(text);
-    return match != null ? int.tryParse(match.group(1)!) : null;
-  }
-
-  /// Starts the rest timer countdown between sets.
   void _startRestTimer() {
     _restTimer?.cancel();
-    final restSec = _exercise.pivot?.restSeconds ?? 60;
-    // Start local rest timer.
+    final restSec = _pivot?.restSeconds ?? 60;
     setState(() {
       _restRemaining = restSec;
       _restRunning = true;
@@ -90,9 +88,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     });
   }
 
-  /// Fetches the live schedule instance to ensure data integrity on submission.
   TodaySchedule _scheduleForSubmit() {
-    // Prefer the latest schedule from provider state.
     final list = ref.read(todaySchedulesProvider).valueOrNull;
     if (list != null) {
       for (final s in list) {
@@ -102,46 +98,31 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     return widget.schedule;
   }
 
-  /// Validates and sends the workout log to the backend.
   Future<void> _submitLog() async {
     if (_isSubmitting) return;
-    // Dismiss keyboard before submit.
     FocusScope.of(context).unfocus();
     setState(() => _isSubmitting = true);
 
     try {
       final schedule = _scheduleForSubmit();
-      // Keep logs for other exercises in the same schedule.
       final existingFromOthers = schedule.workoutLog?.exerciseLogs
               .where((l) => l.exerciseId != _exercise.id)
               .toList() ??
           [];
 
+      final pivot = _pivot;
       final newLogs = <ExerciseLog>[];
       for (var i = 0; i < _sets.length; i++) {
-        final s = _sets[i];
-        final actualReps = _intFrom(s.repsCtrl.text, s.targetReps);
-        final actualWeight = _doubleFrom(s.weightCtrl.text, s.targetWeight);
-
-        newLogs.add(ExerciseLog(
-          exerciseId: _exercise.id,
-          setNumber: i + 1,
-          targetReps: s.targetReps,
-          actualReps: actualReps,
-          targetWeight: s.targetWeight,
-          actualWeight: actualWeight,
-          intensityType: _exercise.pivot?.intensityType ?? 'weight',
-          rpeTarget: _exercise.pivot?.rpeTarget,
-          notes: s.notesCtrl.text.trim().isEmpty ? null : s.notesCtrl.text.trim(),
-        ));
+        newLogs.add(_buildExerciseLog(_sets[i], i + 1, pivot));
       }
 
       final exerciseLogs = [...existingFromOthers, ...newLogs];
 
-      final success = await ref.read(todaySchedulesProvider.notifier).saveWorkoutLog(
-            scheduleId: schedule.scheduleId,
-            exerciseLogs: exerciseLogs,
-          );
+      final success =
+          await ref.read(todaySchedulesProvider.notifier).saveWorkoutLog(
+                scheduleId: schedule.scheduleId,
+                exerciseLogs: exerciseLogs,
+              );
 
       if (!mounted) return;
 
@@ -162,6 +143,64 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
+  }
+
+  ExerciseLog _buildExerciseLog(
+    _SetFields set,
+    int setNumber,
+    ExercisePivot? pivot,
+  ) {
+    switch (_intensityType) {
+      case 'percentage':
+        return ExerciseLog(
+          exerciseId: _exercise.id,
+          setNumber: setNumber,
+          targetReps: set.targetReps,
+          actualReps: _intFrom(set.repsCtrl.text, set.targetReps),
+          targetPercentage: set.targetPercentage,
+          actualPercentage:
+              _intFrom(set.percentageCtrl.text, set.targetPercentage),
+          intensityType: 'percentage',
+          notes: _notesFrom(set),
+        );
+      case 'rpe':
+        return ExerciseLog(
+          exerciseId: _exercise.id,
+          setNumber: setNumber,
+          targetReps: set.targetReps,
+          actualReps: _intFrom(set.repsCtrl.text, set.targetReps),
+          rpeTarget: set.rpeTarget,
+          rpe: _intFrom(set.rpeCtrl.text, set.rpeTarget),
+          intensityType: 'rpe',
+          notes: _notesFrom(set),
+        );
+      case 'time':
+        return ExerciseLog(
+          exerciseId: _exercise.id,
+          setNumber: setNumber,
+          targetDurationSeconds: set.targetDurationSeconds,
+          actualDurationSeconds:
+              _intFrom(set.durationCtrl.text, set.targetDurationSeconds),
+          intensityType: 'time',
+          notes: _notesFrom(set),
+        );
+      default:
+        return ExerciseLog(
+          exerciseId: _exercise.id,
+          setNumber: setNumber,
+          targetReps: set.targetReps,
+          actualReps: _intFrom(set.repsCtrl.text, set.targetReps),
+          targetWeight: set.targetWeight,
+          actualWeight: _doubleFrom(set.weightCtrl.text, set.targetWeight),
+          intensityType: 'weight',
+          notes: _notesFrom(set),
+        );
+    }
+  }
+
+  String? _notesFrom(_SetFields set) {
+    final text = set.notesCtrl.text.trim();
+    return text.isEmpty ? null : text;
   }
 
   int? _intFrom(String text, int? fallback) {
@@ -195,14 +234,14 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Header card.
             _buildHeader(),
             const SizedBox(height: 12),
-            // Rest timer.
             _buildRestTimer(),
             const SizedBox(height: 16),
-            const Text('المجموعات',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
+            Text(
+              _pivot?.isTimeBased == true ? 'الجولات' : 'المجموعات',
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            ),
             const SizedBox(height: 10),
             ...List.generate(_sets.length, (i) => _buildSetCard(i)),
             const SizedBox(height: 16),
@@ -227,7 +266,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
                               AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text('إنهاء التمرين',
+                    : const Text('حفظ التسجيل',
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w700,
@@ -241,8 +280,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   }
 
   Widget _buildHeader() {
-    final pivot = _exercise.pivot;
-    // Exercise header info.
+    final pivot = _pivot;
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
@@ -270,9 +308,13 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
               alignment: WrapAlignment.end,
               children: [
                 _tag('${pivot.sets} مجموعات', Colors.blue[50]!, Colors.blue),
-                _tag('${pivot.reps} عدات', Colors.orange[50]!, Colors.orange),
-                _tag(_weightLabel(pivot.targetWeight), Colors.green[50]!,
-                    Colors.green),
+                if (!pivot.isTimeBased)
+                  _tag('${pivot.reps} عدات', Colors.orange[50]!, Colors.orange),
+                _tag(
+                  '${pivot.intensityTypeLabel}: ${pivot.targetIntensityText}',
+                  Colors.green[50]!,
+                  Colors.green,
+                ),
               ],
             ),
           ],
@@ -301,7 +343,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
               const Text('مؤقت الراحة',
                   style: TextStyle(fontWeight: FontWeight.w700)),
               const SizedBox(height: 2),
-              Text('${_exercise.pivot?.restSeconds ?? 60} ثانية للراحة',
+              Text('${_pivot?.restSeconds ?? 60} ثانية للراحة',
                   style: const TextStyle(color: Colors.grey, fontSize: 12)),
             ],
           ),
@@ -336,7 +378,6 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   Widget _buildSetCard(int index) {
     final s = _sets[index];
-    // Input card for a set.
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
@@ -354,12 +395,82 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
               Text('المجموعة ${index + 1}',
                   style: const TextStyle(fontWeight: FontWeight.w700)),
               Text(
-                'الهدف: ${s.targetReps ?? "--"} | ${_weightLabel(s.targetWeight)}',
+                'الهدف: ${s.targetSummary}',
                 style: const TextStyle(color: Colors.grey, fontSize: 12),
               ),
             ],
           ),
           const SizedBox(height: 12),
+          ..._buildSetInputs(s),
+          const SizedBox(height: 10),
+          TextFormField(
+            controller: s.notesCtrl,
+            textAlign: TextAlign.right,
+            maxLines: 1,
+            decoration: _inputDeco('ملاحظات المجموعة'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildSetInputs(_SetFields s) {
+    switch (_intensityType) {
+      case 'percentage':
+        return [
+          Row(children: [
+            Expanded(
+              child: TextFormField(
+                controller: s.repsCtrl,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: _inputDeco('العدات'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: s.percentageCtrl,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: _inputDeco('النسبة %'),
+              ),
+            ),
+          ]),
+        ];
+      case 'rpe':
+        return [
+          Row(children: [
+            Expanded(
+              child: TextFormField(
+                controller: s.repsCtrl,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: _inputDeco('العدات'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: TextFormField(
+                controller: s.rpeCtrl,
+                textAlign: TextAlign.center,
+                keyboardType: TextInputType.number,
+                decoration: _inputDeco('RPE (1-10)'),
+              ),
+            ),
+          ]),
+        ];
+      case 'time':
+        return [
+          TextFormField(
+            controller: s.durationCtrl,
+            textAlign: TextAlign.center,
+            keyboardType: TextInputType.number,
+            decoration: _inputDeco('المدة (ثانية)'),
+          ),
+        ];
+      default:
+        return [
           Row(children: [
             Expanded(
               child: TextFormField(
@@ -380,16 +491,8 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
               ),
             ),
           ]),
-          const SizedBox(height: 10),
-          TextFormField(
-            controller: s.notesCtrl,
-            textAlign: TextAlign.right,
-            maxLines: 1,
-            decoration: _inputDeco('ملاحظات المجموعة'),
-          ),
-        ],
-      ),
-    );
+        ];
+    }
   }
 
   InputDecoration _inputDeco(String label) => InputDecoration(
@@ -412,30 +515,112 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
             style:
                 TextStyle(color: fg, fontWeight: FontWeight.bold, fontSize: 11)),
       );
-
-  String _weightLabel(double? w) {
-    // Format weight label.
-    if (w == null || w == 0) return 'بوزن الجسم';
-    return '${w.toStringAsFixed(w % 1 == 0 ? 0 : 1)} كجم';
-  }
 }
 
 class _SetFields {
-  final TextEditingController repsCtrl;
-  final TextEditingController weightCtrl;
-  final TextEditingController notesCtrl;
+  final String intensityType;
   final int? targetReps;
   final double? targetWeight;
+  final int? targetPercentage;
+  final int? targetDurationSeconds;
+  final int? rpeTarget;
 
-  _SetFields({this.targetReps, this.targetWeight})
-      : repsCtrl = TextEditingController(text: targetReps?.toString() ?? ''),
-        weightCtrl =
-            TextEditingController(text: targetWeight?.toString() ?? ''),
-        notesCtrl = TextEditingController();
+  final TextEditingController repsCtrl;
+  final TextEditingController weightCtrl;
+  final TextEditingController percentageCtrl;
+  final TextEditingController durationCtrl;
+  final TextEditingController rpeCtrl;
+  final TextEditingController notesCtrl;
+
+  _SetFields._({
+    required this.intensityType,
+    this.targetReps,
+    this.targetWeight,
+    this.targetPercentage,
+    this.targetDurationSeconds,
+    this.rpeTarget,
+    required this.repsCtrl,
+    required this.weightCtrl,
+    required this.percentageCtrl,
+    required this.durationCtrl,
+    required this.rpeCtrl,
+    required this.notesCtrl,
+  });
+
+  factory _SetFields.fromTargets({
+    required String intensityType,
+    ExercisePivot? pivot,
+    ExerciseLog? existing,
+  }) {
+    final targetReps = intensityType == 'time'
+        ? null
+        : _parseFirstIntStatic(pivot?.reps ?? existing?.targetReps?.toString());
+    final targetWeight = pivot?.targetWeight ?? existing?.targetWeight;
+    final targetPercentage =
+        pivot?.targetPercentage ?? existing?.targetPercentage;
+    final targetDurationSeconds =
+        pivot?.targetDurationSeconds ?? existing?.targetDurationSeconds;
+    final rpeTarget = pivot?.rpeTarget ?? existing?.rpeTarget;
+
+    return _SetFields._(
+      intensityType: intensityType,
+      targetReps: existing?.targetReps ?? targetReps,
+      targetWeight: existing?.targetWeight ?? targetWeight,
+      targetPercentage: existing?.targetPercentage ?? targetPercentage,
+      targetDurationSeconds:
+          existing?.targetDurationSeconds ?? targetDurationSeconds,
+      rpeTarget: existing?.rpeTarget ?? rpeTarget,
+      repsCtrl: TextEditingController(
+        text: _textOrEmpty(existing?.actualReps ?? targetReps),
+      ),
+      weightCtrl: TextEditingController(
+        text: _textOrEmpty(existing?.actualWeight ?? targetWeight),
+      ),
+      percentageCtrl: TextEditingController(
+        text: _textOrEmpty(existing?.actualPercentage ?? targetPercentage),
+      ),
+      durationCtrl: TextEditingController(
+        text: _textOrEmpty(
+            existing?.actualDurationSeconds ?? targetDurationSeconds),
+      ),
+      rpeCtrl: TextEditingController(
+        text: _textOrEmpty(existing?.rpe ?? rpeTarget),
+      ),
+      notesCtrl: TextEditingController(text: existing?.notes ?? ''),
+    );
+  }
+
+  String get targetSummary {
+    switch (intensityType) {
+      case 'percentage':
+        return '${targetReps ?? "--"} عدات | ${targetPercentage ?? "--"}%';
+      case 'rpe':
+        return '${targetReps ?? "--"} عدات | RPE ${rpeTarget ?? "--"}';
+      case 'time':
+        return '${targetDurationSeconds ?? "--"} ث';
+      default:
+        return '${targetReps ?? "--"} | ${ExercisePivot.formatWeight(targetWeight)}';
+    }
+  }
+
+  static int? _parseFirstIntStatic(String? text) {
+    if (text == null) return null;
+    final match = RegExp(r'(\d+)').firstMatch(text);
+    return match != null ? int.tryParse(match.group(1)!) : null;
+  }
+
+  static String _textOrEmpty(num? value) {
+    if (value == null) return '';
+    if (value is double && value % 1 != 0) return value.toString();
+    return value.toInt().toString();
+  }
 
   void dispose() {
     repsCtrl.dispose();
     weightCtrl.dispose();
+    percentageCtrl.dispose();
+    durationCtrl.dispose();
+    rpeCtrl.dispose();
     notesCtrl.dispose();
   }
 }

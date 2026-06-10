@@ -4,9 +4,10 @@ import '../models/programs/client_program_detail.dart';
 import '../models/programs/program_assignment_summary.dart';
 import 'base_service.dart';
 
+/// Assigned workout/nutrition programs from the coach.
 /// `GET /api/client/programs`, `GET /api/client/programs/{id}`.
 class ClientProgramService extends BaseService {
-  /// يبني رابطًا لصورة مخزّنة نسبيًا (مثل مجلد avatars).
+  /// Turns a relative storage path (e.g. `avatars/...`) into a full URL.
   String resolveMediaUrl(String? path) {
     if (path == null || path.isEmpty) return '';
     if (path.startsWith('http://') || path.startsWith('https://')) return path;
@@ -16,6 +17,7 @@ class ClientProgramService extends BaseService {
     return '$origin/storage/$clean';
   }
 
+  /// GET `/api/client/programs` — list of program assignments for the client.
   Future<List<ProgramAssignmentSummary>> fetchPrograms() async {
     try {
       final response = await dio.get('client/programs');
@@ -37,6 +39,7 @@ class ClientProgramService extends BaseService {
     }
   }
 
+  /// GET `/api/client/programs/{id}` — full program with days and exercises.
   Future<ClientProgramDetail> fetchProgramDetail(int assignmentId) async {
     try {
       final response = await dio.get('client/programs/$assignmentId');

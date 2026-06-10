@@ -7,6 +7,8 @@ import 'subscription_provider.dart';
 import 'widgets/trainers_expert_card.dart';
 import 'widgets/trainers_screen_widgets.dart';
 
+/// Browse trainers and nutritionists, filter by role, start checkout.
+/// Data flow: expertsProvider → local filter → TrainersExpertCard(expert).
 class TrainersScreen extends ConsumerStatefulWidget {
   const TrainersScreen({super.key});
 
@@ -18,29 +20,28 @@ class _TrainersScreenState extends ConsumerState<TrainersScreen> {
   /// 'all' | 'trainer' | 'nutritionist'
   String _filter = 'all';
 
-  static const _primary = Color(0xFF00D9D9);
-  static const _dark = Color(0xFF1E293B);
-
   @override
   Widget build(BuildContext context) {
+    // Watch expert list from provider.
     final async = ref.watch(expertsProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: async.when(
         loading: () =>
-            const Center(child: CircularProgressIndicator(color: _primary)),
+            const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (e, _) => TrainersErrorView(
           message: e.toString().replaceFirst('Exception: ', ''),
           onRetry: () => ref.read(expertsProvider.notifier).refresh(),
         ),
         data: (experts) {
+          // Client-side role filter — no extra API call.
           final filtered = _filter == 'all'
               ? experts
               : experts.where((e) => e.role == _filter).toList();
 
           return RefreshIndicator(
-            color: _primary,
+            color: AppColors.primary,
             onRefresh: () => ref.read(expertsProvider.notifier).refresh(),
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(
@@ -57,7 +58,7 @@ class _TrainersScreenState extends ConsumerState<TrainersScreen> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.arrow_back_ios,
-                                  size: 20, color: _dark),
+                                  size: 20, color: AppColors.textPrimary),
                               onPressed: () => Navigator.pop(context),
                             ),
                             const Spacer(),
@@ -68,7 +69,7 @@ class _TrainersScreenState extends ConsumerState<TrainersScreen> {
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
-                            color: _dark,
+                            color: AppColors.textPrimary,
                           ),
                         ),
                         const SizedBox(height: 4),

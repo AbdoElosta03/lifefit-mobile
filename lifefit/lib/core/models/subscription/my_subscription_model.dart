@@ -1,5 +1,6 @@
 // ─── Nested service info ──────────────────────────────────────────────────────
 
+/// Nested `service` object inside a client subscription record.
 class SubscriptionServiceInfo {
   final int id;
   final String title;

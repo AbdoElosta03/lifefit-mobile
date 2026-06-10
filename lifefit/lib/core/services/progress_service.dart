@@ -63,6 +63,7 @@ class ProgressService extends BaseService {
     }
   }
 
+  /// Normalizes Dio errors into a single Exception with a readable message.
   Never _throwDio(DioException e) {
     final msg = e.response?.data is Map
         ? e.response?.data['message']?.toString()

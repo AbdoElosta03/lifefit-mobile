@@ -20,7 +20,7 @@ class ClientDrawer extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).user;
-    final avatarUrl = user?.avatar;
+    final avatarUrl = user?.displayAvatarUrl;
     final userName = user?.name ?? 'المستخدم';
 
     return Drawer(

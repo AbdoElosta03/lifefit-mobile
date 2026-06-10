@@ -4,6 +4,7 @@ import '../models/profile_web/client_profile_bundle.dart';
 
 /// Client profile: GET/PUT `/api/client/profile`.
 class ProfileService extends BaseService {
+  /// GET `/api/client/profile` — fitness profile, stats, and preferences bundle.
   Future<ClientProfileBundle> fetchProfile() async {
     final response = await dio.get('client/profile');
     if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
@@ -12,7 +13,7 @@ class ProfileService extends BaseService {
     throw Exception('تعذر تحميل الملف الشخصي');
   }
 
-  /// Same shape as [fetchProfile] after update.
+  /// PUT `/api/client/profile` — returns the same bundle shape as [fetchProfile].
   Future<ClientProfileBundle> updateProfile(Map<String, dynamic> body) async {
     try {
       final response = await dio.put('client/profile', data: body);

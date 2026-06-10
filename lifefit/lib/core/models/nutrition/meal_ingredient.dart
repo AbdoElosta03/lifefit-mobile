@@ -1,5 +1,6 @@
 double _d(dynamic v) => v == null ? 0 : double.tryParse(v.toString()) ?? 0;
 
+/// Single food line inside a [MealDetail] with scaled macros.
 class MealIngredient {
   final String foodName;
   final String? imageUrl;

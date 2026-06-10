@@ -1,3 +1,4 @@
+/// In-app notification: [type] selects behavior; human text lives in [payload].
 class AppNotification {
   final int id;
   final int userId;
@@ -15,6 +16,7 @@ class AppNotification {
     this.createdAt,
   });
 
+  /// Falls back to a type-based label when `payload.title` is missing.
   String get title {
     final t = payload['title']?.toString();
     if (t != null && t.isNotEmpty) return t;

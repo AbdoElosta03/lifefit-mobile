@@ -1,3 +1,4 @@
+/// Account fields returned inside the profile bundle (subset of [User]).
 class ProfileUser {
   final String name;
   final String email;

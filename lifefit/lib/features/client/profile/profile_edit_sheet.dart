@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
 import 'profile_provider.dart';
 
+/// Bottom sheet to edit profile and body stats.
+/// Receives [initial] bundle from [ProfileScreen]; writes via [clientProfileProvider].
 class ProfileEditSheet extends ConsumerStatefulWidget {
   final ClientProfileBundle initial;
 
@@ -15,7 +17,6 @@ class ProfileEditSheet extends ConsumerStatefulWidget {
 }
 
 class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
-  late final TextEditingController _nameCtrl;
   late final TextEditingController _birthCtrl;
   late final TextEditingController _heightCtrl;
   late final TextEditingController _targetWeightCtrl;
@@ -30,10 +31,9 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   @override
   void initState() {
     super.initState();
-    final u = widget.initial.user;
+    // Seed controllers from the bundle passed by ProfileScreen.
     final p = widget.initial.profile;
     final s = widget.initial.currentStats;
-    _nameCtrl = TextEditingController(text: u.name);
     _birthCtrl = TextEditingController(text: p.birthDate ?? '');
     _heightCtrl = TextEditingController(text: p.heightCm?.toString() ?? '');
     _targetWeightCtrl =
@@ -47,7 +47,6 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
     _birthCtrl.dispose();
     _heightCtrl.dispose();
     _targetWeightCtrl.dispose();
@@ -58,10 +57,10 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
     super.dispose();
   }
 
+  /// Builds PATCH body from non-empty fields, then calls provider.update.
   Future<void> _save() async {
     setState(() => _saving = true);
     final body = <String, dynamic>{};
-    if (_nameCtrl.text.trim().isNotEmpty) body['name'] = _nameCtrl.text.trim();
     if (_birthCtrl.text.trim().isNotEmpty) {
       body['birth_date'] = _birthCtrl.text.trim();
     }
@@ -96,6 +95,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
     }
   }
 
+  /// Adds a numeric field to [map] only when the text parses to a double.
   void _putNum(Map<String, dynamic> map, String key, String text) {
     final t = text.trim();
     if (t.isEmpty) return;
@@ -141,9 +141,6 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
             ),
             const SizedBox(height: 16),
-            // Name field.
-            _field('الاسم', _nameCtrl, Icons.person_outline),
-            const SizedBox(height: 12),
             // Birth date field.
             _field(
               'تاريخ الميلاد (YYYY-MM-DD)',

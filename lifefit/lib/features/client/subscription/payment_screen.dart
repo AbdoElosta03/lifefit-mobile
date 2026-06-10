@@ -6,9 +6,11 @@ import 'package:webview_flutter/webview_flutter.dart';
 
 import '../../../core/services/subscription_service.dart';
 
-/// Result of a Moamalat payment.
+/// Terminal outcome returned to [ExpertSubscriptionPayment.start].
 enum PaymentResult { success, cancelled, failed }
 
+/// WebView wrapper for the Moamalat payment gateway.
+/// Receives checkout params from backend → JS callbacks → confirm/fail API.
 class MoamalatPaymentScreen extends StatefulWidget {
   final Map<String, dynamic> paymentData;
 

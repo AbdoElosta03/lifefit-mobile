@@ -3,6 +3,8 @@ import '../auth/token_storage.dart';
 import '../models/user.dart';
 import 'base_service.dart';
 
+/// Authentication: login, register, session check, and logout.
+/// Persists the Sanctum token via [TokenStorage] on successful auth.
 class AuthService extends BaseService {
   /// GET `/api/user` — current Sanctum user (Bearer token).
   Future<User> fetchCurrentUser() async {
@@ -33,6 +35,7 @@ class AuthService extends BaseService {
     await TokenStorage.deleteToken();
   }
 
+  /// POST `/api/login` — saves `access_token` or `token` from the response.
   Future<Response> login(String email, String password) async {
     final response = await dio.post(
       "login",
@@ -47,6 +50,7 @@ class AuthService extends BaseService {
     return response;
   }
 
+  /// POST `/api/register` — same token persistence as [login].
   Future<Response> register({
     required String name,
     required String email,
@@ -70,5 +74,58 @@ class AuthService extends BaseService {
     }
 
     return response;
+  }
+
+  /// POST `/api/forgot-password` — sends a 6-digit OTP to [email].
+  Future<String> forgotPassword(String email) async {
+    try {
+      final response = await dio.post(
+        'forgot-password',
+        data: {'email': email},
+      );
+      final data = response.data;
+      if (data is Map && data['message'] != null) {
+        return data['message'].toString();
+      }
+      return 'تم إرسال رمز التحقق إلى بريدك الإلكتروني.';
+    } on DioException catch (e) {
+      throw Exception(_messageFromDio(e, 'فشل إرسال رمز التحقق'));
+    }
+  }
+
+  /// POST `/api/reset-password` — verifies OTP and sets a new password.
+  Future<String> resetPassword({
+    required String email,
+    required String otp,
+    required String password,
+    required String passwordConfirmation,
+  }) async {
+    try {
+      final response = await dio.post(
+        'reset-password',
+        data: {
+          'email': email,
+          'otp': otp,
+          'password': password,
+          'password_confirmation': passwordConfirmation,
+        },
+      );
+      final data = response.data;
+      if (data is Map && data['message'] != null) {
+        return data['message'].toString();
+      }
+      return 'تم تغيير كلمة المرور بنجاح! يمكنك الآن تسجيل الدخول.';
+    } on DioException catch (e) {
+      throw Exception(_messageFromDio(e, 'فشل إعادة تعيين كلمة المرور'));
+    }
+  }
+
+  String _messageFromDio(DioException e, String fallback) {
+    final data = e.response?.data;
+    if (data is Map) {
+      if (data['message'] != null) return data['message'].toString();
+      if (data['debug'] != null) return data['debug'].toString();
+    }
+    return fallback;
   }
 }

@@ -1,4 +1,4 @@
-/// جذر `GET /api/client/programs/{id}` → `data`.
+/// Root of `GET /api/client/programs/{id}` → `data`.
 class ClientProgramDetail {
   final int id;
   final ProgramDetailBlock program;
@@ -95,6 +95,7 @@ class TrainerDetailBlock {
   }
 }
 
+/// One week/day slot in the program calendar with its [workout].
 class ProgramScheduleEntry {
   final int id;
   final int? dayOfWeek;
@@ -155,6 +156,7 @@ class ScheduleWorkout {
   }
 }
 
+/// Flattened exercise row in program detail (not the shared [Exercise] workout model).
 class ProgramExerciseRow {
   final int id;
   final String name;

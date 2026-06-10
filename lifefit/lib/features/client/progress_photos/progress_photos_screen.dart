@@ -12,8 +12,6 @@ import 'progress_photos_provider.dart';
 class ProgressPhotosScreen extends ConsumerWidget {
   const ProgressPhotosScreen({super.key});
 
-  static const _primary = Color(0xFF00D9D9);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(progressPhotosProvider);
@@ -39,14 +37,14 @@ class ProgressPhotosScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => showAddProgressPhotoSheet(context),
-        backgroundColor: _primary,
+        backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add_a_photo_outlined),
         label: const Text('إضافة صورة', style: TextStyle(fontWeight: FontWeight.w700)),
       ),
       body: async.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: _primary, strokeWidth: 2.5),
+          child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
         ),
         error: (e, _) => Center(
           child: Padding(
@@ -84,8 +82,8 @@ class ProgressPhotosScreen extends ConsumerWidget {
                     const SizedBox(height: 20),
                     TextButton.icon(
                       onPressed: () => showAddProgressPhotoSheet(context),
-                      icon: const Icon(Icons.add_a_photo_outlined, color: _primary),
-                      label: const Text('إضافة أول صورة', style: TextStyle(fontWeight: FontWeight.w700, color: _primary)),
+                      icon: const Icon(Icons.add_a_photo_outlined, color: AppColors.primary),
+                      label: const Text('إضافة أول صورة', style: TextStyle(fontWeight: FontWeight.w700, color: AppColors.primary)),
                     ),
                   ],
                 ),
@@ -94,7 +92,7 @@ class ProgressPhotosScreen extends ConsumerWidget {
           }
 
           return RefreshIndicator(
-            color: _primary,
+            color: AppColors.primary,
             onRefresh: () => ref.read(progressPhotosProvider.notifier).refresh(),
             child: ListView.builder(
               physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
@@ -133,7 +131,7 @@ class ProgressPhotosScreen extends ConsumerWidget {
       await ref.read(progressPhotosProvider.notifier).deletePhoto(photo.id);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('تم حذف الصورة'), backgroundColor: _primary),
+          const SnackBar(content: Text('تم حذف الصورة'), backgroundColor: AppColors.primary),
         );
       }
     } catch (e) {
@@ -149,8 +147,6 @@ class _DaySection extends StatelessWidget {
   final void Function(ProgressPhoto photo) onDelete;
 
   const _DaySection({required this.day, required this.onDelete});
-
-  static const _dark = Color(0xFF1E293B);
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +166,7 @@ class _DaySection extends StatelessWidget {
               style: const TextStyle(
                 fontSize: 15,
                 fontWeight: FontWeight.w800,
-                color: _dark,
+                color: AppColors.textPrimary,
               ),
             ),
           ),

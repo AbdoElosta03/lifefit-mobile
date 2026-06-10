@@ -418,10 +418,16 @@ class _WorkoutExerciseCard extends StatelessWidget {
                               '${pivot.sets} جولات',
                               const Color(0xFF3ABEF9).withOpacity(0.1),
                               const Color(0xFF3ABEF9)),
+                          if (!pivot.isTimeBased)
+                            _chip(
+                                '${pivot.reps} عدة',
+                                const Color(0xFFF59E0B).withOpacity(0.12),
+                                const Color(0xFFF59E0B)),
                           _chip(
-                              '${pivot.reps} عدة',
-                              const Color(0xFFF59E0B).withOpacity(0.12),
-                              const Color(0xFFF59E0B)),
+                            pivot.targetIntensityText,
+                            const Color(0xFF10B981).withOpacity(0.12),
+                            const Color(0xFF10B981),
+                          ),
                         ],
                       ),
                     ],

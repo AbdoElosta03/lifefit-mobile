@@ -4,7 +4,8 @@ import '../../../core/models/nutrition/today_meals_response.dart';
 import '../../../core/models/nutrition/meal_schedule.dart';
 import '../../../core/services/nutrition_service.dart';
 
-/// Manages the state of today's nutrition log and meal schedules.
+/// Central state for [NutritionScreen] and [LogMealSheet].
+/// Holds [TodayMealsResponse]; optimistic updates on log/skip.
 class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
   final NutritionService _service;
 
@@ -98,7 +99,7 @@ class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
     }
   }
 
-  /// Helper to update a specific meal in the current state list.
+  /// Patches one [MealSchedule] by [scheduleId] and rebuilds [TodayMealsResponse].
   void _updateMealState(int scheduleId, MealSchedule Function(MealSchedule) updater) {
     state.whenData((response) {
       final updated = response.meals.map((m) {
@@ -114,6 +115,7 @@ class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
   }
 }
 
+/// Watched by [NutritionScreen]; written by [LogMealSheet] via logMeal/skipMeal.
 final nutritionProvider = StateNotifierProvider<NutritionNotifier, AsyncValue<TodayMealsResponse>>(
   (ref) => NutritionNotifier(NutritionService()),
 );

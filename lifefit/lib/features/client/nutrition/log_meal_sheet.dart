@@ -5,7 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/nutrition/meal_schedule.dart';
 import 'nutrition_provider.dart';
 
-/// Bottom sheet for logging or skipping a meal.
+/// Bottom sheet to confirm intake weight or skip a meal.
+/// Writes back to [nutritionProvider] via logMeal / skipMeal.
 class LogMealSheet extends ConsumerStatefulWidget {
   final MealSchedule schedule;
 
@@ -277,6 +278,7 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
   }
 }
 
+/// Target macros for the selected [MealSchedule].
 class _MacroRow extends StatelessWidget {
   final MealSchedule schedule;
   const _MacroRow({required this.schedule});
