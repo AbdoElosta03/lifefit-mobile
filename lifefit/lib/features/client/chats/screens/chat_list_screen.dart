@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/chat/chat_model.dart';
 import '../providers/chat_providers.dart';
 import '../widgets/chat_list_tile.dart';
@@ -13,18 +13,29 @@ class ChatListScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watch for chat updates from Firestore via stream
     final chatsAsync = ref.watch(chatsStreamProvider);
     final userId = ref.watch(currentUserIdProvider);
     final role = ref.watch(currentUserRoleProvider);
-    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('المحادثات'),
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        title: const Text(
+          'المحادثات',
+          style: TextStyle(
+            color: AppColors.textPrimary,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
+        ),
         centerTitle: true,
         actions: [
+          // Button to start a new chat with a subscribed expert
           IconButton(
-            icon: const Icon(Icons.add),
+            icon: const Icon(Icons.add_comment_outlined, color: AppColors.primary),
             tooltip: 'محادثة جديدة',
             onPressed: () => Navigator.push(
               context,
@@ -42,17 +53,19 @@ class ChatListScreen extends ConsumerWidget {
               icon: Icons.lock_outline,
             )
           : chatsAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
+              ),
               error: (e, _) => EmptyState(
                 title: 'حدث خطأ',
-                message: e.toString(),
+                message: e.toString().replaceFirst('Exception: ', ''),
                 icon: Icons.error_outline,
               ),
               data: (chats) {
                 if (chats.isEmpty) {
                   return const EmptyState(
                     title: 'لا توجد محادثات بعد',
-                    message: 'اضغط + لبدء محادثة مع مدربك.',
+                    message: 'تواصل مع مدربك المفضل وابدأ رحلتك الآن.',
                     icon: Icons.chat_bubble_outline,
                   );
                 }
@@ -65,10 +78,11 @@ class ChatListScreen extends ConsumerWidget {
                     final chat = chats[index];
                     final title = _chatTitle(chat, role);
                     final peerId = chat.otherParticipantId(userId);
+                    
                     return ChatListTile(
                       chat: chat,
                       title: title,
-                      accentColor: colorScheme.primary,
+                      accentColor: AppColors.primary,
                       onTap: () {
                         Navigator.push(
                           context,

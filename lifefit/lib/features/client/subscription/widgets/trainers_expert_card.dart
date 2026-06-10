@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/ui/app_colors.dart';
 
 import '../../../../core/models/subscription/expert_model.dart';
 import 'expert_subscription_payment.dart';
@@ -9,15 +10,14 @@ class TrainersExpertCard extends ConsumerWidget {
 
   const TrainersExpertCard({super.key, required this.expert});
 
-  static const _primary = Color(0xFF00D9D9);
-  static const _dark = Color(0xFF1E293B);
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isTrainer = expert.role == 'trainer';
     final roleLabel = isTrainer ? 'مدرب' : 'أخصائي تغذية';
+    
+    // Assign secondary colors based on role
     final roleColor =
-        isTrainer ? const Color(0xFF00D9D9) : const Color(0xFF3ABEF9);
+        isTrainer ? AppColors.primary : const Color(0xFF3ABEF9);
     final lowest = expert.lowestPrice;
 
     return Container(
@@ -35,12 +35,13 @@ class TrainersExpertCard extends ConsumerWidget {
       ),
       child: Column(
         children: [
+          // Gradient top bar status indicator
           Container(
             height: 4,
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: expert.isSubscribed
-                    ? [_primary, _primary.withOpacity(0.3)]
+                    ? [AppColors.primary, AppColors.primary.withOpacity(0.3)]
                     : [Colors.grey.shade300, Colors.grey.shade100],
                 begin: Alignment.centerRight,
                 end: Alignment.centerLeft,
@@ -52,10 +53,11 @@ class TrainersExpertCard extends ConsumerWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            padding: const EdgeInsets.all(14),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
+                // ── Profile Info Row ───────────────────────────────
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -74,7 +76,7 @@ class TrainersExpertCard extends ConsumerWidget {
                             style: const TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              color: _dark,
+                              color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 5),
@@ -96,6 +98,8 @@ class TrainersExpertCard extends ConsumerWidget {
                     ),
                   ],
                 ),
+                
+                // ── Specialties ────────────────────────────────────
                 if (expert.specialties.isNotEmpty) ...[
                   const SizedBox(height: 10),
                   Wrap(
@@ -110,7 +114,9 @@ class TrainersExpertCard extends ConsumerWidget {
                 ],
                 const SizedBox(height: 12),
                 Divider(height: 1, color: Colors.grey.withOpacity(0.1)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
+
+                // ── Pricing and Subscription Status ────────────────
                 Row(
                   children: [
                     if (lowest != null)
@@ -120,7 +126,7 @@ class TrainersExpertCard extends ConsumerWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: _primary.withOpacity(0.1),
+                          color: AppColors.primary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Text(
@@ -128,7 +134,7 @@ class TrainersExpertCard extends ConsumerWidget {
                           style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: _primary,
+                            color: AppColors.primary,
                           ),
                         ),
                       ),
@@ -140,7 +146,7 @@ class TrainersExpertCard extends ConsumerWidget {
                           vertical: 5,
                         ),
                         decoration: BoxDecoration(
-                          color: _primary.withOpacity(0.12),
+                          color: AppColors.primary.withOpacity(0.12),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: const Row(
@@ -151,27 +157,29 @@ class TrainersExpertCard extends ConsumerWidget {
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.w700,
-                                color: Color(0xFF00D9D9),
+                                color: AppColors.primary,
                               ),
                             ),
-                            SizedBox(width: 4),
+                            const SizedBox(width: 4),
                             Icon(
                               Icons.check_circle,
                               size: 14,
-                              color: Color(0xFF00D9D9),
+                              color: AppColors.primary,
                             ),
                           ],
                         ),
                       ),
                   ],
                 ),
+                
+                // ── Action Button ──────────────────────────────────
                 if (!expert.isSubscribed && expert.services.isNotEmpty) ...[
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 12),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: _primary,
+                        backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         elevation: 0,
                         shape: RoundedRectangleBorder(
@@ -233,7 +241,7 @@ class _GradientAvatar extends StatelessWidget {
         shape: BoxShape.circle,
         gradient: LinearGradient(
           colors: active
-              ? [const Color(0xFF00D9D9), const Color(0xFF0099AA)]
+              ? [AppColors.primary, AppColors.primaryDark]
               : [Colors.grey.shade300, Colors.grey.shade400],
         ),
       ),
@@ -248,8 +256,8 @@ class _GradientAvatar extends StatelessWidget {
 
   Widget _fallback(double size) => CircleAvatar(
         radius: size / 2,
-        backgroundColor: const Color(0xFF00D9D9).withOpacity(0.15),
-        child: const Icon(Icons.person, color: Color(0xFF00D9D9), size: 22),
+        backgroundColor: AppColors.primary.withOpacity(0.15),
+        child: const Icon(Icons.person, color: AppColors.primary, size: 22),
       );
 }
 

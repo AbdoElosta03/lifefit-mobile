@@ -23,8 +23,7 @@ class _ExpertServiceSelectionSheetState
     extends State<ExpertServiceSelectionSheet> {
   ExpertServiceItem? _selected;
 
-  static const _primary = Color(0xFF00D9D9);
-
+  /// Helper to map technical service types to readable Arabic labels.
   String _typeLabel(String type) {
     switch (type) {
       case 'monthly':
@@ -56,6 +55,7 @@ class _ExpertServiceSelectionSheetState
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          // Drag handle for the bottom sheet
           Center(
             child: Container(
               width: 40,
@@ -72,11 +72,12 @@ class _ExpertServiceSelectionSheetState
             style: const TextStyle(
               fontSize: 17,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
             textAlign: TextAlign.right,
           ),
           const SizedBox(height: 16),
+          // List of available service plans (Monthly, Yearly, etc.)
           ...services.map((entry) {
             final item = entry.value;
             final isSelected = _selected?.id == item.id;
@@ -88,11 +89,11 @@ class _ExpertServiceSelectionSheetState
                 padding: const EdgeInsets.all(14),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? _primary.withOpacity(0.07)
+                      ? AppColors.primary.withOpacity(0.07)
                       : AppColors.background,
                   borderRadius: BorderRadius.circular(14),
                   border: Border.all(
-                    color: isSelected ? _primary : Colors.grey.shade200,
+                    color: isSelected ? AppColors.primary : Colors.grey.shade200,
                     width: isSelected ? 2 : 1,
                   ),
                 ),
@@ -102,7 +103,7 @@ class _ExpertServiceSelectionSheetState
                       isSelected
                           ? Icons.radio_button_checked
                           : Icons.radio_button_unchecked,
-                      color: isSelected ? _primary : Colors.grey,
+                      color: isSelected ? AppColors.primary : Colors.grey,
                       size: 22,
                     ),
                     const SizedBox(width: 12),
@@ -118,8 +119,8 @@ class _ExpertServiceSelectionSheetState
                               fontSize: 15,
                               fontWeight: FontWeight.w700,
                               color: isSelected
-                                  ? _primary
-                                  : const Color(0xFF1E293B),
+                                  ? AppColors.primary
+                                  : AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 2),
@@ -140,7 +141,7 @@ class _ExpertServiceSelectionSheetState
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                         color:
-                            isSelected ? _primary : const Color(0xFF1E293B),
+                            isSelected ? AppColors.primary : AppColors.textPrimary,
                       ),
                     ),
                   ],
@@ -149,12 +150,13 @@ class _ExpertServiceSelectionSheetState
             );
           }),
           const SizedBox(height: 16),
+          // Button to proceed to the secure payment gateway
           SizedBox(
             width: double.infinity,
             height: 52,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: _primary,
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 elevation: 0,
                 shape: RoundedRectangleBorder(
@@ -176,7 +178,13 @@ class _ExpertServiceSelectionSheetState
   }
 }
 
-/// Plan selection → API initiate → Moamalat WebView → confirm / feedback.
+/// Orchestrator class for the subscription payment flow.
+/// 
+/// Sequence:
+/// 1. [Select Plan] via BottomSheet.
+/// 2. [Initiate Payment] via Backend API to get Moamalat params.
+/// 3. [Open Gateway] via WebView with the retrieved params.
+/// 4. [Verify & Result] Handle success/fail/cancel callbacks.
 class ExpertSubscriptionPayment {
   ExpertSubscriptionPayment._();
 
@@ -185,6 +193,7 @@ class ExpertSubscriptionPayment {
     WidgetRef ref, {
     required ExpertModel expert,
   }) async {
+    // Step 1: User picks a specific service plan
     final selectedService = await showModalBottomSheet<ExpertServiceItem>(
       context: context,
       isScrollControlled: true,
@@ -198,15 +207,19 @@ class ExpertSubscriptionPayment {
     );
 
     try {
+      // Step 2: Request Moamalat secure parameters from the backend
       final data =
           await SubscriptionService().initiatePayment(selectedService.id);
 
       if (!context.mounted) return;
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
+      // Step 3: Launch the Moamalat payment WebView
       final result = await MoamalatPaymentScreen.open(context, data);
 
       if (!context.mounted) return;
+      
+      // Step 4: Handle the terminal payment result
       if (result == PaymentResult.success) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -214,6 +227,7 @@ class ExpertSubscriptionPayment {
             backgroundColor: Colors.green,
           ),
         );
+        // Refresh experts list to show 'Subscribed' status
         ref.read(expertsProvider.notifier).refresh();
       } else if (result == PaymentResult.cancelled) {
         ScaffoldMessenger.of(context).showSnackBar(

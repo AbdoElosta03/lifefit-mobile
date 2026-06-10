@@ -20,7 +20,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
 
   static const _primary = AppColors.primary;
 
-  /// Always read the live schedule from the provider so state stays fresh.
+  /// Retrieves the latest state of the schedule from the provider.
   TodaySchedule _liveSchedule(WidgetRef ref) {
     final list = ref.watch(todaySchedulesProvider).valueOrNull;
     if (list != null) {
@@ -33,6 +33,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Current live data including logs
     final live = _liveSchedule(ref);
     final isDone = live.isExerciseLogged(exercise.id);
     final pivot = exercise.pivot;
@@ -48,13 +49,13 @@ class WorkoutDetailScreen extends ConsumerWidget {
         title: const Text(
           'تفاصيل التمرين',
           style: TextStyle(
-            color: Colors.black,
+            color: AppColors.textPrimary,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Colors.black, size: 20),
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -63,22 +64,27 @@ class WorkoutDetailScreen extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            // Media header.
+            // Media header — image display.
             _buildImage(),
             if (hasVideo) ...[
               const SizedBox(height: 16),
+              // Video demonstration card.
               ExerciseVideoCard(videoUrl: videoUrl.trim(), primary: _primary),
             ],
             const SizedBox(height: 24),
-            // Exercise name.
+            // Name of the exercise.
             Text(
               exercise.name,
-              style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                fontSize: 26, 
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
             if (exercise.description != null &&
                 exercise.description!.trim().isNotEmpty) ...[
               const SizedBox(height: 8),
-              // Exercise description.
+              // Longer description or instructions.
               Text(
                 exercise.description!,
                 textAlign: TextAlign.right,
@@ -89,7 +95,7 @@ class WorkoutDetailScreen extends ConsumerWidget {
             if (exercise.muscles != null &&
                 exercise.muscles!.trim().isNotEmpty) ...[
               const SizedBox(height: 8),
-              // Muscle list.
+              // List of target muscle groups.
               Text(
                 'العضلات: ${exercise.muscles}',
                 style: const TextStyle(fontSize: 13, color: Colors.grey),
@@ -98,7 +104,11 @@ class WorkoutDetailScreen extends ConsumerWidget {
             const SizedBox(height: 30),
             const Text(
               'معلومات التدريب',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 18, 
+                fontWeight: FontWeight.bold,
+                color: AppColors.textPrimary,
+              ),
             ),
             const SizedBox(height: 16),
             if (pivot != null) ...[

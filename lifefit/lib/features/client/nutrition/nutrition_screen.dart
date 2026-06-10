@@ -15,13 +15,14 @@ class NutritionScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    // Watches the nutrition state (loading, error, or data)
     final state = ref.watch(nutritionProvider);
 
     return Scaffold(
       backgroundColor: AppColors.background,
       body: state.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: Color(0xFF00D9D9)),
+          child: CircularProgressIndicator(color: AppColors.primary),
         ),
         error: (err, _) => _ErrorView(
           message: err.toString().replaceFirst('Exception: ', ''),
@@ -36,7 +37,7 @@ class NutritionScreen extends ConsumerWidget {
 }
 
 // ─────────────────────────────────────────
-// Main meals list
+// Main meals list view
 // ─────────────────────────────────────────
 
 class _MealsList extends ConsumerWidget {
@@ -46,7 +47,8 @@ class _MealsList extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final today = DateFormat('EEEE، d MMMM', 'ar').format(DateTime.now());
-    // Group meals by type, preserving meal_order within each group
+    
+    // Group meals by their type (breakfast, lunch, etc.) and sort them
     final grouped = <String, List<MealSchedule>>{};
     final sortedMeals = [...data.meals]..sort((a, b) {
         final typeOrder = _typeOrder(a.mealType) - _typeOrder(b.mealType);
@@ -59,12 +61,12 @@ class _MealsList extends ConsumerWidget {
     }
 
     return RefreshIndicator(
-      color: const Color(0xFF00D9D9),
+      color: AppColors.primary,
       onRefresh: () => ref.read(nutritionProvider.notifier).refresh(),
       child: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
-          // Header
+          // Screen Header
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 24, 16, 0),
@@ -76,7 +78,7 @@ class _MealsList extends ConsumerWidget {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
@@ -92,14 +94,14 @@ class _MealsList extends ConsumerWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF00D9D9).withOpacity(0.1),
+                            color: AppColors.primary.withOpacity(0.1),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Text(
                             data.planName!,
                             style: const TextStyle(
                               fontSize: 11,
-                              color: Color(0xFF00D9D9),
+                              color: AppColors.primary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -112,7 +114,7 @@ class _MealsList extends ConsumerWidget {
             ),
           ),
 
-          // Macros summary
+          // Daily Macros summary card (Calories, Protein, etc.)
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
@@ -120,7 +122,7 @@ class _MealsList extends ConsumerWidget {
             ),
           ),
 
-          // Meals grouped by type
+          // Meals grouped by type (e.g., Breakfast section)
           for (final entry in grouped.entries) ...[
             SliverToBoxAdapter(
               child: Padding(
@@ -153,11 +155,13 @@ class _MealsList extends ConsumerWidget {
     );
   }
 
+  /// Defines the display order for meal types.
   int _typeOrder(String type) {
     const order = {'breakfast': 0, 'lunch': 1, 'dinner': 2, 'snack': 3};
     return order[type] ?? 4;
   }
 
+  /// Shows a confirmation dialog before skipping a meal.
   Future<void> _confirmSkip(
     BuildContext context,
     WidgetRef ref,
@@ -251,11 +255,11 @@ class _SectionHeader extends StatelessWidget {
           style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w700,
-            color: Color(0xFF1E293B),
+            color: AppColors.textPrimary,
           ),
         ),
         const SizedBox(width: 6),
-        Icon(_icon, size: 18, color: const Color(0xFF00D9D9)),
+        Icon(_icon, size: 18, color: AppColors.primary),
       ],
     );
   }
@@ -280,13 +284,13 @@ class _EmptyView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF00D9D9).withOpacity(0.08),
+                color: AppColors.primary.withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
                 Icons.restaurant_menu_outlined,
                 size: 60,
-                color: Color(0xFF00D9D9),
+                color: AppColors.primary,
               ),
             ),
             const SizedBox(height: 20),
@@ -295,7 +299,7 @@ class _EmptyView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -308,7 +312,7 @@ class _EmptyView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRefresh,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D9D9),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -345,7 +349,7 @@ class _ErrorView extends StatelessWidget {
             const SizedBox(height: 16),
             const Text(
               'تعذّر التحميل',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.textPrimary),
             ),
             const SizedBox(height: 8),
             Text(
@@ -357,7 +361,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D9D9),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

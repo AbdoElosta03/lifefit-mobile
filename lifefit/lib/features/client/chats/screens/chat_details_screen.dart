@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
+import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/chat/chat_message_model.dart';
 import '../providers/chat_providers.dart';
 import '../widgets/chat_bubble.dart';
@@ -31,6 +32,7 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
   @override
   void initState() {
     super.initState();
+    // Tracking application lifecycle to set presence (Online/Offline)
     _lifecycle = AppLifecycleListener(
       onResume: () => _setOwnPresence(true),
       onHide: () => _setOwnPresence(false),
@@ -38,11 +40,13 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
       onDetach: () => _setOwnPresence(false),
     );
     Future.microtask(() {
+      // Mark messages as read when entering the chat
       ref.read(chatComposerProvider(widget.chatId).notifier).markAsRead();
       _setOwnPresence(true);
     });
   }
 
+  /// Updates current user's online status in Firestore.
   void _setOwnPresence(bool online) {
     final uid = ref.read(currentUserIdProvider);
     if (uid == null || uid.isEmpty) return;
@@ -55,6 +59,7 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
   void dispose() {
     _lifecycle.dispose();
     _setOwnPresence(false);
+    // Reset typing status on exit
     ref.read(chatComposerProvider(widget.chatId).notifier).setTyping(false);
     super.dispose();
   }
@@ -69,46 +74,71 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
     final isOnline = ref.watch(presenceStreamProvider(widget.peerId)).valueOrNull ?? false;
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        backgroundColor: Colors.white,
+        elevation: 0.5,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, color: AppColors.textPrimary, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Row(
           children: [
-            Text(widget.title, style: const TextStyle(fontSize: 16)),
-            Row(
-              children: [
-                Container(
-                  width: 8,
-                  height: 8,
-                  margin: const EdgeInsets.only(left: 4),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: isOnline ? Colors.green : Colors.grey.shade400,
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.textPrimary,
+                    ),
                   ),
-                ),
-                Text(
-                  isOnline ? 'متصل الآن' : 'غير متصل',
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isOnline ? Colors.green : Colors.grey.shade500,
-                    fontWeight: FontWeight.normal,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        isOnline ? 'متصل الآن' : 'غير متصل',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: isOnline ? Colors.green : Colors.grey.shade500,
+                          fontWeight: FontWeight.normal,
+                        ),
+                      ),
+                      const SizedBox(width: 4),
+                      Container(
+                        width: 7,
+                        height: 7,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: isOnline ? Colors.green : Colors.grey.shade400,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ],
         ),
       ),
       body: Column(
         children: [
+          // ── Messages List ──────────────────────────────────────────
           Expanded(
             child: messagesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
+              ),
               error: (e, _) => EmptyState(
                 title: 'Unable to load messages',
-                message: e.toString(),
+                message: e.toString().replaceFirst('Exception: ', ''),
                 icon: Icons.error_outline,
               ),
               data: (streamMessages) {
+                // Combine real-time stream messages with paginated older messages
                 final combined = _mergeMessages(
                   streamMessages,
                   pagingState.olderMessages,
@@ -116,8 +146,8 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
 
                 if (combined.isEmpty) {
                   return const EmptyState(
-                    title: 'Say hello',
-                    message: 'Send the first message to start the chat.',
+                    title: 'ابدأ المحادثة',
+                    message: 'أرسل أول رسالة لمدربك الآن.',
                     icon: Icons.chat_bubble_outline,
                   );
                 }
@@ -127,9 +157,10 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
                     horizontal: 16,
                     vertical: 12,
                   ),
-                  reverse: true,
+                  reverse: true, // Show newest messages at the bottom
                   itemCount: combined.length + (pagingState.hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
+                    // "Load More" trigger at the top of the list
                     if (index == combined.length && pagingState.hasMore) {
                       return _LoadOlderButton(
                         isLoading: pagingState.isFetchingMore,
@@ -156,12 +187,16 @@ class _ChatDetailsScreenState extends ConsumerState<ChatDetailsScreen> {
               },
             ),
           ),
+          
+          // ── Typing Indicator ───────────────────────────────────────
           if (typingAsync.valueOrNull != null &&
               _isSomeoneTyping(typingAsync.value!, currentUserId))
             const Padding(
               padding: EdgeInsets.only(bottom: 4),
               child: TypingIndicator(),
             ),
+            
+          // ── Input Field ───────────────────────────────────────────
           ChatInput(
             isSending: composerState.isSending,
             onSend: (text) => ref

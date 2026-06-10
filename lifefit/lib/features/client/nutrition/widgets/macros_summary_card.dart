@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/nutrition/today_meals_response.dart';
 
+/// Displays a summary card of total nutrition progress (Calories and Macros).
 class MacrosSummaryCard extends StatelessWidget {
   final TodayMealsResponse data;
 
@@ -8,6 +10,7 @@ class MacrosSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calculate remaining calories and progress percentage
     final remaining = (data.totalTargetCalories - data.totalConsumedCalories).clamp(0, double.infinity);
     final calProgress = data.totalTargetCalories > 0
         ? (data.totalConsumedCalories / data.totalTargetCalories).clamp(0.0, 1.0)
@@ -15,6 +18,7 @@ class MacrosSummaryCard extends StatelessWidget {
 
     return Column(
       children: [
+        // Main calorie progress card
         _CaloriesCard(
           consumed: data.totalConsumedCalories,
           target: data.totalTargetCalories,
@@ -22,6 +26,7 @@ class MacrosSummaryCard extends StatelessWidget {
           progress: calProgress.toDouble(),
         ),
         const SizedBox(height: 12),
+        // Macro breakdown row
         Row(
           children: [
             Expanded(
@@ -60,6 +65,7 @@ class MacrosSummaryCard extends StatelessWidget {
   }
 }
 
+/// The top card showing calorie progress with a circular or linear indicator.
 class _CaloriesCard extends StatelessWidget {
   final double consumed;
   final double target;
@@ -79,15 +85,11 @@ class _CaloriesCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF00D9D9), Color(0xFF00B4B4)],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
+        gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00D9D9).withOpacity(0.25),
+            color: AppColors.primary.withOpacity(0.25),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),

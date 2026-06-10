@@ -19,9 +19,9 @@ class GreetingHeader extends StatelessWidget {
 
   String get _motivationalLine {
     final hour = DateTime.now().hour;
-    if (hour < 12) return 'ابدأ يومك بقوة وتركيز 💪';
-    if (hour < 17) return 'واصل تقدمك نحو هدفك 🎯';
-    return 'أنهِ يومك بنشاط وتحدٍّ 🔥';
+    if (hour < 12) return 'ابدأ يومك بقوة وتركيز ';
+    if (hour < 17) return 'واصل تقدمك نحو هدفك ';
+    return 'أنهِ يومك بنشاط وتحدٍّ ';
   }
 
   @override

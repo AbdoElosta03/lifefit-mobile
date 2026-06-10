@@ -64,7 +64,7 @@ class _TrainersScreenState extends ConsumerState<TrainersScreen> {
                           ],
                         ),
                         const Text(
-                          'المدربون والمتخصصون',
+                          'المدربون ,وأخصائيو التغذية',
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
@@ -73,7 +73,7 @@ class _TrainersScreenState extends ConsumerState<TrainersScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          '${experts.length} متخصص متاح',
+                          '${experts.length} متاح',
                           style: const TextStyle(
                               fontSize: 14, color: Colors.grey),
                         ),

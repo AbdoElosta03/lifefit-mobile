@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
+import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/subscription/expert_model.dart';
 
+/// Stats Banner with aggregate numbers of experts and subscriptions.
 class TrainersStatsBanner extends StatelessWidget {
   final List<ExpertModel> experts;
 
@@ -9,6 +10,7 @@ class TrainersStatsBanner extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Calculative logic for stats
     final subscribed = experts.where((e) => e.isSubscribed).length;
     final trainers = experts.where((e) => e.role == 'trainer').length;
     final nutritionists =
@@ -16,17 +18,13 @@ class TrainersStatsBanner extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF00D9D9), Color(0xFF0099AA)],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
+        gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF00D9D9).withOpacity(0.28),
+            color: AppColors.primary.withOpacity(0.28),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -86,7 +84,7 @@ class _BannerStat extends StatelessWidget {
           value,
           style: const TextStyle(
             color: Colors.white,
-            fontSize: 20,
+            fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -102,6 +100,7 @@ class _BannerStat extends StatelessWidget {
   }
 }
 
+/// Category filtering chips (All, Trainer, Nutritionist).
 class TrainersFilterChips extends StatelessWidget {
   final String current;
   final void Function(String) onChanged;
@@ -134,12 +133,12 @@ class TrainersFilterChips extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFF00D9D9) : Colors.white,
+          color: selected ? AppColors.primary : Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: selected
               ? [
                   BoxShadow(
-                    color: const Color(0xFF00D9D9).withOpacity(0.3),
+                    color: AppColors.primary.withOpacity(0.3),
                     blurRadius: 8,
                     offset: const Offset(0, 3),
                   ),
@@ -176,6 +175,7 @@ class TrainersFilterChips extends StatelessWidget {
   }
 }
 
+/// View shown when no experts match the filter criteria.
 class TrainersEmptyView extends StatelessWidget {
   const TrainersEmptyView({super.key});
 
@@ -189,13 +189,13 @@ class TrainersEmptyView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF00D9D9).withOpacity(0.08),
+              color: AppColors.primary.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
             child: const Icon(
               Icons.people_outline,
               size: 56,
-              color: Color(0xFF00D9D9),
+              color: AppColors.primary,
             ),
           ),
           const SizedBox(height: 20),
@@ -204,7 +204,7 @@ class TrainersEmptyView extends StatelessWidget {
             style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
           ),
           const SizedBox(height: 6),
@@ -219,6 +219,7 @@ class TrainersEmptyView extends StatelessWidget {
   }
 }
 
+/// Error view with retry capability.
 class TrainersErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -244,7 +245,7 @@ class TrainersErrorView extends StatelessWidget {
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
               ),
             ),
             const SizedBox(height: 8),
@@ -257,7 +258,7 @@ class TrainersErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D9D9),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),

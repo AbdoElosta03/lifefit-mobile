@@ -10,9 +10,7 @@ import 'subscription_provider.dart';
 class MySubscriptionsScreen extends ConsumerWidget {
   const MySubscriptionsScreen({super.key});
 
-  static const _primary = Color(0xFF00D9D9);
-  static const _dark = Color(0xFF1E293B);
-
+  /// Main screen showing the list of active or past subscriptions for the client.
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(mySubscriptionsProvider);
@@ -21,7 +19,7 @@ class MySubscriptionsScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
       body: async.when(
         loading: () =>
-            const Center(child: CircularProgressIndicator(color: _primary)),
+            const Center(child: CircularProgressIndicator(color: AppColors.primary)),
         error: (e, _) => _ErrorView(
           message: e.toString().replaceFirst('Exception: ', ''),
           onRetry: () => ref.invalidate(mySubscriptionsProvider),
@@ -30,7 +28,8 @@ class MySubscriptionsScreen extends ConsumerWidget {
           physics: const AlwaysScrollableScrollPhysics(
               parent: BouncingScrollPhysics()),
           slivers: [
-            // ── Header ───────────────────────────────────────────
+            // ── Header Section ───────────────────────────────────────────
+            // Contains page title and back navigation.
             SliverToBoxAdapter(
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(20, 56, 20, 0),
@@ -40,7 +39,7 @@ class MySubscriptionsScreen extends ConsumerWidget {
                     Row(children: [
                       IconButton(
                         icon: const Icon(Icons.arrow_back_ios,
-                            size: 20, color: _dark),
+                            size: 20, color: AppColors.textPrimary),
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Spacer(),
@@ -49,9 +48,9 @@ class MySubscriptionsScreen extends ConsumerWidget {
                         style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.bold,
-                            color: _dark)),
+                            color: AppColors.textPrimary)),
                     const SizedBox(height: 4),
-                    Text('${subs.length} اشتراك',
+                    Text('${subs.length} اشتراك متاح',
                         style: const TextStyle(
                             fontSize: 14, color: Colors.grey)),
                   ],
@@ -62,6 +61,7 @@ class MySubscriptionsScreen extends ConsumerWidget {
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
 
             // ── List or empty state ───────────────────────────────
+            // Displays a list of subscription cards or a placeholder if empty.
             if (subs.isEmpty)
               const SliverToBoxAdapter(child: _EmptyView())
             else
@@ -82,12 +82,10 @@ class MySubscriptionsScreen extends ConsumerWidget {
 }
 
 // ─── Subscription Card ────────────────────────────────────────────────────────
-
+// Represents a single subscription entry with its status, type, and price.
 class _SubscriptionCard extends StatelessWidget {
   final MySubscription sub;
   const _SubscriptionCard({required this.sub});
-
-  static const _dark = Color(0xFF1E293B);
 
   @override
   Widget build(BuildContext context) {
@@ -114,7 +112,7 @@ class _SubscriptionCard extends StatelessWidget {
       ),
       child: Column(
         children: [
-          // Gradient top bar colored by status
+          // Visual accent bar colored by status (Active/Expired/etc)
           Container(
             height: 4,
             decoration: BoxDecoration(
@@ -131,38 +129,14 @@ class _SubscriptionCard extends StatelessWidget {
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+            padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // ── Service title + status badge ────────────────
+                // ── Service Title & Status Badge ────────────────
                 Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: statusColor.withOpacity(0.12),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(statusLabel,
-                              style: TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                  color: statusColor)),
-                          const SizedBox(width: 5),
-                          Container(
-                              width: 6,
-                              height: 6,
-                              decoration: BoxDecoration(
-                                  color: statusColor,
-                                  shape: BoxShape.circle)),
-                        ],
-                      ),
-                    ),
+                    _statusBadge(statusLabel, statusColor),
                     const Spacer(),
                     Flexible(
                       child: Text(
@@ -171,13 +145,13 @@ class _SubscriptionCard extends StatelessWidget {
                         style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: _dark),
+                            color: AppColors.textPrimary),
                       ),
                     ),
                   ],
                 ),
 
-                // ── Expert name ─────────────────────────────────
+                // ── Expert Name ─────────────────────────────────
                 if (service?.expertName != null) ...[
                   const SizedBox(height: 6),
                   Row(
@@ -197,19 +171,19 @@ class _SubscriptionCard extends StatelessWidget {
 
                 const SizedBox(height: 12),
                 Divider(height: 1, color: Colors.grey.withOpacity(0.1)),
-                const SizedBox(height: 10),
+                const SizedBox(height: 12),
 
-                // ── Type badge + renewal date + price ───────────
+                // ── Metadata Chips: Date, Type, and Price ──────────
                 Row(
                   children: [
                     _dateChip(Icons.calendar_today_outlined, renewalStr),
                     const Spacer(),
                     if (service != null) ...[
                       _labelChip(typeLabel, typeColor),
-                      const SizedBox(width: 6),
+                      const SizedBox(width: 8),
                       _labelChip(
                           '${service.price.toStringAsFixed(0)} ر.س',
-                          const Color(0xFF00D9D9)),
+                          AppColors.primary),
                     ],
                   ],
                 ),
@@ -221,6 +195,35 @@ class _SubscriptionCard extends StatelessWidget {
     );
   }
 
+  /// Small chip indicating the subscription status (e.g., Active).
+  static Widget _statusBadge(String label, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(label,
+              style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  color: color)),
+          const SizedBox(width: 5),
+          Container(
+              width: 6,
+              height: 6,
+              decoration: BoxDecoration(
+                  color: color,
+                  shape: BoxShape.circle)),
+        ],
+      ),
+    );
+  }
+
+  /// Horizontal chip for date information.
   static Widget _dateChip(IconData icon, String label) {
     return Container(
       padding:
@@ -243,6 +246,7 @@ class _SubscriptionCard extends StatelessWidget {
     );
   }
 
+  /// Generic label chip for types and prices.
   static Widget _labelChip(String label, Color color) {
     return Container(
       padding:
@@ -258,10 +262,11 @@ class _SubscriptionCard extends StatelessWidget {
     );
   }
 
+  /// Maps subscription status string to branding colors.
   static Color _statusColor(String s) {
     switch (s.toLowerCase()) {
       case 'active':
-        return const Color(0xFF00D9D9);
+        return AppColors.primary;
       case 'expired':
         return const Color(0xFFEF4444);
       case 'cancelled':
@@ -272,6 +277,7 @@ class _SubscriptionCard extends StatelessWidget {
     }
   }
 
+  /// Translates status string to Arabic display labels.
   static String _statusLabel(String s) {
     switch (s.toLowerCase()) {
       case 'active':
@@ -315,6 +321,7 @@ class _SubscriptionCard extends StatelessWidget {
 
 // ─── States ───────────────────────────────────────────────────────────────────
 
+/// Placeholder view when no subscriptions are available.
 class _EmptyView extends StatelessWidget {
   const _EmptyView();
 
@@ -328,18 +335,18 @@ class _EmptyView extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF00D9D9).withOpacity(0.08),
+              color: AppColors.primary.withOpacity(0.08),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.card_membership_outlined,
-                size: 56, color: Color(0xFF00D9D9)),
+                size: 56, color: AppColors.primary),
           ),
           const SizedBox(height: 20),
           const Text('لا توجد اشتراكات',
               style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E293B))),
+                  color: AppColors.textPrimary)),
           const SizedBox(height: 6),
           const Text(
             'لم تشترك في أي خدمة بعد.\nتصفّح المتخصصين وابدأ رحلتك.',
@@ -352,6 +359,7 @@ class _EmptyView extends StatelessWidget {
   }
 }
 
+/// Generic error view for failed data loading.
 class _ErrorView extends StatelessWidget {
   final String message;
   final VoidCallback onRetry;
@@ -372,7 +380,7 @@ class _ErrorView extends StatelessWidget {
                 style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B))),
+                    color: AppColors.textPrimary)),
             const SizedBox(height: 8),
             Text(message,
                 style:
@@ -382,7 +390,7 @@ class _ErrorView extends StatelessWidget {
             ElevatedButton.icon(
               onPressed: onRetry,
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF00D9D9),
+                backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,
                 padding: const EdgeInsets.symmetric(
                     horizontal: 24, vertical: 12),
@@ -400,3 +408,4 @@ class _ErrorView extends StatelessWidget {
     );
   }
 }
+  

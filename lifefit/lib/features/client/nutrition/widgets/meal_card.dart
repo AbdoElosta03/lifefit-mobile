@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/nutrition/meal_schedule.dart';
 
+/// A card representing a specific meal in the schedule.
 class MealCard extends StatelessWidget {
   final MealSchedule schedule;
   final VoidCallback onLog;
@@ -29,7 +31,7 @@ class MealCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
             color: schedule.isEaten
-                ? const Color(0xFF00D9D9).withOpacity(0.4)
+                ? AppColors.primary.withOpacity(0.4)
                 : schedule.isSkipped
                     ? Colors.grey.withOpacity(0.3)
                     : Colors.grey.withOpacity(0.08),
@@ -46,6 +48,7 @@ class MealCard extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
+              // Shows checkmark if eaten, X if skipped, or plate icon
               _StatusIcon(schedule: schedule),
               const SizedBox(width: 12),
               Expanded(
@@ -59,7 +62,7 @@ class MealCard extends StatelessWidget {
                         fontWeight: FontWeight.w700,
                         color: schedule.isSkipped
                             ? Colors.grey
-                            : const Color(0xFF1E293B),
+                            : AppColors.textPrimary,
                         decoration: schedule.isSkipped
                             ? TextDecoration.lineThrough
                             : null,
@@ -67,6 +70,7 @@ class MealCard extends StatelessWidget {
                       textAlign: TextAlign.right,
                     ),
                     const SizedBox(height: 4),
+                    // Quick view of meal macros
                     _MacroChips(schedule: schedule),
                   ],
                 ),
@@ -81,6 +85,7 @@ class MealCard extends StatelessWidget {
   }
 }
 
+/// Circular status indicator for the meal.
 class _StatusIcon extends StatelessWidget {
   final MealSchedule schedule;
   const _StatusIcon({required this.schedule});
@@ -92,10 +97,10 @@ class _StatusIcon extends StatelessWidget {
         width: 40,
         height: 40,
         decoration: BoxDecoration(
-          color: const Color(0xFF00D9D9).withOpacity(0.12),
+          color: AppColors.primary.withOpacity(0.12),
           shape: BoxShape.circle,
         ),
-        child: const Icon(Icons.check_circle, color: Color(0xFF00D9D9), size: 22),
+        child: const Icon(Icons.check_circle, color: AppColors.primary, size: 22),
       );
     }
     if (schedule.isSkipped) {
@@ -121,6 +126,7 @@ class _StatusIcon extends StatelessWidget {
   }
 }
 
+/// Displays calories and main macros for the meal.
 class _MacroChips extends StatelessWidget {
   final MealSchedule schedule;
   const _MacroChips({required this.schedule});
@@ -144,7 +150,7 @@ class _MacroChips extends StatelessWidget {
       children: [
         _Chip(
           label: '${cal.toStringAsFixed(0)} سعرة',
-          color: const Color(0xFF00D9D9),
+          color: AppColors.primary,
           icon: Icons.local_fire_department,
         ),
         _Chip(

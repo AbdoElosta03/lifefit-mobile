@@ -4,6 +4,7 @@ import '../../../core/models/nutrition/today_meals_response.dart';
 import '../../../core/models/nutrition/meal_schedule.dart';
 import '../../../core/services/nutrition_service.dart';
 
+/// Manages the state of today's nutrition log and meal schedules.
 class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
   final NutritionService _service;
 
@@ -11,6 +12,7 @@ class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
     fetch();
   }
 
+  /// Fetches the user's meals for today.
   Future<void> fetch() async {
     state = const AsyncValue.loading();
     try {
@@ -21,9 +23,11 @@ class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
     }
   }
 
+  /// Refreshes the meal data.
   Future<void> refresh() => fetch();
 
-  /// Optimistically marks meal as eaten, then confirms with API.
+  /// Logs a meal as eaten. 
+  /// Performs an optimistic update first, then syncs with the server.
   Future<bool> logMeal({
     required int scheduleId,
     required int mealId,
@@ -94,6 +98,7 @@ class NutritionNotifier extends StateNotifier<AsyncValue<TodayMealsResponse>> {
     }
   }
 
+  /// Helper to update a specific meal in the current state list.
   void _updateMealState(int scheduleId, MealSchedule Function(MealSchedule) updater) {
     state.whenData((response) {
       final updated = response.meals.map((m) {

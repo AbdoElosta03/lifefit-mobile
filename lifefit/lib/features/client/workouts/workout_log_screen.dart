@@ -8,6 +8,7 @@ import '../../../core/models/workout/exercise.dart';
 import '../../../core/models/workout/exercise_log.dart';
 import 'workout_provider.dart';
 
+/// Screen for logging user performance (sets, reps, weight) for a specific exercise.
 class WorkoutLogScreen extends ConsumerStatefulWidget {
   final TodaySchedule schedule;
   final Exercise exercise;
@@ -38,7 +39,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize set fields from pivot.
+    // Initialize text controllers for each set based on target volume.
     final pivot = _exercise.pivot;
     final count = (pivot?.sets ?? 1).clamp(1, 20);
     final targetReps = _parseFirstInt(pivot?.reps);
@@ -55,6 +56,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
   @override
   void dispose() {
+    // Clean up timers and controllers.
     for (final s in _sets) {
       s.dispose();
     }
@@ -62,12 +64,14 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     super.dispose();
   }
 
+  /// Extracts the first integer from a string (e.g. "10-12 reps" -> 10).
   int? _parseFirstInt(String? text) {
     if (text == null) return null;
     final match = RegExp(r'(\d+)').firstMatch(text);
     return match != null ? int.tryParse(match.group(1)!) : null;
   }
 
+  /// Starts the rest timer countdown between sets.
   void _startRestTimer() {
     _restTimer?.cancel();
     final restSec = _exercise.pivot?.restSeconds ?? 60;
@@ -86,6 +90,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     });
   }
 
+  /// Fetches the live schedule instance to ensure data integrity on submission.
   TodaySchedule _scheduleForSubmit() {
     // Prefer the latest schedule from provider state.
     final list = ref.read(todaySchedulesProvider).valueOrNull;
@@ -97,6 +102,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
     return widget.schedule;
   }
 
+  /// Validates and sends the workout log to the backend.
   Future<void> _submitLog() async {
     if (_isSubmitting) return;
     // Dismiss keyboard before submit.
@@ -105,6 +111,7 @@ class _WorkoutLogScreenState extends ConsumerState<WorkoutLogScreen> {
 
     try {
       final schedule = _scheduleForSubmit();
+      // Keep logs for other exercises in the same schedule.
       final existingFromOthers = schedule.workoutLog?.exerciseLogs
               .where((l) => l.exerciseId != _exercise.id)
               .toList() ??

@@ -90,14 +90,14 @@ class _WorkoutsList extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E293B),
+                      color: AppColors.textPrimary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      // Date label.
+                      // Date label formatted for the user.
                       Text(
                         today,
                         style: const TextStyle(fontSize: 14, color: Colors.grey),
@@ -128,6 +128,7 @@ class _WorkoutsList extends StatelessWidget {
             ),
           ),
 
+          // Overview of weekly or daily progress.
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.fromLTRB(16, 20, 16, 4),
@@ -139,6 +140,7 @@ class _WorkoutsList extends StatelessWidget {
             ),
           ),
 
+          // Detailed list of workout sections for today.
           for (final schedule in schedules) ...[
             SliverToBoxAdapter(
               child: Padding(
@@ -198,15 +200,11 @@ class _WorkoutsSummaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [AppColors.primary, AppColors.primaryDark],
-          begin: Alignment.topRight,
-          end: Alignment.bottomLeft,
-        ),
+        gradient: AppColors.primaryGradient,
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: _primary.withValues(alpha: 0.28),
+            color: _primary.withOpacity(0.28),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),

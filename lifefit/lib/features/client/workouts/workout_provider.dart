@@ -3,6 +3,7 @@ import '../../../core/models/workout/today_schedule.dart';
 import '../../../core/models/workout/exercise_log.dart';
 import '../../../core/services/workout_service.dart';
 
+/// Manages the state and operations for today's workout schedules.
 class TodaySchedulesNotifier
     extends StateNotifier<AsyncValue<List<TodaySchedule>>> {
   final WorkoutService _service;
@@ -11,6 +12,7 @@ class TodaySchedulesNotifier
     fetch();
   }
 
+  /// Fetches today's schedules from the backend.
   Future<void> fetch() async {
     state = const AsyncValue.loading();
     try {
@@ -21,8 +23,10 @@ class TodaySchedulesNotifier
     }
   }
 
+  /// Reloads schedules.
   Future<void> refresh() => fetch();
 
+  /// Saves workout logs for a specific schedule and updates local state.
   Future<bool> saveWorkoutLog({
     required int scheduleId,
     required List<ExerciseLog> exerciseLogs,
@@ -59,6 +63,7 @@ class TodaySchedulesNotifier
   }
 }
 
+/// Provider to access the TodaySchedulesNotifier and its state.
 final todaySchedulesProvider = StateNotifierProvider<TodaySchedulesNotifier,
     AsyncValue<List<TodaySchedule>>>((ref) {
   return TodaySchedulesNotifier(WorkoutService());

@@ -66,12 +66,14 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
       ..loadHtmlString(html);
   }
 
+  /// Handles callbacks sent from the JS code inside the WebView.
   void _handleCallback(JavaScriptMessage message) {
     try {
       final json = jsonDecode(message.message) as Map<String, dynamic>;
       final type = json['type'] as String?;
 
       if (type == 'complete') {
+        // Payment successful on gateway side, now confirm with our backend.
         final networkRef = (json['data'] as Map<String, dynamic>?)
             ?['NetworkReference'] as String?;
         _confirmPayment(networkRef);
@@ -87,6 +89,7 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
     }
   }
 
+  /// Verification step: verify the transaction with the app server.
   Future<void> _confirmPayment(String? networkRef) async {
     try {
       await SubscriptionService().confirmPayment(
@@ -100,6 +103,7 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
     }
   }
 
+  /// Logging failure: notify backend about the failed attempt.
   Future<void> _failPayment(String? errorCode) async {
     await SubscriptionService().failPayment(
       merchantReference:
@@ -118,13 +122,13 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
         elevation: 0.5,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.black),
+          icon: const Icon(Icons.close, color: AppColors.textPrimary),
           onPressed: () => Navigator.pop(context, PaymentResult.cancelled),
         ),
         title: const Text(
           'الدفع الإلكتروني',
           style: TextStyle(
-              color: Colors.black, fontWeight: FontWeight.bold, fontSize: 18),
+              color: AppColors.textPrimary, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
           Container(
@@ -132,11 +136,11 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
             child: const Row(
               children: [
                 Icon(Icons.lock_outline,
-                    color: Color(0xFF00D9D9), size: 16),
+                    color: AppColors.primary, size: 16),
                 SizedBox(width: 4),
                 Text('آمن',
                     style: TextStyle(
-                        color: Color(0xFF00D9D9),
+                        color: AppColors.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w600)),
               ],
@@ -152,7 +156,7 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  CircularProgressIndicator(color: Color(0xFF00D9D9)),
+                  CircularProgressIndicator(color: AppColors.primary),
                   SizedBox(height: 16),
                   Text('جاري تحميل بوابة الدفع...',
                       style: TextStyle(color: Colors.grey)),
@@ -199,10 +203,7 @@ class _MoamalatPaymentScreenState extends State<MoamalatPaymentScreen> {
   </style>
 </head>
 <body>
-  <div class="msg">
-    <div class="dot">⏳</div>
-    <p>جاري فتح نافذة الدفع...</p>
-  </div>
+  
   <script>
     function startPayment() {
       if (typeof Lightbox === 'undefined') {

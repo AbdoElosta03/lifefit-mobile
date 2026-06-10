@@ -23,10 +23,12 @@ class SelectCoachScreen extends ConsumerStatefulWidget {
 }
 
 class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
-  static const _primary = Color(0xFF00D9D9);
-
   String? _loadingCoachId;
 
+  /// Initiates a chat session with the selected expert.
+  /// 1. Calls backend to start/get chat ID.
+  /// 2. Ensures the chat document exists in Firestore.
+  /// 3. Navigates to the chat details screen.
   Future<void> _openChat(ExpertModel expert) async {
     setState(() => _loadingCoachId = expert.id.toString());
 
@@ -36,6 +38,7 @@ class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
 
       final firestoreService = ref.read(firestoreChatServiceProvider);
 
+      // Sync Firestore with metadata from the backend response
       await firestoreService.ensureChatDoc(
         chatId: response.firebaseChatId,
         clientId: response.clientId.toString(),
@@ -49,6 +52,7 @@ class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
       );
 
       if (!mounted) return;
+      // Close selection and move to chat room
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -79,24 +83,29 @@ class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        backgroundColor: _primary,
-        foregroundColor: Colors.white,
+        backgroundColor: Colors.white,
+        foregroundColor: AppColors.textPrimary,
+        elevation: 0.5,
         title: const Text(
           'اختر مدرباً',
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
         ),
         centerTitle: true,
-        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back_ios, size: 20),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: expertsAsync.when(
         loading: () => const Center(
-          child: CircularProgressIndicator(color: _primary),
+          child: CircularProgressIndicator(color: AppColors.primary, strokeWidth: 2.5),
         ),
         error: (e, _) => _ErrorView(
           message: e.toString().replaceFirst('Exception: ', ''),
           onRetry: () => ref.read(expertsProvider.notifier).refresh(),
         ),
         data: (experts) {
+          // Only show experts the client has an active subscription with
           final subscribed =
               experts.where((e) => e.isSubscribed).toList();
 
@@ -107,7 +116,7 @@ class _SelectCoachScreenState extends ConsumerState<SelectCoachScreen> {
           return ListView.separated(
             padding: const EdgeInsets.all(16),
             itemCount: subscribed.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
+            separatorBuilder: (_, __) => const SizedBox(height: 12),
             itemBuilder: (context, index) {
               final expert = subscribed[index];
               final isLoading =
@@ -139,9 +148,6 @@ class _CoachTile extends StatelessWidget {
   final bool isLoading;
   final VoidCallback? onTap;
 
-  static const _primary = Color(0xFF00D9D9);
-  static const _dark = Color(0xFF1E293B);
-
   @override
   Widget build(BuildContext context) {
     final roleLabel =
@@ -149,8 +155,11 @@ class _CoachTile extends StatelessWidget {
 
     return Material(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(16),
-      elevation: 1,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: Colors.grey.withOpacity(0.1)),
+      ),
       child: InkWell(
         borderRadius: BorderRadius.circular(16),
         onTap: onTap,
@@ -158,18 +167,31 @@ class _CoachTile extends StatelessWidget {
           padding: const EdgeInsets.all(14),
           child: Row(
             children: [
-              _Avatar(url: expert.avatarUrl),
-              const SizedBox(width: 14),
+              // ── Status Indicator or Loading ────────────────────────────
+              if (isLoading)
+                const SizedBox(
+                  width: 22,
+                  height: 22,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: AppColors.primary),
+                )
+              else
+                const Icon(Icons.arrow_back_ios, size: 14, color: Colors.grey),
+              
+              const Spacer(),
+
+              // ── Coach Info ─────────────────────────────────────────────
               Expanded(
+                flex: 4,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.end, // RTL alignment
                   children: [
                     Text(
                       expert.name,
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
-                        color: _dark,
+                        color: AppColors.textPrimary,
                       ),
                     ),
                     const SizedBox(height: 2),
@@ -181,16 +203,8 @@ class _CoachTile extends StatelessWidget {
                   ],
                 ),
               ),
-              if (isLoading)
-                const SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                      strokeWidth: 2, color: _primary),
-                )
-              else
-                const Icon(Icons.chat_bubble_outline_rounded,
-                    color: _primary, size: 22),
+              const SizedBox(width: 14),
+              _Avatar(url: expert.avatarUrl),
             ],
           ),
         ),
@@ -206,16 +220,23 @@ class _Avatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (url != null && url!.isNotEmpty) {
-      return CircleAvatar(
-        radius: 26,
-        backgroundImage: NetworkImage(url!),
-        backgroundColor: Colors.grey[200],
+      return Container(
+        padding: const EdgeInsets.all(2),
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+        ),
+        child: CircleAvatar(
+          radius: 26,
+          backgroundImage: NetworkImage(url!),
+          backgroundColor: Colors.grey[100],
+        ),
       );
     }
-    return const CircleAvatar(
+    return CircleAvatar(
       radius: 26,
-      backgroundColor: Color(0xFFE0FAFA),
-      child: Icon(Icons.person, color: Color(0xFF00D9D9), size: 28),
+      backgroundColor: AppColors.primary.withOpacity(0.1),
+      child: const Icon(Icons.person, color: AppColors.primary, size: 28),
     );
   }
 }

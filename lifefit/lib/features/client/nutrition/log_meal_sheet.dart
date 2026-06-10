@@ -78,14 +78,14 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF00D9D9).withOpacity(0.1),
+                  color: AppColors.primary.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   schedule.mealTypeLabel,
                   style: const TextStyle(
                     fontSize: 12,
-                    color: Color(0xFF00D9D9),
+                    color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -97,7 +97,7 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
+                    color: AppColors.textPrimary,
                   ),
                   textAlign: TextAlign.right,
                 ),
@@ -107,19 +107,19 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
 
           const SizedBox(height: 16),
 
-          // Macro summary row
+          // Macro summary row - Show targets for the meal
           if (meal != null) _MacroRow(schedule: schedule),
 
           const SizedBox(height: 20),
 
-          // Ingredients list (if any)
+          // Ingredients list - Shows components of the meal
           if (meal != null && meal.ingredients.isNotEmpty) ...[
             const Text(
               'المكونات',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w700,
-                color: Color(0xFF1E293B),
+                color: AppColors.textPrimary,
               ),
               textAlign: TextAlign.right,
             ),
@@ -136,7 +136,7 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
                     ),
                     Text(
                       ing.foodName,
-                      style: const TextStyle(fontSize: 13, color: Color(0xFF1E293B)),
+                      style: const TextStyle(fontSize: 13, color: AppColors.textPrimary),
                     ),
                   ],
                 ),
@@ -145,13 +145,13 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
             const Divider(height: 24),
           ],
 
-          // Weight input
+          // Weight input - Allow user to adjust intake quantity
           Text(
             'الكمية المُتناولة (غرام)',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
-              color: Color(0xFF1E293B),
+              color: AppColors.textPrimary,
             ),
             textAlign: TextAlign.right,
           ),
@@ -203,7 +203,7 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
                 child: ElevatedButton(
                   onPressed: _loading ? null : _log,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF00D9D9),
+                    backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
                     minimumSize: const Size(double.infinity, 48),
                     elevation: 0,
@@ -233,6 +233,7 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
     );
   }
 
+  /// Logs the meal intake with the specified weight.
   Future<void> _log() async {
     final raw = double.tryParse(_weightController.text.trim());
     if (raw == null || raw <= 0) {
@@ -262,6 +263,7 @@ class _LogMealSheetState extends ConsumerState<LogMealSheet> {
     }
   }
 
+  /// Skips the meal intake for today.
   Future<void> _skip() async {
     setState(() => _loading = true);
     await ref.read(nutritionProvider.notifier).skipMeal(
@@ -295,7 +297,7 @@ class _MacroRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: [
-          _MacroItem(value: cal.toStringAsFixed(0), unit: 'سعرة', color: const Color(0xFF00D9D9)),
+          _MacroItem(value: cal.toStringAsFixed(0), unit: 'سعرة', color: AppColors.primary),
           _MacroItem(value: '${prot.toStringAsFixed(0)}غ', unit: 'بروتين', color: const Color(0xFF3ABEF9)),
           _MacroItem(value: '${carbs.toStringAsFixed(0)}غ', unit: 'كارب', color: const Color(0xFFF59E0B)),
           _MacroItem(value: '${fat.toStringAsFixed(0)}غ', unit: 'دهون', color: const Color(0xFFEF4444)),
