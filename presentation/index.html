@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>منصة FitLife — عرض مشروع التخرج</title>
+  <link rel="stylesheet" href="vendor/reveal.css" />
+  <link rel="stylesheet" href="fonts/tajawal.css" />
+  <link rel="stylesheet" href="theme.css" />
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- ===================== COVER ===================== -->
+      <section data-background-color="#0d9488">
+        <div class="cover">
+          <div class="logo">
+            <div class="mark">🌿</div>
+            <div class="name">FitLife</div>
+          </div>
+          <h1>منصة FitLife لإدارة اللياقة البدنية والتغذية</h1>
+          <div class="sub">حل تقني متكامل يربط العملاء، المدربين، أخصائيي التغذية، والإدارة داخل منصة واحدة تدعم التدريب، التغذية، المتابعة، التواصل، والدفع المحلي.</div>
+          <div class="meta">
+            <span class="chip">مشروع تخرج — هندسة البرمجيات</span>
+            <span class="chip">تطبيق موبايل + لوحة تحكم ويب</span>
+          </div>
+        </div>
+        <aside class="notes">
+          مشروع FitLife ليس مجرد تطبيق لعرض التمارين أو الوجبات، بل منصة رقمية متكاملة تهدف إلى تنظيم رحلة المستخدم الصحية من لحظة الاشتراك وحتى متابعة التقدم بشكل مستمر.
+        </aside>
+      </section>
+
+      <!-- ===================== 2: خلفية المشروع ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">01</div>
+            <div class="s-titles">
+              <span class="kicker">خلفية المشروع</span>
+              <h2>لماذا <span class="accent">FitLife؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="split split-img">
+              <div>
+                <p class="lead" style="margin-bottom:22px">يشهد المجتمع اليوم وعيًا متزايدًا بأهمية الصحة واللياقة والتغذية السليمة، لكن الحصول على متابعة احترافية ومنظمة ما زال يواجه تحديات حقيقية في السوق المحلي.</p>
+                <ul class="checks">
+                  <li>زيادة الاهتمام بالصحة ونمط الحياة المتوازن</li>
+                  <li>الحاجة إلى متابعة شخصية من مختصين موثوقين</li>
+                  <li>غياب منصة محلية موحدة تجمع التدريب والتغذية</li>
+                  <li>صعوبة تنظيم الخطط والقياسات والتواصل والدفع في مكان واحد</li>
+                </ul>
+              </div>
+              <div class="phones">
+                <img class="shot-mobile" src="images/mobile-home.png" alt="الشاشة الرئيسية" />
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          رغم وجود تطبيقات عالمية كثيرة، يحتاج المستخدم المحلي إلى حل يناسب بيئته، يدعم طرق الدفع المحلية، ويتيح التواصل مع مختصين يفهمون احتياجاته بشكل مباشر.
+        </aside>
+      </section>
+
+      <!-- ===================== 3: النظام الحالي ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">02</div>
+            <div class="s-titles">
+              <span class="kicker">النظام الحالي</span>
+              <h2>كيف تتم العملية <span class="accent">حاليًا؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <p class="lead" style="margin-bottom:26px">يعتمد المستخدمون والمختصون غالبًا على أدوات تقليدية منفصلة وغير مترابطة:</p>
+            <div class="grid g3">
+              <div class="card tint-teal"><div class="ic">💬</div><h3>تواصل مشتت</h3><p>الخطط تُرسل عبر WhatsApp أو Telegram كرسائل وملفات PDF.</p></div>
+              <div class="card tint-amber"><div class="ic">📝</div><h3>تسجيل عشوائي</h3><p>متابعة التقدم عبر صور ورسائل دون نظام واضح.</p></div>
+              <div class="card tint-rose"><div class="ic">📉</div><h3>لا لوحة موحّدة</h3><p>غياب لوحة لعرض القياسات والنتائج بشكل منظم.</p></div>
+              <div class="card tint-blue"><div class="ic">💳</div><h3>دفع غير منظم</h3><p>عدم وجود نظام دفع محلي مدمج وموثوق.</p></div>
+              <div class="card tint-violet"><div class="ic">🗂️</div><h3>سجلات ضائعة</h3><p>صعوبة الرجوع إلى السجلات والبيانات السابقة.</p></div>
+              <div class="card tint-teal"><div class="ic">🔁</div><h3>تكرار يدوي</h3><p>إعادة العمل نفسه يدويًا لكل عميل على حدة.</p></div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          المشكلة أن العملية الحالية ليست مبنية على نظام واضح بل على أدوات منفصلة، ما يسبب ضياع البيانات، ضعف المتابعة، وصعوبة تقييم التقدم الحقيقي للعميل.
+        </aside>
+      </section>
+
+      <!-- ===================== 4: مشكلة المشروع ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">03</div>
+            <div class="s-titles">
+              <span class="kicker">تعريف المشكلة</span>
+              <h2>المشكلة <span class="accent">الأساسية</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="card" style="background:var(--grad-soft); border-color:var(--mint-200); margin-bottom:26px">
+              <p class="lead" style="color:var(--teal-900); margin:0; font-weight:700">لا توجد منصة رقمية موحدة تربط بين العميل والمدرب وأخصائي التغذية داخل بيئة واحدة تدعم إدارة الخطط، تتبع التقدم، التواصل، والدفع المحلي.</p>
+            </div>
+            <div class="split">
+              <ul class="checks warn">
+                <li>تشتت وسائل التواصل بين أطراف متعددة</li>
+                <li>عدم وجود نظام موحد لإدارة الخطط</li>
+                <li>ضعف القدرة على تتبع تقدم العميل</li>
+                <li>غياب الرسوم البيانية والمؤشرات الصحية</li>
+              </ul>
+              <ul class="checks warn">
+                <li>صعوبة الوصول إلى مختصين موثوقين</li>
+                <li>غياب آلية دفع محلية مناسبة</li>
+                <li>عدم وجود تنبيهات وتذكيرات فعّالة</li>
+                <li>صعوبة تحليل وتقييم النتائج</li>
+              </ul>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          المشكلة ليست في غياب التمارين أو الوجبات، بل في غياب منظومة كاملة تدير العلاقة بين العميل والمختص بطريقة احترافية قابلة للمتابعة والتحليل.
+        </aside>
+      </section>
+
+      <!-- ===================== 5: الحل المقترح ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">04</div>
+            <div class="s-titles">
+              <span class="kicker">الحل المقترح</span>
+              <h2>منصة <span class="accent">FitLife</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="split split-img">
+              <div>
+                <p class="lead" style="margin-bottom:20px">منصة رقمية متكاملة لإدارة خدمات اللياقة والتغذية عبر <b>تطبيق موبايل للعملاء</b> و<b>لوحة تحكم ويب</b> للمختصين والإدارة.</p>
+                <div class="grid g2" style="gap:14px">
+                  <div class="pill">🏋️ خطط تدريبية</div>
+                  <div class="pill">🥗 خطط غذائية</div>
+                  <div class="pill">📈 تتبع القياسات</div>
+                  <div class="pill">💬 محادثة مباشرة</div>
+                  <div class="pill">🔔 إشعارات وتنبيهات</div>
+                  <div class="pill">💳 دفع محلي (معاملات)</div>
+                </div>
+              </div>
+              <div class="phones">
+                <img class="shot-mobile" src="images/mobile-workouts.png" alt="تمارين اليوم" />
+                <img class="shot-mobile" src="images/mobile-nutrition-plan.png" alt="الخطة الغذائية" />
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          FitLife يحول تجربة التدريب والتغذية من متابعة عشوائية عبر الرسائل إلى نظام رقمي منظم يدعم كل طرف حسب دوره واحتياجاته.
+        </aside>
+      </section>
+
+      <!-- ===================== 6: القيمة المقترحة ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">05</div>
+            <div class="s-titles">
+              <span class="kicker">القيمة المقترحة</span>
+              <h2>ما الذي يميّز <span class="accent">FitLife؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g3">
+              <div class="card tint-teal">
+                <div class="ic">🙋‍♂️</div><h3>للعميل</h3>
+                <ul class="checks dot" style="gap:8px;font-size:21px">
+                  <li>وصول إلى مختصين موثوقين</li>
+                  <li>خطط تدريب وغذاء منظمة</li>
+                  <li>متابعة الإنجاز اليومي</li>
+                  <li>تقدم عبر مؤشرات ورسوم بيانية</li>
+                </ul>
+              </div>
+              <div class="card tint-blue">
+                <div class="ic">🧑‍🏫</div><h3>للمختص</h3>
+                <ul class="checks dot" style="gap:8px;font-size:21px">
+                  <li>إدارة العملاء من مكان واحد</li>
+                  <li>إنشاء باقات وبرامج متكاملة</li>
+                  <li>متابعة التزام العملاء</li>
+                  <li>إدارة الأرباح وطلبات السحب</li>
+                </ul>
+              </div>
+              <div class="card tint-amber">
+                <div class="ic">🌍</div><h3>للسوق المحلي</h3>
+                <ul class="checks dot" style="gap:8px;font-size:21px">
+                  <li>دعم الدفع المحلي</li>
+                  <li>رقمنة قطاع التدريب والتغذية</li>
+                  <li>تقليل الاعتماد على الرسائل العشوائية</li>
+                  <li>تجربة موحّدة واحترافية</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          القيمة الحقيقية أن المشروع يخدم جميع الأطراف: العميل يحصل على متابعة أفضل، والمختص على أدوات إدارية احترافية، والسوق المحلي على حل رقمي مناسب.
+        </aside>
+      </section>
+
+      <!-- ===================== 7: المستخدمون ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">06</div>
+            <div class="s-titles">
+              <span class="kicker">المستخدمون المستهدفون</span>
+              <h2>أربعة <span class="accent">أدوار</span> داخل النظام</h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g4">
+              <div class="card tint-teal">
+                <div class="ic">🙋</div><h3>العميل</h3>
+                <p>الاشتراك، عرض الخطط اليومية، تسجيل التمارين والوجبات، رفع القياسات والصور، ومتابعة المؤشرات.</p>
+              </div>
+              <div class="card tint-blue">
+                <div class="ic">🏋️</div><h3>المدرب</h3>
+                <p>إنشاء مكتبة تمارين، بناء برامج تدريبية، جدولة التمارين، ومتابعة أداء العميل.</p>
+              </div>
+              <div class="card tint-amber">
+                <div class="ic">🥗</div><h3>أخصائي التغذية</h3>
+                <p>إنشاء مكتبة أغذية ووجبات، بناء برامج غذائية، ومراجعة السعرات والماكروز اليومية.</p>
+              </div>
+              <div class="card tint-violet">
+                <div class="ic">🛡️</div><h3>المسؤول</h3>
+                <p>إدارة المستخدمين، مراقبة المدفوعات والاشتراكات، إدارة المحتوى، ومتابعة طلبات السحب.</p>
+              </div>
+            </div>
+            <p class="note">تصميم قائم على الأدوار (Role-Based) يمنح كل مستخدم صلاحيات ووظائف محددة — تنظيم أعلى، أمان أكبر، وقابلية للتوسع.</p>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          تم تصميم النظام بناءً على الأدوار بحيث يمتلك كل مستخدم صلاحيات ووظائف محددة، ما يجعل النظام أكثر تنظيمًا وأمانًا وقابلية للتوسع.
+        </aside>
+      </section>
+
+      <!-- ===================== 8: الوحدات ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">07</div>
+            <div class="s-titles">
+              <span class="kicker">وظائف النظام</span>
+              <h2>الوحدات <span class="accent">الرئيسية</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="split split-img">
+              <div class="grid g2" style="gap:14px">
+                <div class="pill">🔐 الحسابات والمصادقة</div>
+                <div class="pill">🛒 سوق المدربين والمختصين</div>
+                <div class="pill">💳 الاشتراكات والدفع</div>
+                <div class="pill">🏋️ البرامج التدريبية</div>
+                <div class="pill">🥗 البرامج الغذائية</div>
+                <div class="pill">📈 القياسات والتقدم</div>
+                <div class="pill">💬 المحادثات والإشعارات</div>
+                <div class="pill">🖥️ لوحة تحكم الإدارة</div>
+                <div class="pill">👛 المحافظ وطلبات السحب</div>
+                <div class="pill">📚 مكتبات التمارين والأغذية</div>
+              </div>
+              <div>
+                <div class="browser">
+                  <div class="bar"><span></span><span></span><span></span></div>
+                  <img src="images/web-coach-dashboard.png" alt="لوحة تحكم المدرب" />
+                </div>
+                <div class="cap">لوحة تحكم المدرب — نظرة عامة على النشاط والعملاء</div>
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          هذه الوحدات تعمل معًا لتكوين دورة خدمة كاملة: تسجيل العميل، اختيار المختص، الاشتراك، استلام الخطة، ثم المتابعة والتحليل والتواصل.
+        </aside>
+      </section>
+
+      <!-- ===================== 9: رحلة العميل ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">08</div>
+            <div class="s-titles">
+              <span class="kicker">رحلة العميل</span>
+              <h2>من <span class="accent">الهدف</span> إلى <span class="accent">النتيجة</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="split split-img">
+              <div class="journey">
+                <div class="step"><div class="n">١</div><div class="tx">إنشاء حساب وتعبئة البيانات</div></div>
+                <div class="step"><div class="n">٢</div><div class="tx">تصفح المدربين والمختصين</div></div>
+                <div class="step"><div class="n">٣</div><div class="tx">اختيار المختص والباقة</div></div>
+                <div class="step"><div class="n">٤</div><div class="tx">إتمام الدفع محليًا</div></div>
+                <div class="step"><div class="n">٥</div><div class="tx">استلام الخطة المناسبة</div></div>
+                <div class="step"><div class="n">٦</div><div class="tx">تسجيل التمارين والوجبات</div></div>
+                <div class="step"><div class="n">٧</div><div class="tx">رفع القياسات وصور التقدم</div></div>
+                <div class="step"><div class="n">٨</div><div class="tx">متابعة النتائج بالرسوم البيانية</div></div>
+                <div class="step"><div class="n">٩</div><div class="tx">التواصل مع المختص عند الحاجة</div></div>
+              </div>
+              <div class="phones">
+                <img class="shot-mobile" src="images/mobile-onboarding.png" alt="بدء الرحلة" />
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          هذه الرحلة توضح كيف يحوّل FitLife العملية من فوضى متعددة الأدوات إلى تجربة رقمية واحدة واضحة ومنظمة.
+        </aside>
+      </section>
+
+      <!-- ===================== 10: التقنيات ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">09</div>
+            <div class="s-titles">
+              <span class="kicker">البنية التقنية</span>
+              <h2>التقنيات <span class="accent">المستخدمة</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g4" style="align-items:start">
+              <div class="tech-col card">
+                <h3>⚙️ الخلفية (Backend)</h3>
+                <div class="tech-tags"><span class="tag">PHP</span><span class="tag">Laravel</span><span class="tag">MySQL</span></div>
+              </div>
+              <div class="tech-col card">
+                <h3>🖥️ لوحة التحكم</h3>
+                <div class="tech-tags"><span class="tag">Vue.js</span><span class="tag">TypeScript</span></div>
+              </div>
+              <div class="tech-col card">
+                <h3>📱 تطبيق الموبايل</h3>
+                <div class="tech-tags"><span class="tag">Flutter</span><span class="tag">Dart</span></div>
+              </div>
+              <div class="tech-col card">
+                <h3>☁️ خدمات داعمة</h3>
+                <div class="tech-tags"><span class="tag">Firebase</span><span class="tag">Moamalat</span></div>
+              </div>
+            </div>
+            <div class="card" style="margin-top:20px">
+              <h3>🛠️ أدوات التطوير</h3>
+              <div class="tech-tags">
+                <span class="tag">VS Code</span><span class="tag">Git &amp; GitHub</span>
+                <span class="tag">Postman</span><span class="tag">Draw.io</span><span class="tag">MockFlow</span>
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          اختيرت هذه التقنيات لبناء نظام مستقر قابل للصيانة: Laravel لبنية خلفية قوية، Vue وTypeScript للوحة تفاعلية، وFlutter لتطبيق موبايل متعدد المنصات من قاعدة كود واحدة.
+        </aside>
+      </section>
+
+      <!-- ===================== 11: لماذا هذه التقنيات ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">10</div>
+            <div class="s-titles">
+              <span class="kicker">القرارات التقنية</span>
+              <h2>لماذا <span class="accent">هذه التقنيات؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <table class="tbl">
+              <thead><tr><th>المكوّن</th><th>التقنية</th><th>سبب الاستخدام</th></tr></thead>
+              <tbody>
+                <tr><td>الواجهة الخلفية</td><td class="t-tech">Laravel / PHP</td><td>بناء API، المصادقة، منطق النظام، وقاعدة البيانات</td></tr>
+                <tr><td>لوحة التحكم</td><td class="t-tech">Vue.js / TypeScript</td><td>واجهات تفاعلية وسهلة الصيانة</td></tr>
+                <tr><td>تطبيق الهاتف</td><td class="t-tech">Flutter / Dart</td><td>تطبيق متعدد المنصات بأداء جيد</td></tr>
+                <tr><td>قاعدة البيانات</td><td class="t-tech">MySQL</td><td>تخزين منظم للبيانات العلائقية</td></tr>
+                <tr><td>الخدمات الداعمة</td><td class="t-tech">Firebase</td><td>الإشعارات وبعض خدمات التطبيق</td></tr>
+                <tr><td>الدفع المحلي</td><td class="t-tech">Moamalat</td><td>تمكين المستخدم من الدفع بطرق محلية</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          اختيار التقنيات لم يكن عشوائيًا بل بناءً على طبيعة المشروع: نحتاج تطبيق موبايل، لوحة تحكم ويب، Backend قوي، قاعدة بيانات منظمة، ودفع محلي يناسب السوق.
+        </aside>
+      </section>
+
+      <!-- ===================== 12: المعمارية ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">11</div>
+            <div class="s-titles">
+              <span class="kicker">معمارية النظام</span>
+              <h2>كيف يعمل <span class="accent">FitLife؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="arch">
+              <div class="arch-col">
+                <div class="node client"><div class="t">📱 تطبيق الموبايل</div><div class="d">العملاء — الخطط، التسجيل، التقدم، المحادثة</div></div>
+                <div class="arrow">▼</div>
+              </div>
+              <div class="arch-col">
+                <div class="node client"><div class="t">🖥️ لوحة تحكم الويب</div><div class="d">الإدارة والمدربون وأخصائيو التغذية</div></div>
+                <div class="arrow">▼</div>
+              </div>
+            </div>
+            <div class="node core" style="width:60%; margin:6px auto 0">
+              <div class="t">🔗 الواجهة الخلفية — Backend API (Laravel)</div>
+              <div class="d">المصادقة · منطق النظام · الدفع · إدارة البيانات · التكامل مع Firebase &amp; Moamalat</div>
+            </div>
+            <div class="arrow" style="margin:8px 0">▼</div>
+            <div class="node" style="width:42%; margin:0 auto; background:var(--grad-soft); border-color:var(--mint-200)">
+              <div class="t">🗄️ قاعدة البيانات — MySQL</div>
+            </div>
+            <p class="note center" style="margin-top:18px">فصل واضح للمكونات: كل جزء له مسؤولية محددة، والتواصل بينها يتم عبر API.</p>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          فصل المكونات بهذه الطريقة يجعل النظام أوضح وأسهل في الصيانة، وكل جزء له مسؤولية محددة والتواصل بين الأجزاء يتم عبر API.
+        </aside>
+      </section>
+
+      <!-- ===================== 13: واجهات الموبايل ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">12</div>
+            <div class="s-titles">
+              <span class="kicker">الواجهات وتجربة المستخدم</span>
+              <h2>تطبيق <span class="accent">العميل</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="phones">
+              <img class="shot-mobile" src="images/mobile-workouts.png" alt="تمارين اليوم" />
+              <img class="shot-mobile" src="images/mobile-exercise-detail.png" alt="تفاصيل التمرين" />
+              <img class="shot-mobile" src="images/mobile-nutrition-plan.png" alt="الخطة الغذائية" />
+              <img class="shot-mobile" src="images/mobile-chat.png" alt="المحادثة" />
+            </div>
+            <p class="note center" style="margin-top:18px">جدول التمارين · تفاصيل التمرين · الخطة الغذائية والسعرات · المحادثة مع المختص — تصميم بسيط يدعم العربية بالكامل.</p>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          تم التركيز على البساطة وسهولة التنقل، بحيث يستطيع المستخدم تنفيذ مهامه دون الحاجة إلى خبرة تقنية مسبقة، مع دعم كامل للغة العربية واتجاه RTL.
+        </aside>
+      </section>
+
+      <!-- ===================== 13b: لوحة التحكم ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">12</div>
+            <div class="s-titles">
+              <span class="kicker">الواجهات وتجربة المستخدم</span>
+              <h2>لوحة تحكم <span class="accent">المختصين والإدارة</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g2">
+              <div><div class="browser"><div class="bar"><span></span><span></span><span></span></div><img src="images/web-exercise-library.png" alt="مكتبة التمارين" /></div><div class="cap">مكتبة التمارين</div></div>
+              <div><div class="browser"><div class="bar"><span></span><span></span><span></span></div><img src="images/web-recipes.png" alt="مكتبة الوصفات" /></div><div class="cap">مكتبة الوصفات والوجبات</div></div>
+              <div><div class="browser"><div class="bar"><span></span><span></span><span></span></div><img src="images/web-client-details.png" alt="تفاصيل العميل" /></div><div class="cap">ملف العميل والقياسات والأهداف</div></div>
+              <div><div class="browser"><div class="bar"><span></span><span></span><span></span></div><img src="images/web-packages.png" alt="الباقات" /></div><div class="cap">إدارة الخدمات والباقات</div></div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          لوحة الويب تتيح للمختصين والإدارة إدارة العملاء، إنشاء البرامج، إدارة التمارين والوجبات، متابعة الاشتراكات والمدفوعات، ومراقبة النظام — من مكان واحد.
+        </aside>
+      </section>
+
+      <!-- ===================== 14: المتطلبات غير الوظيفية ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">13</div>
+            <div class="s-titles">
+              <span class="kicker">معايير الجودة</span>
+              <h2>المتطلبات <span class="accent">غير الوظيفية</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g3">
+              <div class="card tint-teal"><div class="ic">⚡</div><h3>الأداء</h3><p>استجابة سريعة للعمليات الأساسية.</p></div>
+              <div class="card tint-rose"><div class="ic">🔒</div><h3>الأمان والخصوصية</h3><p>حماية البيانات الصحية، تشفير كلمات المرور، ومنع الوصول غير المصرح به.</p></div>
+              <div class="card tint-blue"><div class="ic">🎯</div><h3>سهولة الاستخدام</h3><p>واجهات واضحة ومتناسقة بدعم كامل للغة العربية.</p></div>
+              <div class="card tint-amber"><div class="ic">🔗</div><h3>التوافقية</h3><p>العمل على الهواتف والمتصفحات الحديثة.</p></div>
+              <div class="card tint-violet"><div class="ic">🛡️</div><h3>الموثوقية</h3><p>الحفاظ على التوفر مع دعم النسخ الاحتياطي.</p></div>
+              <div class="card tint-teal"><div class="ic">📈</div><h3>قابلية التوسع</h3><p>استيعاب زيادة المستخدمين والبيانات مستقبلًا.</p></div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          النظام الناجح لا يعتمد فقط على عدد الوظائف، بل على جودة الأداء، الأمان، سهولة الاستخدام، وقابلية التوسع.
+        </aside>
+      </section>
+
+      <!-- ===================== 15: الجدوى ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">14</div>
+            <div class="s-titles">
+              <span class="kicker">دراسة الجدوى</span>
+              <h2>لماذا يمكن أن <span class="accent">ينجح FitLife؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g3">
+              <div class="card tint-amber">
+                <div class="ic">💰</div><h3>الجدوى الاقتصادية</h3>
+                <ul class="checks dot" style="font-size:21px;gap:8px">
+                  <li>طلب متزايد على خدمات اللياقة</li>
+                  <li>بيع المختصين خدماتهم مباشرة</li>
+                  <li>دعم الدفع المحلي</li>
+                  <li>نموذج عمل قابل للنمو</li>
+                </ul>
+              </div>
+              <div class="card tint-teal">
+                <div class="ic">⚙️</div><h3>الجدوى التشغيلية</h3>
+                <ul class="checks dot" style="font-size:21px;gap:8px">
+                  <li>توحيد العمليات في منصة واحدة</li>
+                  <li>تقليل الفوضى بين التطبيقات</li>
+                  <li>تسهيل إدارة العملاء والخطط</li>
+                  <li>إدارة الاشتراكات بسلاسة</li>
+                </ul>
+              </div>
+              <div class="card tint-blue">
+                <div class="ic">🧩</div><h3>الجدوى الفنية</h3>
+                <ul class="checks dot" style="font-size:21px;gap:8px">
+                  <li>تقنيات معروفة ومستقرة</li>
+                  <li>دعم الويب والموبايل</li>
+                  <li>قابلية النظام للتطوير</li>
+                  <li>بنية واضحة قابلة للصيانة</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          FitLife قابل للنجاح لأنه يعالج مشكلة واقعية، يستخدم تقنيات متاحة، ويقدم قيمة واضحة لكل الأطراف داخل السوق المحلي.
+        </aside>
+      </section>
+
+      <!-- ===================== 16: الميزة التنافسية ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">15</div>
+            <div class="s-titles">
+              <span class="kicker">الميزة التنافسية</span>
+              <h2>ما الذي يجعل FitLife <span class="accent">مختلفًا؟</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="split">
+              <ul class="checks">
+                <li>مصمّم ليناسب السوق المحلي</li>
+                <li>يدعم الدفع المحلي عبر معاملات</li>
+                <li>يجمع التدريب والتغذية والمتابعة والتواصل في منصة واحدة</li>
+                <li>يخدم العميل والمختص والإدارة معًا</li>
+              </ul>
+              <ul class="checks">
+                <li>يحوّل المتابعة من رسائل عشوائية إلى نظام منظم</li>
+                <li>يعتمد على البيانات والرسوم البيانية لقياس التقدم</li>
+                <li>قابل للتوسع بإضافة مزايا ذكية مستقبلًا</li>
+                <li>تجربة عربية كاملة وحديثة</li>
+              </ul>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          الفرق بين FitLife والحلول التقليدية أنه لا يقدم وظيفة منفصلة فقط، بل يبني منظومة رقمية كاملة لإدارة الخدمة من البداية إلى النهاية.
+        </aside>
+      </section>
+
+      <!-- ===================== 17: منهجية التطوير ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">16</div>
+            <div class="s-titles">
+              <span class="kicker">منهجية التطوير</span>
+              <h2>نموذج الشلال <span class="accent">المعدّل</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="journey" style="grid-template-columns:repeat(6,1fr); margin-bottom:28px">
+              <div class="step" style="flex-direction:column;align-items:center;text-align:center"><div class="n">١</div><div class="tx">تحليل المتطلبات</div></div>
+              <div class="step" style="flex-direction:column;align-items:center;text-align:center"><div class="n">٢</div><div class="tx">تصميم النظام</div></div>
+              <div class="step" style="flex-direction:column;align-items:center;text-align:center"><div class="n">٣</div><div class="tx">التنفيذ</div></div>
+              <div class="step" style="flex-direction:column;align-items:center;text-align:center"><div class="n">٤</div><div class="tx">الاختبار</div></div>
+              <div class="step" style="flex-direction:column;align-items:center;text-align:center"><div class="n">٥</div><div class="tx">النشر</div></div>
+              <div class="step" style="flex-direction:column;align-items:center;text-align:center"><div class="n">٦</div><div class="tx">الصيانة والتحسين</div></div>
+            </div>
+            <div class="card" style="background:var(--grad-soft);border-color:var(--mint-200)">
+              <h3>لماذا هذا النموذج؟</h3>
+              <p style="color:var(--teal-900);font-size:23px">متطلبات المشروع كانت واضحة من البداية، والنموذج مناسب لمشاريع التخرج، يوفر تسلسلًا منظمًا للمراحل، ويسمح بالرجوع المحدود للمراحل السابقة عند الحاجة للتصحيح.</p>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          استخدام نموذج الشلال المعدل ساعد على تنظيم العمل بطريقة واضحة، مع إمكانية تحسين بعض الأجزاء أثناء التنفيذ عند ظهور ملاحظات جديدة.
+        </aside>
+      </section>
+
+      <!-- ===================== 18: التطوير المستقبلي ===================== -->
+      <section>
+        <div class="slide">
+          <div class="s-head">
+            <div class="s-num">17</div>
+            <div class="s-titles">
+              <span class="kicker">رؤية مستقبلية</span>
+              <h2>التطوير <span class="accent">المستقبلي</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <div class="grid g3">
+              <div class="card tint-violet"><div class="ic">🤖</div><h3>توصيات ذكية</h3><p>نظام توصيات بالذكاء الاصطناعي للتمارين والوجبات.</p></div>
+              <div class="card tint-teal"><div class="ic">⏰</div><h3>تنبيهات ذكية</h3><p>تذكيرات تكيّفية حسب سلوك المستخدم.</p></div>
+              <div class="card tint-blue"><div class="ic">📊</div><h3>تحليل متقدم</h3><p>تحليل أعمق للتقدم الصحي وتقارير للإدارة.</p></div>
+              <div class="card tint-amber"><div class="ic">⭐</div><h3>تقييمات ومراجعات</h3><p>تقييم المدربين وأخصائيي التغذية.</p></div>
+              <div class="card tint-rose"><div class="ic">⌚</div><h3>الأجهزة القابلة للارتداء</h3><p>ربط النظام بالساعات وأجهزة التتبع.</p></div>
+              <div class="card tint-teal"><div class="ic">💳</div><h3>طرق دفع إضافية</h3><p>توسيع خيارات الدفع المحلية والعالمية.</p></div>
+            </div>
+          </div>
+          <div class="foot"><span class="b"></span> FitLife</div>
+        </div>
+        <aside class="notes">
+          FitLife يمكن أن يتطور من منصة إدارة إلى مساعد صحي ذكي يساعد المستخدم على اتخاذ قرارات أفضل بناءً على بياناته وسلوكه.
+        </aside>
+      </section>
+
+      <!-- ===================== 19: الخاتمة ===================== -->
+      <section data-background-color="#0d9488">
+        <div class="slide closing">
+          <div class="s-head">
+            <div class="s-num">18</div>
+            <div class="s-titles">
+              <span class="kicker" style="color:#d3fff7">الخاتمة</span>
+              <h2>FitLife كحل تقني <span style="color:#bff7ec">متكامل</span></h2>
+            </div>
+          </div>
+          <div class="s-body">
+            <p class="lead">منصة رقمية متكاملة تربط العملاء والمدربين وأخصائيي التغذية والإدارة داخل نظام واحد منظم.</p>
+            <div class="split" style="margin-top:24px">
+              <ul class="checks">
+                <li>يعالج مشاكل النظام التقليدي</li>
+                <li>ينظّم الخطط والمتابعة</li>
+                <li>يحسّن التواصل بين العميل والمختص</li>
+                <li>يدعم الدفع المحلي</li>
+              </ul>
+              <ul class="checks">
+                <li>يوفّر تجربة استخدام واضحة</li>
+                <li>قابل للتوسع والتطوير مستقبلًا</li>
+                <li>يساهم في التحول الرقمي للصحة والرياضة</li>
+                <li>حل واقعي لمشكلة قائمة في السوق</li>
+              </ul>
+            </div>
+            <p class="lead center" style="margin-top:34px;font-weight:800;font-size:34px;color:#ffffff">شكرًا لاستماعكم — أسئلتكم ومناقشتكم محل ترحيب 🌿</p>
+          </div>
+        </div>
+        <aside class="notes">
+          يمكن اعتبار FitLife أكثر من مشروع تخرج، فهو يقدم حلًا واقعيًا لمشكلة موجودة في السوق، ويجمع بين هندسة البرمجيات والخدمات الصحية والتحول الرقمي في منصة واحدة.
+        </aside>
+      </section>
+
+    </div>
+  </div>
+
+  <script src="vendor/reveal.js"></script>
+  <script src="vendor/notes.js"></script>
+  <script>
+    Reveal.initialize({
+      width: 1280,
+      height: 720,
+      margin: 0.0,
+      minScale: 0.2,
+      maxScale: 2.0,
+      center: false,
+      hash: true,
+      rtl: true,
+      slideNumber: 'c/t',
+      transition: 'slide',
+      transitionSpeed: 'default',
+      plugins: [ RevealNotes ]
+    });
+  </script>
+</body>
+</html>

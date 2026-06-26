@@ -5,7 +5,7 @@ class CurrentBodyStats {
   final double? muscleMassKg;
   final String? recordedAt;
 
-  const CurrentBodyStats({
+  const CurrentBodyStats({      //current body stats
     this.weightKg,
     this.bodyFatPct,
     this.muscleMassKg,

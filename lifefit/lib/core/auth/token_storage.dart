@@ -1,6 +1,6 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-/// Persists the Sanctum bearer token. Read by [ApiService] on each request.
+/// Persists the Sanctum bearer token. Read by [BaseService] on each request.
 class TokenStorage {
   static const _storage = FlutterSecureStorage();
   static const _keyToken = 'auth_token';

@@ -8,7 +8,7 @@ import '../../../core/services/profile_web_service.dart';
 
 /// Manages [ClientProfileBundle] from GET/PUT /api/client/profile.
 class ClientProfileNotifier
-    extends StateNotifier<AsyncValue<ClientProfileBundle>> {
+  extends StateNotifier<AsyncValue<ClientProfileBundle>> {
   final ProfileService _service;
 
   ClientProfileNotifier(this._service) : super(const AsyncValue.loading()) {

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'auth_state.dart';
 import 'token_storage.dart';
 import '../models/user.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 /// Global auth state. Watch via `ref.watch(authProvider)`; mutate via `ref.read(authProvider.notifier)`.
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
@@ -13,7 +13,7 @@ final authProvider = StateNotifierProvider<AuthNotifier, AuthState>(
 
 /// Handles login/register/logout and session restore. Token persistence lives in [TokenStorage].
 class AuthNotifier extends StateNotifier<AuthState> {
-  final ApiService _api = ApiService();
+  final AuthService _auth = AuthService();
 
   AuthNotifier() : super(const AuthState());
 
@@ -28,7 +28,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return;
       }
 
-      final user = await _api.fetchCurrentUser();
+      final user = await _auth.fetchCurrentUser();
       state = state.copyWith(user: user, isInitializing: false, isLoading: false);
     } catch (_) {
       // Stale or invalid token — clear storage so the user is sent to login.
@@ -43,7 +43,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Clears API token and resets state; does not set [AuthState.isInitializing] back to true.
   Future<void> logout() async {
-    await _api.logout();
+    await _auth.logout();
     state = const AuthState(isInitializing: false, isLoading: false);
   }
 
@@ -52,12 +52,12 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(user: user);
   }
 
-  /// On success, [ApiService] stores the token; this notifier only updates [User].
+  /// On success, [AuthService] stores the token; this notifier only updates [User].
   Future<void> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final response = await _api.login(email, password);
+      final response = await _auth.login(email, password);
       final user = User.fromJson(response.data['user']);
 
       state = state.copyWith(
@@ -79,7 +79,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      final response = await _api.register(
+      final response = await _auth.register(
         name: name,
         email: email,
         password: password,
@@ -111,7 +111,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
         return data['message'];
       }
 
-      return "خطأ من السيرفر (${status})";
+      return "خطأ من السيرفر $status";
     }
 
     if (e.type == DioExceptionType.connectionTimeout ||

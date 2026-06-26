@@ -35,12 +35,35 @@ class User {
 
   /// Prefer this in UI over [avatar].
   String? get displayAvatarUrl {
-    final url = avatarUrl?.trim();
-    if (url != null && url.isNotEmpty) return url;
+    final url = _normalizeAvatarUrl(avatarUrl);
+    if (url != null) return url;
+    final fallback = _normalizeAvatarUrl(avatar);
+    if (fallback != null) return fallback;
     return null;
   }
 
-  /// Local merge after profile/account edits; does not PATCH the API by itself.
+  static String? _normalizeAvatarUrl(String? value) {
+    final raw = value?.trim();
+    if (raw == null || raw.isEmpty) return null;
+
+    final embeddedHttpIndex = raw.lastIndexOf('http://');
+    final embeddedHttpsIndex = raw.lastIndexOf('https://');
+    final embeddedIndex = embeddedHttpsIndex > embeddedHttpIndex
+        ? embeddedHttpsIndex
+        : embeddedHttpIndex;
+
+    if (embeddedIndex > 0) {
+      return raw.substring(embeddedIndex);
+    }
+
+    if (raw.startsWith('http://') || raw.startsWith('https://')) {
+      return raw;
+    }
+
+    return null;
+  }
+
+  //copy with is used to create a new instance of the user with the updated values
   User copyWith({
     String? name,
     String? email,

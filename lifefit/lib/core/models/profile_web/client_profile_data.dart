@@ -6,7 +6,7 @@ class ClientProfileData {
   final String? birthDate;
   final String? gender;
 
-  const ClientProfileData({
+  const ClientProfileData({ //profile details
     this.heightCm,
     this.targetWeightKg,
     this.goalNotes,
@@ -24,7 +24,7 @@ class ClientProfileData {
     );
   }
 
-  static double? _toDouble(dynamic v) {
+  static double? _toDouble(dynamic v) {    //helper function to convert to double
     if (v == null) return null;
     if (v is num) return v.toDouble();
     return double.tryParse(v.toString());

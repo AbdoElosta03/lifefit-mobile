@@ -13,13 +13,25 @@ class ExerciseVideoCard extends StatelessWidget {
     this.primary = AppColors.primary,
   });
 
-  Future<void> _open() async {
-    // Launch video in external player.
+  Future<void> _open(BuildContext context) async {
     final uri = Uri.tryParse(videoUrl);
-    if (uri == null) return;
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    if (uri == null) {
+      _showError(context, 'رابط الفيديو غير صالح');
+      return;
     }
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+    if (!launched && context.mounted) {
+      _showError(context, 'تعذّر فتح الفيديو. تأكد من وجود متصفح أو تطبيق يوتيوب.');
+    }
+  }
+
+  void _showError(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -63,7 +75,7 @@ class ExerciseVideoCard extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton.icon(
-              onPressed: _open,
+              onPressed: () => _open(context),
               icon: Icon(Icons.open_in_new_rounded, size: 18, color: primary),
               label: Text(
                 'مشاهدة الفيديو',

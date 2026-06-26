@@ -3,10 +3,11 @@ import 'client_profile_data.dart';
 import 'current_body_stats.dart';
 
 /// Root response from GET/PUT `/api/client/profile`.
+//root for profile bundle contains user, profile, and current stats
 class ClientProfileBundle {
-  final ProfileUser user;
-  final ClientProfileData profile;
-  final CurrentBodyStats currentStats;
+  final ProfileUser user; //user details
+  final ClientProfileData profile; //profile details
+  final CurrentBodyStats currentStats; //current body stats
 
   const ClientProfileBundle({
     required this.user,

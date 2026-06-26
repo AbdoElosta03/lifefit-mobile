@@ -29,7 +29,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   static const _accent = AppColors.primary;
 
   @override
-  void initState() {
+  void initState() {  // inittState  used to initialize the state of the widget
     super.initState();
     // Seed controllers from the bundle passed by ProfileScreen.
     final p = widget.initial.profile;
@@ -46,7 +46,7 @@ class _ProfileEditSheetState extends ConsumerState<ProfileEditSheet> {
   }
 
   @override
-  void dispose() {
+  void dispose() { //dispose is used to clear data from the state of the widget
     _birthCtrl.dispose();
     _heightCtrl.dispose();
     _targetWeightCtrl.dispose();

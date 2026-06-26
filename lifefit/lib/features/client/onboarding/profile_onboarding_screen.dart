@@ -75,11 +75,20 @@ class _ProfileOnboardingScreenState extends ConsumerState<ProfileOnboardingScree
       ref.read(authProvider).user?.name.split(' ').first ?? 'بك';
 
   Future<void> _pickBirthDate() async {
+    final firstDate = DateTime(1940);
+    final lastDate = DateTime.now();
+    final initialDate = switch (_birthDate) {
+      null => DateTime(2000),
+      final date when date.isBefore(firstDate) => firstDate,
+      final date when date.isAfter(lastDate) => lastDate,
+      final date => date,
+    };
+
     final picked = await showDatePicker(
       context: context,
-      initialDate: _birthDate ?? DateTime(2000),
-      firstDate: DateTime(1940),
-      lastDate: DateTime.now(),
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
       locale: const Locale('ar', 'EG'),
       builder: (context, child) {
         return Theme(

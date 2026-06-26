@@ -161,7 +161,7 @@ class TrainersExpertCard extends ConsumerWidget {
                                 color: AppColors.primary,
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            SizedBox(width: 4),
                             Icon(
                               Icons.check_circle,
                               size: 14,

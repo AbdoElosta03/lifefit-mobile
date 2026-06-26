@@ -114,7 +114,7 @@ class _ProfileBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 8),
                 // Avatar widget.
-                _Avatar(url: u.avatarUrl),
+                _Avatar(url: u.displayAvatarUrl),
                 const SizedBox(height: 12),
                 // User name.
                 Text(
