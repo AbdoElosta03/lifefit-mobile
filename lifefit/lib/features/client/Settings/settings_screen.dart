@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../../../core/models/user.dart';
 import '../../../core/ui/app_colors.dart';
+import '../../../core/ui/widgets/app_network_image.dart';
 import 'account_edit_sheet.dart';
 import 'change_password_sheet.dart';
 import 'settings_provider.dart';
@@ -205,12 +206,11 @@ class _SettingsBody extends ConsumerWidget {
                 color: Colors.white,
                 shape: BoxShape.circle,
               ),
-              child: CircleAvatar(
+              child: AppCircleAvatar(
+                url: avatarUrl,
                 radius: 50,
                 backgroundColor: AppColors.primary,
-                backgroundImage:
-                    avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl == null
+                child: resolveAppImageUrl(avatarUrl) == null
                     ? const Icon(Icons.person, size: 60, color: Colors.white)
                     : null,
               ),

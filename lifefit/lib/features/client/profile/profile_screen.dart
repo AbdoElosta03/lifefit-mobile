@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/ui/app_colors.dart';
+import '../../../core/ui/widgets/app_network_image.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/profile_web/client_profile_bundle.dart';
@@ -256,11 +257,12 @@ class _Avatar extends StatelessWidget {
         shape: BoxShape.circle,
         border: Border.all(color: ProfileScreen._accent, width: 2.5),
       ),
-      child: CircleAvatar(
+      child: AppCircleAvatar(
+        url: u,
         radius: 48,
         backgroundColor: ProfileScreen._headerColor,
-        backgroundImage: u != null && u.isNotEmpty ? NetworkImage(u) : null,
-        child: u == null || u.isEmpty
+        fallbackIcon: Icons.person_rounded,
+        child: resolveAppImageUrl(u) == null
             ? const Icon(Icons.person_rounded,
                 size: 52, color: ProfileScreen._accent)
             : null,

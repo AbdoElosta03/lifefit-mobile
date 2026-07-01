@@ -1,11 +1,11 @@
 import 'package:dio/dio.dart';
 import '../auth/token_storage.dart';
+import '../config/server_config.dart';
 
 /// Shared HTTP client for all Laravel API services.
 /// Configures Dio with the base URL and auto-injects the Bearer token.
 class BaseService {
-  /// 10.0.2.2 = Android emulator alias for host machine localhost.
-  final String baseUrl = "http://10.0.2.2:8000/api/";
+  final String baseUrl = ServerConfig.apiBaseUrl;
   late Dio dio;
 
   BaseService() {

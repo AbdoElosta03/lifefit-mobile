@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
+import '../../../../core/ui/widgets/app_network_image.dart';
 import '../../../../core/models/programs/program_assignment_summary.dart';
 import 'package:intl/intl.dart';
 
 /// Card showing summary info for a single program assignment.
 class ProgramSummaryCard extends StatelessWidget {
   final ProgramAssignmentSummary item;
-  final String imageUrl;
+  final String? imageUrl;
   final VoidCallback onTap;
 
   const ProgramSummaryCard({
@@ -262,14 +263,14 @@ class _InfoChip extends StatelessWidget {
 }
 
 class _TrainerAvatar extends StatelessWidget {
-  final String url;
+  final String? url;
   const _TrainerAvatar({required this.url});
 
   @override
   Widget build(BuildContext context) {
     const size = 52.0;
     Widget inner;
-    if (url.isEmpty) {
+    if (resolveAppImageUrl(url) == null) {
       inner = CircleAvatar(
         radius: size / 2,
         backgroundColor: AppColors.primary.withOpacity(0.2),
@@ -277,12 +278,11 @@ class _TrainerAvatar extends StatelessWidget {
       );
     } else {
       inner = ClipOval(
-        child: Image.network(
-          url,
+        child: AppNetworkImage(
+          url: url,
           width: size,
           height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => CircleAvatar(
+          errorWidget: CircleAvatar(
             radius: size / 2,
             backgroundColor: AppColors.primary.withOpacity(0.2),
             child: const Icon(Icons.person, color: AppColors.primary),

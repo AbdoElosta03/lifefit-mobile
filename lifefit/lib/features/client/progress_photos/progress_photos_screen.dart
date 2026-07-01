@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/ui/app_colors.dart';
+import '../../../core/ui/widgets/app_network_image.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -211,10 +212,10 @@ class _PhotoTile extends StatelessWidget {
         fit: StackFit.expand,
         children: [
           if (url.isNotEmpty)
-            Image.network(
-              url,
+            AppNetworkImage(
+              url: url,
               fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => Container(
+              errorWidget: Container(
                 color: Colors.grey[200],
                 child: const Icon(Icons.broken_image_outlined, size: 40, color: Colors.grey),
               ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/ui/app_colors.dart';
-import '../../../core/services/client_program_service.dart';
 import 'client_programs_provider.dart';
 import 'widgets/program_header.dart';
 import 'widgets/schedule_section.dart';
@@ -17,7 +16,6 @@ class ClientProgramDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     // Watch the individual program assignment detail
     final async = ref.watch(clientProgramDetailProvider(assignmentId));
-    final service = ClientProgramService();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -47,8 +45,7 @@ class ClientProgramDetailScreen extends ConsumerWidget {
                 SliverToBoxAdapter(
                   child: ProgramDetailHeader(
                     detail: detail,
-                    trainerImageUrl: service
-                        .resolveMediaUrl(detail.trainer.profileImage),
+                    trainerImageUrl: detail.trainer.profileImage,
                     onBack: () => Navigator.pop(context),
                   ),
                 ),
@@ -97,7 +94,6 @@ class ClientProgramDetailScreen extends ConsumerWidget {
                       delegate: SliverChildBuilderDelegate(
                         (_, i) => ScheduleSection(
                           entry: detail.schedules[i],
-                          service: service,
                         ),
                         childCount: detail.schedules.length,
                       ),

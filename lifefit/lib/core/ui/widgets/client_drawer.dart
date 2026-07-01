@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app_colors.dart';
+import 'app_network_image.dart';
 import '../../auth/auth_provider.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
 import '../../../features/client/Settings/settings_screen.dart';
@@ -202,20 +203,10 @@ class _UserAvatar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (url != null && url!.isNotEmpty) {
-      return CircleAvatar(
-        radius: radius,
-        backgroundColor: Colors.grey[200],
-        backgroundImage: NetworkImage(url!),
-        onBackgroundImageError: (_, __) {},
-        child: null,
-      );
-    }
-    return CircleAvatar(
+    return AppCircleAvatar(
+      url: url,
       radius: radius,
-      backgroundColor: AppColors.primary.withValues(alpha: 0.15),
-      child: Icon(Icons.person,
-          size: radius * 1.1, color: AppColors.primary),
+      backgroundColor: Colors.grey[200],
     );
   }
 }

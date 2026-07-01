@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/ui/app_colors.dart';
-import '../../../core/services/client_program_service.dart';
 import 'client_program_detail_screen.dart';
 import 'client_programs_provider.dart';
 import 'widgets/program_card.dart';
@@ -16,7 +15,6 @@ class ClientProgramsScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final async = ref.watch(clientProgramsProvider);
-    final service = ClientProgramService();
 
     return Scaffold(
       backgroundColor: AppColors.background,
@@ -113,7 +111,7 @@ class ClientProgramsScreen extends ConsumerWidget {
                     delegate: SliverChildBuilderDelegate(
                       (context, i) => ProgramSummaryCard(
                         item: list[i],
-                        imageUrl: service.resolveMediaUrl(list[i].trainerImage),
+                        imageUrl: list[i].trainerImage,
                         onTap: () => Navigator.of(context).push(
                           MaterialPageRoute<void>(
                             builder: (_) => ClientProgramDetailScreen(

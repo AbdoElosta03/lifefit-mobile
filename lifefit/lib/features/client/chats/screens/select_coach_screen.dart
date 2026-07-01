@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
+import '../../../../core/ui/widgets/app_network_image.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -226,9 +227,9 @@ class _Avatar extends StatelessWidget {
           shape: BoxShape.circle,
           border: Border.all(color: AppColors.primary.withOpacity(0.2)),
         ),
-        child: CircleAvatar(
+        child: AppCircleAvatar(
+          url: url,
           radius: 26,
-          backgroundImage: NetworkImage(url!),
           backgroundColor: Colors.grey[100],
         ),
       );

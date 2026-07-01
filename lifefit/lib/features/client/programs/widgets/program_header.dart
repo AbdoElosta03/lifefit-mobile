@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
+import '../../../../core/ui/widgets/app_network_image.dart';
 import '../../../../core/models/programs/client_program_detail.dart';
 import 'package:intl/intl.dart';
 
 /// Top header for the program detail screen, using a thematic gradient background.
 class ProgramDetailHeader extends StatelessWidget {
   final ClientProgramDetail detail;
-  final String trainerImageUrl;
+  final String? trainerImageUrl;
   final VoidCallback onBack;
 
   const ProgramDetailHeader({
@@ -296,14 +297,14 @@ class _VDivider extends StatelessWidget {
 }
 
 class _TrainerAvatarWhite extends StatelessWidget {
-  final String url;
+  final String? url;
   const _TrainerAvatarWhite({required this.url});
 
   @override
   Widget build(BuildContext context) {
     const size = 54.0;
     Widget child;
-    if (url.isEmpty) {
+    if (resolveAppImageUrl(url) == null) {
       child = CircleAvatar(
         radius: size / 2,
         backgroundColor: Colors.white.withOpacity(0.3),
@@ -311,12 +312,11 @@ class _TrainerAvatarWhite extends StatelessWidget {
       );
     } else {
       child = ClipOval(
-        child: Image.network(
-          url,
+        child: AppNetworkImage(
+          url: url,
           width: size,
           height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => CircleAvatar(
+          errorWidget: CircleAvatar(
             radius: size / 2,
             backgroundColor: Colors.white.withOpacity(0.3),
             child: const Icon(Icons.person, color: Colors.white),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/ui/app_colors.dart';
+import '../../../core/ui/widgets/app_network_image.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/models/workout/today_schedule.dart';
@@ -210,18 +211,13 @@ class WorkoutDetailScreen extends ConsumerWidget {
       child: ClipRRect(
         borderRadius: BorderRadius.circular(25),
         child: url != null && url.isNotEmpty
-            ? Image.network(
-                url,
+            ? AppNetworkImage(
+                url: url,
                 fit: BoxFit.cover,
                 width: double.infinity,
                 height: 250,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return const Center(
-                    child: CircularProgressIndicator(color: _primary),
-                  );
-                },
-                errorBuilder: (_, __, ___) => const Center(
+                loadingColor: Colors.white,
+                errorWidget: const Center(
                   child:
                       Icon(Icons.fitness_center, size: 50, color: Colors.grey),
                 ),

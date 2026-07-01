@@ -7,16 +7,6 @@ import 'base_service.dart';
 /// Assigned workout/nutrition programs from the coach.
 /// `GET /api/client/programs`, `GET /api/client/programs/{id}`.
 class ClientProgramService extends BaseService {
-  /// Turns a relative storage path (e.g. `avatars/...`) into a full URL.
-  String resolveMediaUrl(String? path) {
-    if (path == null || path.isEmpty) return '';
-    if (path.startsWith('http://') || path.startsWith('https://')) return path;
-    final origin = Uri.parse(baseUrl).origin;
-    final clean = path.startsWith('/') ? path.substring(1) : path;
-    if (clean.startsWith('storage/')) return '$origin/$clean';
-    return '$origin/storage/$clean';
-  }
-
   /// GET `/api/client/programs` — list of program assignments for the client.
   Future<List<ProgramAssignmentSummary>> fetchPrograms() async {
     try {

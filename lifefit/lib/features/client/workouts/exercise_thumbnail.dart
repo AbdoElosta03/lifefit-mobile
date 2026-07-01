@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../core/ui/app_colors.dart';
+import '../../../core/ui/widgets/app_network_image.dart';
 
 /// Compact thumbnail for exercise list rows — image only, no video.
 class ExerciseThumbnail extends StatelessWidget {
@@ -27,26 +28,11 @@ class ExerciseThumbnail extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             if (url != null && url.isNotEmpty)
-              Image.network(
-                url,
+              AppNetworkImage(
+                url: url,
                 fit: BoxFit.cover,
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return const ColoredBox(
-                    color: Color(0xFFF0F0F0),
-                    child: Center(
-                      child: SizedBox(
-                        width: 22,
-                        height: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                  );
-                },
-                errorBuilder: (_, __, ___) => _placeholder(),
+                placeholder: _placeholder(),
+                errorWidget: _placeholder(),
               )
             else
               _placeholder(),

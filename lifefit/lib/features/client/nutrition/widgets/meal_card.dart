@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
+import '../../../../core/ui/widgets/app_network_image.dart';
 import '../../../../core/models/nutrition/meal_schedule.dart';
 
 /// Displays one scheduled meal; callbacks delegate actions to parent screen.
@@ -204,12 +205,12 @@ class _MealImage extends StatelessWidget {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          imageUrl!,
+        child: AppNetworkImage(
+          url: imageUrl,
           width: 58,
           height: 58,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(),
+          placeholder: _placeholder(),
+          errorWidget: _placeholder(),
         ),
       );
     }

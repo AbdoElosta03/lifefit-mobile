@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../app_colors.dart';
+import 'app_network_image.dart';
 import '../../auth/auth_provider.dart';
 import '../../../features/client/profile/profile_screen.dart';
 import '../../../features/client/notifications/notifications_screen.dart';
@@ -13,7 +14,7 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
 
   const CustomAppBar({
     super.key,
-    required this.title,
+    required this.title, 
   });
 
   @override
@@ -23,6 +24,12 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
     final badgeLabel = unread > 99 ? '99+' : '$unread';
     final user = ref.watch(authProvider).user;
     final avatarUrl = user?.displayAvatarUrl;
+
+    debugPrint('═══ Profile Image Debug ═══');
+    debugPrint('avatar_url (from API): ${user?.avatarUrl}');
+    debugPrint('avatar (from API): ${user?.avatar}');
+    debugPrint('displayAvatarUrl: $avatarUrl');
+    debugPrint('resolved URL: ${resolveAppImageUrl(avatarUrl)}');
 
     return AppBar(
       backgroundColor: Colors.white,
@@ -141,28 +148,27 @@ class _AvatarWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (url != null && url!.isNotEmpty) {
-      return Container(
-        width: 38,
-        height: 38,
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          image: DecorationImage(
-            image: NetworkImage(url!),
-            fit: BoxFit.cover,
-            onError: (_, __) {},
-          ),
-          color: AppColors.primary.withValues(alpha: 0.1),
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(12),
+        child: AppNetworkImage(
+          url: url,
+          width: 38,
+          height: 38,
+          placeholder: _fallback(),
+          errorWidget: _fallback(),
         ),
       );
     }
-    return Container(
-      width: 38,
-      height: 38,
-      decoration: BoxDecoration(
-        color: AppColors.primary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Icon(Icons.person, color: AppColors.primary, size: 22),
-    );
+    return _fallback();
   }
+
+  Widget _fallback() => Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Icon(Icons.person, color: AppColors.primary, size: 22),
+      );
 }

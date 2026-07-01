@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/ui/app_colors.dart';
+import '../../../../core/ui/widgets/app_network_image.dart';
 
 import '../../../../core/models/subscription/expert_model.dart';
 import 'expert_subscription_payment.dart';
@@ -225,12 +226,11 @@ class _GradientAvatar extends StatelessWidget {
     Widget inner;
     if (url != null && url!.isNotEmpty) {
       inner = ClipOval(
-        child: Image.network(
-          url!,
+        child: AppNetworkImage(
+          url: url,
           width: size,
           height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _fallback(size),
+          errorWidget: _fallback(size),
         ),
       );
     } else {

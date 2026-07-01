@@ -25,28 +25,39 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      locale: const Locale('ar', 'EG'),
-      supportedLocales: const [
-        Locale('ar', 'EG'),
-        Locale('en', 'US'),
-      ],
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      theme: ThemeData(
-        useMaterial3: true,
-        fontFamily: 'Tajawal',
-        scaffoldBackgroundColor: AppColors.background,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: AppColors.primary,
-          surface: AppColors.background,
-        ),
-      ),
-      home: AppEntry(),
+return MaterialApp(
+  debugShowCheckedModeBanner: false,
+
+  supportedLocales: const [
+    Locale('ar', 'EG'),
+    Locale('en', 'US'),
+  ],
+
+  localizationsDelegates: const [
+    GlobalMaterialLocalizations.delegate,
+    GlobalWidgetsLocalizations.delegate,
+    GlobalCupertinoLocalizations.delegate,
+  ],
+
+  builder: (context, child) {
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: child!,
     );
-  }
+  },
+
+  theme: ThemeData(
+    useMaterial3: true,
+    fontFamily: 'Tajawal',
+    scaffoldBackgroundColor: AppColors.background,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: AppColors.primary,
+      surface: AppColors.background,
+    ),
+  ),
+
+  home: AppEntry(),
+);
+
+}
 }

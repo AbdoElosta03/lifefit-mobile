@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/ui/app_colors.dart';
 import '../../../../core/models/programs/client_program_detail.dart';
-import '../../../../core/services/client_program_service.dart';
+import '../../../../core/ui/widgets/app_network_image.dart';
 
 /// Collapsible section for a specific workout schedule in the program.
 class ScheduleSection extends StatelessWidget {
   final ProgramScheduleEntry entry;
-  final ClientProgramService service;
 
   const ScheduleSection({
     super.key,
     required this.entry,
-    required this.service,
   });
 
   @override
@@ -110,7 +108,7 @@ class ScheduleSection extends StatelessWidget {
                 )
               else
                 ...w.exercises.map(
-                  (e) => _ExerciseRow(exercise: e, service: service),
+                  (e) => _ExerciseRow(exercise: e),
                 ),
             ],
           ),
@@ -122,14 +120,11 @@ class ScheduleSection extends StatelessWidget {
 
 class _ExerciseRow extends StatelessWidget {
   final ProgramExerciseRow exercise;
-  final ClientProgramService service;
 
-  const _ExerciseRow({required this.exercise, required this.service});
+  const _ExerciseRow({required this.exercise});
 
   @override
   Widget build(BuildContext context) {
-    final img = service.resolveMediaUrl(exercise.imageUrl);
-
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       padding: const EdgeInsets.all(10),
@@ -140,7 +135,7 @@ class _ExerciseRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _ExerciseImage(url: img),
+          _ExerciseImage(url: exercise.imageUrl),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -220,21 +215,20 @@ class _MetaChip extends StatelessWidget {
 }
 
 class _ExerciseImage extends StatelessWidget {
-  final String url;
+  final String? url;
   const _ExerciseImage({required this.url});
 
   @override
   Widget build(BuildContext context) {
     const size = 66.0;
-    if (url.isNotEmpty) {
+    if (resolveAppImageUrl(url) != null) {
       return ClipRRect(
         borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          url,
+        child: AppNetworkImage(
+          url: url,
           width: size,
           height: size,
-          fit: BoxFit.cover,
-          errorBuilder: (_, __, ___) => _placeholder(),
+          errorWidget: _placeholder(),
         ),
       );
     }
